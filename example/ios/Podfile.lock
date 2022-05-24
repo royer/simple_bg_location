@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - simple_bg_location (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - simple_bg_location (from `.symlinks/plugins/simple_bg_location/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  simple_bg_location:
+    :path: ".symlinks/plugins/simple_bg_location/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  simple_bg_location: 0bca90818b9500f015716382672ee6a98f6f3f38
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.11.3

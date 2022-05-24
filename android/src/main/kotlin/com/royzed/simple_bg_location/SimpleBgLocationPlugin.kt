@@ -17,7 +17,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, MethodCallHandler {
   private lateinit var channel : MethodChannel
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "simple_bg_location")
+    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "com.royzed.simple_bg_location/methods")
     channel.setMethodCallHandler(this)
   }
 

@@ -3,7 +3,7 @@ import UIKit
 
 public class SwiftSimpleBgLocationPlugin: NSObject, FlutterPlugin {
   public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "simple_bg_location", binaryMessenger: registrar.messenger())
+    let channel = FlutterMethodChannel(name: "com.royzed.simple_bg_location/methods", binaryMessenger: registrar.messenger())
     let instance = SwiftSimpleBgLocationPlugin()
     registrar.addMethodCallDelegate(instance, channel: channel)
   }

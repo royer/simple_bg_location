@@ -19,7 +19,7 @@ class MethodCallHandlerImpl : MethodChannel.MethodCallHandler {
     private var _channel : MethodChannel? = null
     private val channel : MethodChannel get() = _channel!!
 
-    private lateinit var _context: Context
+    private var _context: Context? = null
     private val context get() = _context!!
 
 

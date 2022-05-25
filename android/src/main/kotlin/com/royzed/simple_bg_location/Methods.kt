@@ -1,4 +1,5 @@
 package com.royzed.simple_bg_location
 
-class Methods {
+object Methods {
+    const val checkPermission = "checkPermission"
 }

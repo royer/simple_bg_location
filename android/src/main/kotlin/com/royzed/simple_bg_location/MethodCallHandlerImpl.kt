@@ -2,13 +2,18 @@ package com.royzed.simple_bg_location
 
 import android.content.Context
 import android.util.Log
+import com.royzed.simple_bg_location.errors.ErrorCodes
+import com.royzed.simple_bg_location.errors.PermissionUndefinedException
+import com.royzed.simple_bg_location.permission.PermissionManager
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
 private const val TAG = "MethodCallHandlerImpl"
 
-class MethodCallHandlerImpl : MethodChannel.MethodCallHandler {
+class MethodCallHandlerImpl(
+    val permissionManager: PermissionManager
+) : MethodChannel.MethodCallHandler {
 
 
 
@@ -26,10 +31,14 @@ class MethodCallHandlerImpl : MethodChannel.MethodCallHandler {
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
-        } else {
+        } else if (call.method == Methods.checkPermission)  {
+            onCheckPermission(result)
+        }
+        else {
             result.notImplemented()
         }
     }
+
 
     fun startListening(context: Context, messenger: BinaryMessenger) {
         if (_channel != null) {
@@ -50,4 +59,19 @@ class MethodCallHandlerImpl : MethodChannel.MethodCallHandler {
         channel.setMethodCallHandler(null)
         _channel = null
     }
+
+    private fun onCheckPermission(result: MethodChannel.Result) {
+        try {
+            val permission = permissionManager.checkPermissionStatus(context)
+            result.success(permission.ordinal)
+
+        } catch (e: PermissionUndefinedException) {
+            Log.e(TAG,"onCheckPermission() got Exception: $e")
+            val errorCode = ErrorCodes.permissionDefinitionsNotFound
+            result.error(errorCode.code, errorCode.description, null)
+        }
+    }
+
+
+
 }

@@ -24,10 +24,6 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('getPlatformVersion() has not been implemented.');
-  }
-
   /// Returns a [Future]<`LocationPermission`> indicating if the user allows the
   /// App to access the device's location
   Future<LocationPermission> checkPermission() {

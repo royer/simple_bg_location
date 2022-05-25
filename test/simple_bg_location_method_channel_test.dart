@@ -14,7 +14,6 @@ void main() {
   group('normal return test group', () {
     setUp(() {
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
-        if (methodCall.method == Methods.getPlatformVersion) return '42';
         if (methodCall.method == Methods.checkPermission) {
           return LocationPermission.always.index;
         }
@@ -25,10 +24,6 @@ void main() {
       channel.setMockMethodCallHandler(null);
     });
 
-    test('getPlatformVersion', () async {
-      expect(await platform.getPlatformVersion(), '42');
-    });
-
     test('checkPermission', () async {
       expect(await platform.checkPermission(), LocationPermission.always);
     });
@@ -37,7 +32,6 @@ void main() {
   group('exception test', () {
     setUp(() {
       channel.setMockMethodCallHandler((MethodCall methodCall) async {
-        if (methodCall.method == Methods.getPlatformVersion) return '42';
         if (methodCall.method == Methods.checkPermission) return 25;
       });
     });

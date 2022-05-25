@@ -1,4 +1,4 @@
 package com.royzed.simple_bg_location.errors
 
-class PermissionUndefinedException {
+class PermissionUndefinedException : Exception() {
 }

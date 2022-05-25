@@ -1,6 +1,6 @@
 package com.royzed.simple_bg_location.permission;
 
-public enum LocationPermission {
+enum class LocationPermission {
     denied,
     deniedForever,
     whileInUse,

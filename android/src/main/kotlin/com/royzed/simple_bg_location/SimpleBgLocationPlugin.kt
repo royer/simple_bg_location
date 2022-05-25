@@ -55,7 +55,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
     unregisterListeners()
 
     if (activityPluginBinding != null) {
-      TODO("unbindService")
+      // TODO "unbindService"
       activityPluginBinding = null
     }
   }
@@ -64,7 +64,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
     if (activityPluginBinding != null) {
       activityPluginBinding!!.addRequestPermissionsResultListener(permissionManager)
     } else {
-      Log.d(TAG, "SHOULDN'T -> registerListeners() activityPluginBindinng = null!" )
+      Log.d(TAG, "SHOULDN'T -> registerListeners() activityPluginBinding = null!" )
     }
   }
 
@@ -72,7 +72,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
     if (activityPluginBinding != null) {
       activityPluginBinding!!.removeRequestPermissionsResultListener(permissionManager)
     } else {
-      Log.d(TAG, "SHOULDN'T -> unregisterListeners() activityPluginBinding = ulll!")
+      Log.d(TAG, "SHOULDN'T -> unregisterListeners() activityPluginBinding = null!")
     }
   }
 

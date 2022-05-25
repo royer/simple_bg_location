@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 
 class OtherApiBody extends StatefulWidget {
@@ -54,9 +53,15 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       setState(() {
         _resultInfo += "successful: $result";
       });
-    } on PlatformException catch (e) {
+    } on PermissionDefinitionsNotFoundException catch (e) {
       setState(() {
-        _resultInfo += "failed.\nException: ${e.message}";
+        _resultInfo +=
+            'failed.\nException: ${e.runtimeType}\n"${e.toString()}"';
+      });
+    } on Exception catch (e) {
+      setState(() {
+        _resultInfo +=
+            'failed.\nOther Exception: ${e.runtimeType}\n"${e.toString()}"';
       });
     }
   }

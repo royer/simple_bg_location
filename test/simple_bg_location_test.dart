@@ -12,6 +12,10 @@ class MockSimpleBgLocationPlatform
   @override
   Future<LocationPermission> checkPermission() =>
       Future.value(LocationPermission.always);
+
+  @override
+  Future<LocationPermission> requestPermission() =>
+      Future.value(LocationPermission.always);
 }
 
 void main() {
@@ -28,6 +32,15 @@ void main() {
     SimpleBgLocationPlatform.instance = fakePlatform;
 
     expect(await simpleBgLocationPlugin.checkPermission(),
+        LocationPermission.always);
+  });
+
+  test('requestPermission', () async {
+    SimpleBgLocation simpleBgLocationPlugin = SimpleBgLocation();
+    MockSimpleBgLocationPlatform fakePlatform = MockSimpleBgLocationPlatform();
+    SimpleBgLocationPlatform.instance = fakePlatform;
+
+    expect(await simpleBgLocationPlugin.requestPermission(),
         LocationPermission.always);
   });
 }

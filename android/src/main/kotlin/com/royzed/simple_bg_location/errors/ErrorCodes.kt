@@ -8,7 +8,7 @@ enum class ErrorCodes(val code: String, val description: String) {
                 "are defined in the manifest."
     ),
     permissioDenied(
-        "PERMISSION_DENNIED",
+        "PERMISSION_DENIED",
         "User denied permissions to access the device's location."
     )
 }

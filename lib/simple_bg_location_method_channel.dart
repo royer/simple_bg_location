@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_bg_location/src/errors/location_permission_exception.dart';
+import 'src/errors/errors.dart';
 import 'src/enums/enums.dart';
 
 import 'simple_bg_location_platform_interface.dart';
@@ -9,6 +9,7 @@ const _pluginPath = "com.royzed.simple_bg_location";
 
 class Methods {
   static const checkPermission = 'checkPermission';
+  static const requestPermission = "requestPermission";
 }
 
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
@@ -25,8 +26,31 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
 
       return permission.toLocationPermission();
     } on PlatformException catch (e) {
-      final error = e;
+      final error = _handlePlatformException(e);
       throw error;
+    }
+  }
+
+  @override
+  Future<LocationPermission> requestPermission() async {
+    try {
+      final int permission =
+          await methodChannel.invokeMethod(Methods.requestPermission);
+      return permission.toLocationPermission();
+    } on PlatformException catch (e) {
+      final error = _handlePlatformException(e);
+      throw error;
+    }
+  }
+
+  Exception _handlePlatformException(PlatformException exception) {
+    switch (exception.code) {
+      case 'PERMISSION_DEFINITIONS_NOT_FOUND':
+        return PermissionDefinitionsNotFoundException(exception.message);
+      case 'PERMISSION_DENIED':
+        return PermissionDeniedException(exception.message);
+      default:
+        return exception;
     }
   }
 }

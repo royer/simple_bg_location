@@ -33,7 +33,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-    //TODO set methodCallHandler.activity
+    methodCallHandler.setActivity(binding.activity)
     activityPluginBinding = binding
     //TODO binding Service
 

@@ -1,14 +1,23 @@
 package com.royzed.simple_bg_location.permission
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
+typealias PermissionResultCallback = (LocationPermission ) -> Unit
+typealias ErrorCallback = (ErrorCodes) -> Unit
 
 class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener {
+
+    private var activity: Activity? = null
+    private var permissionResultCallback: PermissionResultCallback? = null
+    private var errorCallback: ErrorCallback? = null
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -58,6 +67,34 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         return LocationPermission.whileInUse
     }
 
+    fun requestPermission(
+        activity: Activity,
+        errorCallback: ErrorCallback?,
+        resultCallback: PermissionResultCallback) {
+
+        // Before Android M, requesting permissions was not needed.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            resultCallback(LocationPermission.always)
+            return
+        }
+
+        val permissionsToRequest = getLocationPermissionsFromManifest(activity).toMutableList()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+            && hasPermissionInManifest(activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+            val permissionStatus = checkPermissionStatus(activity)
+            if (permissionStatus == LocationPermission.whileInUse) {
+                permissionsToRequest.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
+        }
+
+
+        this.activity = activity;
+        this.permissionResultCallback = resultCallback;
+        this.errorCallback = errorCallback
+
+
+        resultCallback(LocationPermission.always)
+    }
     companion object {
         private const val TAG = "PermissionManager"
 

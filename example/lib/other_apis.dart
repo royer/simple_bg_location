@@ -37,6 +37,9 @@ class _OtherApiBodyState extends State<OtherApiBody> {
                     onPressed: _checkPermission,
                     child: const Text("checkPermission"),
                   ),
+                  TextButton(
+                      onPressed: _requestPermission,
+                      child: const Text("requestPermission")),
                 ],
               ),
             ),
@@ -50,6 +53,26 @@ class _OtherApiBodyState extends State<OtherApiBody> {
     _resultInfo = "checkPermission ";
     try {
       final result = await _simpleBgLocation.checkPermission();
+      setState(() {
+        _resultInfo += "successful: $result";
+      });
+    } on PermissionDefinitionsNotFoundException catch (e) {
+      setState(() {
+        _resultInfo +=
+            'failed.\nException: ${e.runtimeType}\n"${e.toString()}"';
+      });
+    } on Exception catch (e) {
+      setState(() {
+        _resultInfo +=
+            'failed.\nOther Exception: ${e.runtimeType}\n"${e.toString()}"';
+      });
+    }
+  }
+
+  void _requestPermission() async {
+    _resultInfo = "requestPermission";
+    try {
+      final result = await _simpleBgLocation.requestPermission();
       setState(() {
         _resultInfo += "successful: $result";
       });

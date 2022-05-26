@@ -1,5 +1,6 @@
 package com.royzed.simple_bg_location
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.royzed.simple_bg_location.errors.ErrorCodes
@@ -27,16 +28,32 @@ class MethodCallHandlerImpl(
     private var _context: Context? = null
     private val context get() = _context!!
 
+    private var _activity: Activity? = null
+    fun setActivity(activity: Activity) {
+        _activity = activity
+    }
+
+    private val activity get() = _activity!!
+
+
+
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        if (call.method == "getPlatformVersion") {
-            result.success("Android ${android.os.Build.VERSION.RELEASE}")
-        } else if (call.method == Methods.checkPermission)  {
-            onCheckPermission(result)
+        when (call.method) {
+            "getPlatformVersion" -> {
+                result.success("Android ${android.os.Build.VERSION.RELEASE}")
+            }
+            Methods.checkPermission -> {
+                onCheckPermission(result)
+            }
+            Methods.requestPermission -> {
+                onRequestPermission(result)
+            }
+            else -> {
+                result.notImplemented()
+            }
         }
-        else {
-            result.notImplemented()
-        }
+
     }
 
 
@@ -72,6 +89,17 @@ class MethodCallHandlerImpl(
         }
     }
 
-
+    private fun onRequestPermission(result: MethodChannel.Result) {
+        try {
+            permissionManager.requestPermission(activity, {
+                result.error(it.code, it.description, null)
+            }) {
+                result.success(it.ordinal)
+            }
+        } catch (e: PermissionUndefinedException) {
+            val errorCode = ErrorCodes.permissionDefinitionsNotFound
+            result.error(errorCode.code, errorCode.description, null)
+        }
+    }
 
 }

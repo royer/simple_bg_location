@@ -1,8 +1,11 @@
 package com.royzed.simple_bg_location
 
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.annotation.NonNull
+import androidx.core.app.ActivityCompat
 import com.royzed.simple_bg_location.permission.PermissionManager
+import io.flutter.embedding.android.FlutterActivity
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -33,6 +36,12 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
   }
 
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    Log.d(TAG, "onAttachedToActivity()")
+    if (binding.activity is ComponentActivity) {
+      Log.d(TAG,"activity is ComponentActivity")
+    } else {
+      Log.d(TAG, "activity is not ComponentActivity")
+    }
     methodCallHandler.setActivity(binding.activity)
     activityPluginBinding = binding
     //TODO binding Service
@@ -43,14 +52,17 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
 
 
   override fun onDetachedFromActivityForConfigChanges() {
+    Log.d(TAG, "onDetachedFromActivityForConfigChanges()")
     onDetachedFromActivity()
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    Log.d(TAG, "onReattachedToActivityForConfigChanges()")
     onAttachedToActivity(binding)
   }
 
   override fun onDetachedFromActivity() {
+    Log.d(TAG,"onDetachedFromActivity()")
     dispose()
     unregisterListeners()
 

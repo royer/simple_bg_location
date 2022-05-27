@@ -12,6 +12,7 @@ import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.royzed.simple_bg_location.R
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
 typealias PermissionResultCallback = (LocationPermission ) -> Unit

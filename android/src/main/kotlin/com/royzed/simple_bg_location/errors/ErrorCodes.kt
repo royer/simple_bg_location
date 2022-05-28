@@ -11,6 +11,10 @@ enum class ErrorCodes(val code: String, val description: String) {
         "PERMISSION_DENIED",
         "User denied permissions to access the device's location."
     ),
+    otherRequestInProgress(
+        "OTHER_REQUEST_INPROGRESS",
+        "previous request is still waiting answer."
+    ),
     activityMissing(
         "ACTIVITY_MISSING",
         "Activity is missing. This might happen when running a certain function from " +

@@ -96,6 +96,7 @@ class MethodCallHandlerImpl(
             }) {
                 result.success(it.ordinal)
             }
+            Log.d(TAG,"onRequestPermission finished")
         } catch (e: PermissionUndefinedException) {
             val errorCode = ErrorCodes.permissionDefinitionsNotFound
             result.error(errorCode.code, errorCode.description, null)

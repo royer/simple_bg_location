@@ -50,6 +50,9 @@ class _OtherApiBodyState extends State<OtherApiBody> {
   }
 
   void _checkPermission() async {
+    setState(() {
+      _resultInfo = "";
+    });
     _resultInfo = "checkPermission ";
     try {
       final result = await _simpleBgLocation.checkPermission();
@@ -70,6 +73,9 @@ class _OtherApiBodyState extends State<OtherApiBody> {
   }
 
   void _requestPermission() async {
+    setState(() {
+      _resultInfo = "";
+    });
     _resultInfo = "requestPermission";
     try {
       final result = await _simpleBgLocation.requestPermission();

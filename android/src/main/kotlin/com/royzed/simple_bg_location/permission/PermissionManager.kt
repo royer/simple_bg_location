@@ -4,9 +4,11 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.ComponentActivity
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 
 import io.flutter.Log
 import androidx.annotation.RequiresApi
@@ -14,7 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
-import com.royzed.simple_bg_location.utils.SettingsUtils.openLocationSettings
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
 typealias PermissionResultCallback = (LocationPermission ) -> Unit
 typealias ErrorCallback = (ErrorCodes) -> Unit
@@ -22,8 +24,92 @@ typealias ErrorCallback = (ErrorCodes) -> Unit
 class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener {
 
     private var activity: Activity? = null
+    private var flutterActivityPluginBinding: ActivityPluginBinding? = null
+    private var jetPackResultLauncher: ActivityResultLauncher<Array<String>>? = null
     private var permissionResultCallback: PermissionResultCallback? = null
     private var errorCallback: ErrorCallback? = null
+
+    fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        activity = binding.activity
+        flutterActivityPluginBinding = binding
+        if (activity is ComponentActivity && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            jetPackRegisterResultContract(activity as ComponentActivity)
+        } else {
+            binding.addRequestPermissionsResultListener(this)
+        }
+    }
+
+//    fun onDetachedFromActivityForConfigChanges( ) {
+//        onDetachedFromActivity()
+//    }
+//
+//    fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+//        onAttachedToActivity(binding)
+//    }
+
+    fun onDetachedFromActivity() {
+        if (activity is ComponentActivity && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            flutterActivityPluginBinding!!.removeRequestPermissionsResultListener(this)
+        }
+        this.activity = null
+        flutterActivityPluginBinding = null
+
+        jetPackResultLauncher = null
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun jetPackRegisterResultContract(activity: ComponentActivity) {
+        jetPackResultLauncher = activity.registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            Log.d(TAG, "onContractsResult: $permissions")
+            val locationPermission : LocationPermission
+            when {
+                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                    Log.d(TAG, "JetPack: FINE Approved")
+                    locationPermission =
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+                            || permissions.getOrDefault(
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                                false)
+                        )
+                            LocationPermission.always
+                        else
+                            LocationPermission.whileInUse
+                }
+                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                    Log.d(TAG, "JetPack: approximate Approved")
+                    locationPermission =
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+                            || permissions.getOrDefault(
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                                false)
+                        )
+                            LocationPermission.always
+                        else
+                            LocationPermission.whileInUse
+                }
+                permissions.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
+                    Log.d(TAG, "JetPack: background Approved")
+                    locationPermission = LocationPermission.always
+                }
+                else -> {
+                    var showRationale = false
+                    for (p in permissions.keys) {
+                        showRationale =
+                            ActivityCompat.shouldShowRequestPermissionRationale(activity, p)
+                        if (showRationale)
+                            break
+                    }
+                    locationPermission = if (showRationale) LocationPermission.denied
+                    else LocationPermission.deniedForever
+                }
+            }
+            answerPermissionRequestResult(locationPermission)
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onRequestPermissionsResult(
@@ -31,12 +117,18 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         permissions: Array<out String>,
         grantResults: IntArray
     ): Boolean {
+
+
         val permissionsString = permissions.joinToString(",", "[","]")
         val grantsString = grantResults.joinToString(",","[","]") {
             it.toString()
         }
         Log.d(TAG,"onRequestPermissionsResult() requestCode: $requestCode permissions: $permissionsString and grantResults: $grantsString")
         Log.d(TAG,"activity: $activity errorCallback: $errorCallback resultCallBack: $permissionResultCallback")
+        if (requestCode != REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE && requestCode != REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE) {
+            Log.d(TAG,"request code is not mine. because it in Jetpack version")
+            return false
+        }
 
         //!! when upgrade to background permission but user downgrade permission,
         //!! whole app will restart, activity will became null. in this situation
@@ -152,11 +244,10 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
     }
 
     fun requestPermission(
-        activity: Activity,
         errorCallback: ErrorCallback,
         resultCallback: PermissionResultCallback) {
 
-        if (this.activity != null || this.permissionResultCallback != null || this.errorCallback != null) {
+        if (this.permissionResultCallback != null || this.errorCallback != null) {
             errorCallback(ErrorCodes.otherRequestInProgress)
             return
         }
@@ -167,55 +258,109 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             return
         }
 
-        this.activity = activity
         this.permissionResultCallback = resultCallback
         this.errorCallback = errorCallback
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity is ComponentActivity) {
+            requestPermissionUseJetPack()
+        } else {
+            requestPermissionUsePlatform()
+        }
 
-        val permissionsToRequest = getLocationPermissionsFromManifest(activity).toMutableList()
+    }
+
+    private fun requestPermissionUsePlatform() {
+
+        Log.d(TAG,"Request permission use Platform")
+        val permissionsToRequest = getLocationPermissionsFromManifest(activity!!).toMutableList()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-            && hasPermissionInManifest(activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-            val permissionStatus = checkPermissionStatus(activity)
+            && hasPermissionInManifest(activity!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        ) {
+            val permissionStatus = checkPermissionStatus(activity!!)
             if (permissionStatus == LocationPermission.whileInUse) {
-                val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                    activity!!,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
                 if (shouldShowRationale) {
-                    showBackgroundPermissionRationale(activity)
+                    showBackgroundPermissionRationale(activity!!)
                 } else {
-                    Log.d(TAG,"shouldShowRationale return false. return user deniedForever")
+                    Log.d(TAG, "shouldShowRationale return false. return user deniedForever")
                     answerPermissionRequestResult(LocationPermission.deniedForever)
                 }
-            } else if(permissionStatus == LocationPermission.always) {
+            } else if (permissionStatus == LocationPermission.always) {
                 answerPermissionRequestResult(LocationPermission.always)
             } else {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                     permissionsToRequest.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                ActivityCompat.requestPermissions(activity, permissionsToRequest.toTypedArray(), REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE)
+                }
+                ActivityCompat.requestPermissions(
+                    activity!!,
+                    permissionsToRequest.toTypedArray(),
+                    REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE
+                )
             }
-        }  else {
-            ActivityCompat.requestPermissions(activity, permissionsToRequest.toTypedArray(), REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE)
+        } else {
+            ActivityCompat.requestPermissions(
+                activity!!,
+                permissionsToRequest.toTypedArray(),
+                REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE
+            )
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun requestPermissionUseJetPack() {
+        Log.d(TAG,"Request permission use JetPack ")
+        val alreadyHasPermission = checkPermissionStatus(activity!!.applicationContext)
+        val requestPermissions: MutableList<String> =
+            getLocationPermissionsFromManifest(activity!!.applicationContext).toMutableList()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+            && hasPermissionInManifest(activity!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+            if (alreadyHasPermission == LocationPermission.whileInUse) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                    showBackgroundPermissionRationale(activity!!)
+                } else {
+                    answerPermissionRequestResult(LocationPermission.deniedForever)
+                }
+            } else if (alreadyHasPermission == LocationPermission.always) {
+                // user may want change accuracy
+                requestPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                jetPackResultLauncher!!.launch(requestPermissions.toTypedArray())
+            } else {
+                // current permission is denied or deniedForever
+                // Andriod Q allow background permission with Fine or coarse request together
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+                    requestPermissions.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                }
+                jetPackResultLauncher!!.launch(requestPermissions.toTypedArray())
+            }
+        } else {
+            jetPackResultLauncher!!.launch(requestPermissions.toTypedArray())
         }
 
     }
 
     private fun answerPermissionRequestResult(permission: LocationPermission? = null, errorCode: ErrorCodes? = null) {
-        Log.d(TAG,"permission: $permission, errorCode: $errorCode")
+        Log.d(TAG,"permission: $permission, errorCode: $errorCode will send back to user")
         assert((permission != null && errorCode == null) || (permission == null && errorCode != null))
 
         if (permission != null) {
             if (permissionResultCallback != null) {
                 permissionResultCallback!!(permission)
             } else {
-                Log.e(TAG,"answerPeermissionResquestResult but permissionResultCallback == null")
+                Log.w(TAG,"answerPeermissionResquestResult but permissionResultCallback == null")
             }
         }
         if (errorCode != null) {
             if (errorCallback != null) {
                 errorCallback!!(errorCode)
             } else {
-                Log.e(TAG,"answerPermissionRequestResult but errorCallback == null")
+                Log.w(TAG,"answerPermissionRequestResult but errorCallback == null")
             }
         }
 
-        activity = null
         permissionResultCallback = null
         errorCallback = null
     }
@@ -236,22 +381,21 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             val builder = AlertDialog.Builder(it)
             builder.apply {
                 setPositiveButton("Change to \"$permissionLabel\"") { _, _ ->
-                    Log.i(TAG, "Click Allow")
-                    ActivityCompat.requestPermissions(
-                        activity,
-                        arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-                        REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE
-                    )
+                    Log.d(TAG, "Background Permission Rationale Dialog user clicked PositiveButton")
+                    if (jetPackResultLauncher != null) {
+                        jetPackResultLauncher!!.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+                    } else {
+                        ActivityCompat.requestPermissions(
+                            activity,
+                            arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                            REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE
+                        )
+                    }
 
                 }
                 setNegativeButton("No, Thanks!") { _, _ ->
-                    Log.i(TAG, "Click No Thanks")
-                    if (permissionResultCallback != null) {
-                        Log.d(TAG, "on No Thanks. resultCallback is not null")
-                        answerPermissionRequestResult(permission)
-                    } else {
-                        Log.d(TAG, "on No Thanks. resultCallback is null")
-                    }
+                    Log.d(TAG, "Background Permission rationale Dialog user clicked NegativeButton")
+                    answerPermissionRequestResult(permission)
                 }
                 setTitle("Allow Title")
                 setMessage("need background location form the feature.")
@@ -265,14 +409,10 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
 //                        }
 //                    }
 //                })
-                setOnCancelListener { dialog -> run {
-                    Log.i(TAG, "Dialog canceled")
-                    if (permissionResultCallback != null) {
-                        answerPermissionRequestResult(permission)
-                    } else {
-                        Log.d(TAG, "onCancel resultCallback is null")
-                    }
-                } }
+                setOnCancelListener { _ ->
+                    Log.d(TAG, "Background Permission rationale dialog canceled")
+                    answerPermissionRequestResult(permission)
+                }
                 setCancelable(false)
             }
             builder.create()

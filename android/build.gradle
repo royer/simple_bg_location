@@ -46,5 +46,12 @@ android {
 }
 
 dependencies {
+    def activity_version = "1.4.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.activity:activity-ktx:$activity_version"
+    // androidx.fragment and android.activity must implementation together
+    // otherwise in androidx.activity.result.ActivityResultCallback will throw exception
+    // said can only use 16 bits for requestCode
+    // https://stackoverflow.com/questions/25529865/java-lang-illegalargumentexception-can-only-use-lower-16-bits-for-requestcode
+    implementation 'androidx.fragment:fragment-ktx:1.4.1'
 }

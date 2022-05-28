@@ -13,7 +13,7 @@ import io.flutter.plugin.common.MethodChannel
 private const val TAG = "MethodCallHandlerImpl"
 
 class MethodCallHandlerImpl(
-    val permissionManager: PermissionManager
+    private val permissionManager: PermissionManager
 ) : MethodChannel.MethodCallHandler {
 
 
@@ -91,7 +91,7 @@ class MethodCallHandlerImpl(
 
     private fun onRequestPermission(result: MethodChannel.Result) {
         try {
-            permissionManager.requestPermission(activity, {
+            permissionManager.requestPermission( {
                 result.error(it.code, it.description, null)
             }) {
                 result.success(it.ordinal)

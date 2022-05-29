@@ -32,13 +32,24 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
 
   /// Request permission to access the location of the device.
   ///
-  /// Returns a [Future] which when completes indicates if the user granted
-  /// permission to access the device's location.
+  /// Returns a [Future]<`LocationPermission`> which when completes indicates
+  /// if the user granted permission to access the device's location in this
+  /// request.
   /// Throws a [PermissionDefinitionsNotFoundException] when the required
   /// platform specific configuration is missing (e.g. in the
   /// AndroidManifest.xml on Android or the Info.plist on iOS).
   /// A [PermissionRequestInProgressException] is thrown if permissions are
   /// requested while an earlier request has not yet been completed.
+  ///
+  /// Note: The return value is the same as [checkPermission] return value
+  /// in most of the time. but there is some exceptions.
+  /// [requestPermission] return value is indicates this time request get
+  /// what kind permission. [checkPermission] is the permission already have.
+  /// for example:
+  /// Now already has 'whileInUse' permission, call requestPermission
+  /// to upgrade to 'always' permission, but user do not approve upgrade to
+  /// 'always', then [requestPermission] while return 'denied' or 'deniedForever'
+  /// indicates this request failed.
   Future<LocationPermission> requestPermission() {
     throw UnimplementedError('requestPermission() has not been implemented.');
   }

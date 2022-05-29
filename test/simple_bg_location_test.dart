@@ -16,6 +16,16 @@ class MockSimpleBgLocationPlatform
   @override
   Future<LocationPermission> requestPermission() =>
       Future.value(LocationPermission.always);
+
+  @override
+  Future<bool> openAppSettings() {
+    return Future.value(true);
+  }
+
+  @override
+  Future<bool> openLocationSettings() {
+    return Future.value(true);
+  }
 }
 
 void main() {

@@ -12,4 +12,12 @@ class SimpleBgLocation {
   Future<LocationPermission> requestPermission() {
     return SimpleBgLocationPlatform.instance.requestPermission();
   }
+
+  Future<bool> openAppSettings() {
+    return SimpleBgLocationPlatform.instance.openAppSettings();
+  }
+
+  Future<bool> openLocationSettings() {
+    return SimpleBgLocationPlatform.instance.openLocationSettings();
+  }
 }

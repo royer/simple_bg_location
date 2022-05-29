@@ -10,6 +10,8 @@ const _pluginPath = "com.royzed.simple_bg_location";
 class Methods {
   static const checkPermission = 'checkPermission';
   static const requestPermission = "requestPermission";
+  static const openAppSettings = "openAppSettings";
+  static const openLocationSettings = "openLocationSettings";
 }
 
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
@@ -37,6 +39,26 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
       final int permission =
           await methodChannel.invokeMethod(Methods.requestPermission);
       return permission.toLocationPermission();
+    } on PlatformException catch (e) {
+      final error = _handlePlatformException(e);
+      throw error;
+    }
+  }
+
+  @override
+  Future<bool> openAppSettings() async {
+    try {
+      return await methodChannel.invokeMethod(Methods.openAppSettings);
+    } on PlatformException catch (e) {
+      final error = _handlePlatformException(e);
+      throw error;
+    }
+  }
+
+  @override
+  Future<bool> openLocationSettings() async {
+    try {
+      return await methodChannel.invokeMethod(Methods.openLocationSettings);
     } on PlatformException catch (e) {
       final error = _handlePlatformException(e);
       throw error;

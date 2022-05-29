@@ -6,6 +6,7 @@ import android.util.Log
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
 import com.royzed.simple_bg_location.permission.PermissionManager
+import com.royzed.simple_bg_location.utils.SettingsUtils
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -48,6 +49,14 @@ class MethodCallHandlerImpl(
             }
             Methods.requestPermission -> {
                 onRequestPermission(result)
+            }
+            Methods.openAppSettings -> {
+                val hasOpenAppSettings = SettingsUtils.openAppSettings(context)
+                result.success(hasOpenAppSettings)
+            }
+            Methods.openLocationSettings -> {
+                val hasOpenLocationSettings = SettingsUtils.openLocationSettings(context)
+                result.success(hasOpenLocationSettings)
             }
             else -> {
                 result.notImplemented()

@@ -413,7 +413,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
 
 
     companion object {
-        private const val TAG = "PermissionManager"
+        private const val TAG = "SimpleBgl.PermissionManager"
         private const val REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE = 34
         private const val REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE = 35
 

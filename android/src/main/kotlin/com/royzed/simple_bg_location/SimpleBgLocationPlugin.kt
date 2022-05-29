@@ -24,7 +24,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
 
   private var activityPluginBinding: ActivityPluginBinding? = null
 
-  private val myObserver: MyObserver = MyObserver()
+  private val activityObserver: ActivityObserver = ActivityObserver()
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Log.d(TAG,"onAttachedToFlutterEngine()")
@@ -49,7 +49,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
     activityPluginBinding = binding
     permissionManager.onAttachedToActivity(binding)
 
-    (binding.lifecycle as HiddenLifecycleReference).lifecycle.addObserver(myObserver)
+    (binding.lifecycle as HiddenLifecycleReference).lifecycle.addObserver(activityObserver)
     //TODO binding Service
 
     registerListeners()
@@ -76,7 +76,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
 
 
     if (activityPluginBinding != null) {
-      (activityPluginBinding!!.lifecycle as HiddenLifecycleReference).lifecycle.removeObserver(myObserver)
+      (activityPluginBinding!!.lifecycle as HiddenLifecycleReference).lifecycle.removeObserver(activityObserver)
       // TODO "unbindService"
       activityPluginBinding = null
     }
@@ -106,36 +106,3 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
 
 }
 
-class MyObserver : DefaultLifecycleObserver {
-  override fun onCreate(owner: LifecycleOwner) {
-    super.onCreate(owner)
-    Log.d(TAG,"$owner onCreate()")
-  }
-
-  override fun onStart(owner: LifecycleOwner) {
-    super.onStart(owner)
-    Log.d(TAG,"$owner onStart()")
-  }
-
-  override fun onResume(owner: LifecycleOwner) {
-    super.onResume(owner)
-    Log.d(TAG,"$owner onResume()")
-  }
-
-  override fun onPause(owner: LifecycleOwner) {
-    super.onPause(owner)
-    Log.d(TAG,"$owner onPause()")
-  }
-
-  override fun onStop(owner: LifecycleOwner) {
-    super.onStop(owner)
-    Log.d(TAG,"$owner onStop()")
-
-  }
-
-  override fun onDestroy(owner: LifecycleOwner) {
-    super.onDestroy(owner)
-    Log.d(TAG,"$owner onDestroy()")
-
-  }
-}

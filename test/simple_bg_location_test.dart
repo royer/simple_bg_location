@@ -26,6 +26,18 @@ class MockSimpleBgLocationPlatform
   Future<bool> openLocationSettings() {
     return Future.value(true);
   }
+
+  @override
+  Future<bool> isLocationServiceEnabled() {
+    // TODO: implement isLocationServiceEnable
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<LocationAccuracyPermission> getAccuracyPermission() {
+    // TODO: implement getAccuracyPermission
+    throw UnimplementedError();
+  }
 }
 
 void main() {

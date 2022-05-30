@@ -1,15 +1,12 @@
 package com.royzed.simple_bg_location.services
 
 import android.app.*
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Binder
-import android.os.Build
 import android.os.IBinder
-import androidx.core.app.NotificationCompat
-import com.royzed.simple_bg_location.location.ForegroundNotification
-import com.royzed.simple_bg_location.location.ForegroundNotificationConfig
+import com.royzed.simple_bg_location.domain.ForegroundNotification
+import com.royzed.simple_bg_location.domain.ForegroundNotificationConfig
 import io.flutter.Log
 
 class SimpleBgLocationService : Service() {

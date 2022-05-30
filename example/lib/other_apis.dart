@@ -55,6 +55,14 @@ class _OtherApiBodyState extends State<OtherApiBody> {
                       onPressed: _requestPermission,
                       child: const Text("requestPermission")),
                   TextButton(
+                    onPressed: _isLocationServiceEnabled,
+                    child: const Text("isLocationServicesEnabled"),
+                  ),
+                  TextButton(
+                    onPressed: _getAccuracyPermission,
+                    child: const Text("getAccuracyPermission"),
+                  ),
+                  TextButton(
                     onPressed: _openAppSettings,
                     child: const Text("openAppSettings"),
                   ),
@@ -152,6 +160,45 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       });
 
       final result = await _simpleBgLocation.openLocationSettings();
+      setState(() {
+        _resultInfo = "$result";
+      });
+    } catch (e) {
+      setState(() {
+        _resultInfo = "failed. Exception: $e";
+      });
+    }
+  }
+
+  void _isLocationServiceEnabled() async {
+    _reset();
+
+    try {
+      setState(() {
+        _method = "isLocationServiceEnabled";
+      });
+      final result = await _simpleBgLocation.isLocationServiceEnabled();
+      setState(() {
+        _resultInfo = '$result';
+      });
+    } catch (e) {
+      setState(() {
+        _resultInfo = "failed. Exception: $e";
+      });
+    }
+  }
+
+  void _getAccuracyPermission() async {
+    _reset();
+
+    try {
+      setState(() {
+        _method = "getAccuracyPermission";
+      });
+      final result = await _simpleBgLocation.getAccuracyPermission();
+      setState(() {
+        _resultInfo = "$result";
+      });
     } catch (e) {
       setState(() {
         _resultInfo = "failed. Exception: $e";

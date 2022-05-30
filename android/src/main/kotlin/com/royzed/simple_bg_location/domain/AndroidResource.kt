@@ -1,4 +1,4 @@
-package com.royzed.simple_bg_location.location
+package com.royzed.simple_bg_location.domain
 
 class AndroidResource(private val _name: String, private val _defType: String) {
 

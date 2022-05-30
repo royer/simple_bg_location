@@ -1,4 +1,4 @@
-package com.royzed.simple_bg_location.location
+package com.royzed.simple_bg_location.domain
 
 import android.app.Notification
 import android.app.NotificationChannel

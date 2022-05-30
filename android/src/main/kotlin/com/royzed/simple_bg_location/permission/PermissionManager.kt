@@ -14,12 +14,13 @@ import io.flutter.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.royzed.simple_bg_location.errors.ErrorCallback
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
 typealias PermissionResultCallback = (LocationPermission ) -> Unit
-typealias ErrorCallback = (ErrorCodes) -> Unit
+
 
 class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener {
 
@@ -156,59 +157,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         handleRequestResult(permissionsGrantsMap, requestCode)
 
         return true
-
-//        when(requestCode) {
-//            REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE,
-//            REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE -> when {
-//                grantResults.isEmpty() -> {
-//                    return false
-//                }
-//                else -> {
-//                    val indexOfBgPermission = permissions.indexOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-//                    if (indexOfBgPermission >= 0) {
-//                        if (grantResults[indexOfBgPermission] == PackageManager.PERMISSION_GRANTED) {
-//                            answerPermissionRequestResult(LocationPermission.always)
-//                            return true
-//                        } else {
-//                            val shouldShowRationale =
-//                                ActivityCompat.shouldShowRequestPermissionRationale(
-//                                    activity!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-//                            val permission =
-//                            if (shouldShowRationale)
-//                                LocationPermission.denied
-//                            else
-//                                LocationPermission.deniedForever
-//
-//                            answerPermissionRequestResult(permission)
-//                            return true
-//                        }
-//                    } else {
-//                        val indexOfApproved = grantResults.indexOf(PackageManager.PERMISSION_GRANTED)
-//                        val permission =
-//                        if (indexOfApproved >= 0)
-//                            LocationPermission.whileInUse
-//                        else {
-//                            var shouldShowRationaleFine = false
-//                            for(permission in permissions) {
-//                                shouldShowRationaleFine = ActivityCompat.shouldShowRequestPermissionRationale(activity!!,permission )
-//                                Log.d(TAG, "$permission should show rationale: $shouldShowRationaleFine")
-//                            }
-//                            if (shouldShowRationaleFine)
-//                                LocationPermission.denied
-//                            else
-//                                LocationPermission.deniedForever
-//                        }
-//
-//                        answerPermissionRequestResult(permission)
-//                        return true
-//                    }
-//                }
-//            }
-//            else -> {
-//                Log.w(TAG, "unknown request Permission code: $requestCode")
-//                return false
-//            }
-//        }
 
     }
 
@@ -484,6 +432,19 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             }
 
             return map.toMap()
+        }
+
+        @JvmStatic
+        fun getAccuracyPermission(context: Context): AccuracyPermission {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+                return AccuracyPermission.precise
+            } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+                return AccuracyPermission.approximate
+            } else {
+                return AccuracyPermission.denied
+            }
         }
     }
 

@@ -3,6 +3,8 @@ package com.royzed.simple_bg_location
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.royzed.simple_bg_location.domain.location.LocationServiceListener
+import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
 import com.royzed.simple_bg_location.permission.PermissionManager
@@ -49,6 +51,12 @@ class MethodCallHandlerImpl(
             }
             Methods.requestPermission -> {
                 onRequestPermission(result)
+            }
+            Methods.isLocationServiceEnabled -> {
+                onIsLocationServiceEnable(result)
+            }
+            Methods.getAccuracyPermission -> {
+                onGetAccuracyPermission(result)
             }
             Methods.openAppSettings -> {
                 val hasOpenAppSettings = SettingsUtils.openAppSettings(context)
@@ -110,6 +118,32 @@ class MethodCallHandlerImpl(
             val errorCode = ErrorCodes.permissionDefinitionsNotFound
             result.error(errorCode.code, errorCode.description, null)
         }
+    }
+
+    private fun onIsLocationServiceEnable(result: MethodChannel.Result) {
+        try {
+            SimpleBgLocationManager().isLocationServiceEnabled(activity, object : LocationServiceListener {
+                override fun onLocationServiceResult(isEnabled: Boolean) {
+                    result.success(isEnabled)
+                }
+
+                override fun onLocationServiceError(errorCode: ErrorCodes) {
+                    result.error(errorCode.code, errorCode.description, null)
+                }
+            })
+        } catch (e: Exception ){
+            // todo should send report ?
+            Log.e(TAG, "onIsLocationServiceEnable failed. Exception: $e")
+            throw e
+        }
+    }
+
+    private fun onGetAccuracyPermission(result: MethodChannel.Result) = try {
+        val permission = PermissionManager.getAccuracyPermission(context)
+        result.success(permission.ordinal)
+    } catch (e: Exception) {
+        Log.e(TAG,"onGetAccuracyPermission failed. Exception: $e")
+        throw e
     }
 
 }

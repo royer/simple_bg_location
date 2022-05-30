@@ -54,6 +54,17 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
     throw UnimplementedError('requestPermission() has not been implemented.');
   }
 
+  /// Check location service is enabled
+  Future<bool> isLocationServiceEnabled() {
+    throw UnimplementedError(
+        'isLocationServiceEnable() has not been implemented.');
+  }
+
+  Future<LocationAccuracyPermission> getAccuracyPermission() {
+    throw UnimplementedError(
+        'getAccuracyPermission() has not been implemented.');
+  }
+
   /// Open the App settings page
   ///
   /// Returns [true] if app settings page could be opened, otherwise [false]

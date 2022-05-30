@@ -1,4 +1,4 @@
-package com.royzed.simple_bg_location.location
+package com.royzed.simple_bg_location.domain
 
 class ForegroundNotificationConfig(
     val title: String,

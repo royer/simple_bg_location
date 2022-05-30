@@ -41,7 +41,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 16
     }
 }
 
@@ -55,4 +55,6 @@ dependencies {
     // said can only use 16 bits for requestCode
     // https://stackoverflow.com/questions/25529865/java-lang-illegalargumentexception-can-only-use-lower-16-bits-for-requestcode
     implementation 'androidx.fragment:fragment-ktx:1.4.1'
+
+    implementation 'com.google.android.gms:play-services-location:19.0.1'
 }

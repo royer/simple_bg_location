@@ -20,6 +20,11 @@ enum class ErrorCodes(val code: String, val description: String) {
         "Activity is missing. This might happen when running a certain function from " +
                 "the background that requires a UI element (e.g. requesting permissions or "+
                 "enabling the location services)."
+    ),
+    locationServicesDisabled(
+        "LOCATION_SERVICES_DISABLED",
+        "Neither GPS nor Network location service is enabled."
+
     )
 
 }

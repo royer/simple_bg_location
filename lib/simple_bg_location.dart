@@ -13,6 +13,14 @@ class SimpleBgLocation {
     return SimpleBgLocationPlatform.instance.requestPermission();
   }
 
+  Future<bool> isLocationServiceEnabled() {
+    return SimpleBgLocationPlatform.instance.isLocationServiceEnabled();
+  }
+
+  Future<LocationAccuracyPermission> getAccuracyPermission() {
+    return SimpleBgLocationPlatform.instance.getAccuracyPermission();
+  }
+
   Future<bool> openAppSettings() {
     return SimpleBgLocationPlatform.instance.openAppSettings();
   }

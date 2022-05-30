@@ -1,4 +1,3 @@
 package com.royzed.simple_bg_location.errors
 
-interface ErrorCallback {
-}
+typealias ErrorCallback = (ErrorCodes) -> Unit

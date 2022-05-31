@@ -3,6 +3,7 @@ package com.royzed.simple_bg_location
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.royzed.simple_bg_location.data.Position
 import com.royzed.simple_bg_location.domain.location.LocationServiceListener
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
 import com.royzed.simple_bg_location.errors.ErrorCodes
@@ -58,6 +59,9 @@ class MethodCallHandlerImpl(
             Methods.getAccuracyPermission -> {
                 onGetAccuracyPermission(result)
             }
+            Methods.getLastKnownPosition -> {
+                onGetLastKnownPosition(call, result)
+            }
             Methods.openAppSettings -> {
                 val hasOpenAppSettings = SettingsUtils.openAppSettings(context)
                 result.success(hasOpenAppSettings)
@@ -96,7 +100,7 @@ class MethodCallHandlerImpl(
 
     private fun onCheckPermission(result: MethodChannel.Result) {
         try {
-            val permission = permissionManager.checkPermissionStatus(context)
+            val permission = PermissionManager.checkPermissionStatus(context)
             result.success(permission.ordinal)
 
         } catch (e: PermissionUndefinedException) {
@@ -122,7 +126,7 @@ class MethodCallHandlerImpl(
 
     private fun onIsLocationServiceEnable(result: MethodChannel.Result) {
         try {
-            SimpleBgLocationManager().isLocationServiceEnabled(activity, object : LocationServiceListener {
+            SimpleBgLocationManager.isLocationServiceEnabled(activity, object : LocationServiceListener {
                 override fun onLocationServiceResult(isEnabled: Boolean) {
                     result.success(isEnabled)
                 }
@@ -144,6 +148,32 @@ class MethodCallHandlerImpl(
     } catch (e: Exception) {
         Log.e(TAG,"onGetAccuracyPermission failed. Exception: $e")
         throw e
+    }
+
+    private fun onGetLastKnownPosition(call: MethodCall, result: MethodChannel.Result) {
+        try {
+            if (!PermissionManager.hasPermission(context)) {
+                result.error(
+                    ErrorCodes.permissionDenied.code,
+                    ErrorCodes.permissionDenied.description,
+                    null
+                )
+                return
+            }
+        } catch (e: PermissionUndefinedException) {
+            val errorCode = ErrorCodes.permissionDefinitionsNotFound
+            result.error(errorCode.code, errorCode.description, null)
+            return
+        }
+
+        val forceLocationManager: Boolean = call.argument<Boolean>("forceLocationManager") == true
+        SimpleBgLocationManager.getLastKnownPosition(context, forceLocationManager,
+            positionChangedCallback = {
+            val position: Position? = if (it != null) Position.fromLocation(it) else null
+            result.success(position?.toMap())
+        }, errorCallback = {
+            result.error(it.code, it.description,null)
+        })
     }
 
 }

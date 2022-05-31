@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:simple_bg_location/src/errors/location_services_disabled_exception.dart';
 import 'src/errors/errors.dart';
 import 'src/enums/enums.dart';
-
+import 'src/models/models.dart';
 import 'simple_bg_location_platform_interface.dart';
 
 const _pluginPath = "com.royzed.simple_bg_location";
@@ -15,6 +15,7 @@ class Methods {
   static const getAccuracyPermission = "getAccuracyPermission";
   static const openAppSettings = "openAppSettings";
   static const openLocationSettings = "openLocationSettings";
+  static const getLastKnownPosition = "getLastKnownPosition";
 }
 
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
@@ -65,6 +66,25 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
       final int permission =
           await methodChannel.invokeMethod(Methods.requestPermission);
       return permission.toLocationPermission();
+    } on PlatformException catch (e) {
+      final error = _handlePlatformException(e);
+      throw error;
+    }
+  }
+
+  @override
+  Future<Position?> getLastKnownPosition(
+      {bool forceLocationManager = false}) async {
+    try {
+      final params = <String, dynamic>{
+        'forceLocationManager': forceLocationManager
+      };
+
+      final result = await methodChannel.invokeMethod(
+          Methods.getLastKnownPosition, params);
+      final positionMap =
+          result != null ? Map<String, dynamic>.from(result) : null;
+      return positionMap != null ? Position.fromMap(positionMap) : null;
     } on PlatformException catch (e) {
       final error = _handlePlatformException(e);
       throw error;

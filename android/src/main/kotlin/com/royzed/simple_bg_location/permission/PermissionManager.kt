@@ -160,45 +160,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
 
     }
 
-    fun checkPermissionStatus(context: Context) : LocationPermission {
-        // If device is before Android 6.0(API 23)  , permission is always granted
-        // reference https://developer.android.com/training/permissions/requesting
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return LocationPermission.always
-        }
-
-        var permissionStatus = PackageManager.PERMISSION_DENIED
-
-        val permissions = getLocationPermissionsFromManifest(context)
-        for(permission in permissions) {
-            if (ContextCompat.checkSelfPermission(context, permission) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                permissionStatus = PackageManager.PERMISSION_GRANTED
-                break
-            }
-        }
-
-        if (permissionStatus == PackageManager.PERMISSION_DENIED) {
-            return LocationPermission.denied
-        }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            return LocationPermission.always
-        }
-
-        val wantsBackgroundLocation = hasPermissionInManifest(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        if (!wantsBackgroundLocation) {
-            return LocationPermission.whileInUse
-        }
-
-        val permissionStatusBackground =
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        if(permissionStatusBackground == PackageManager.PERMISSION_GRANTED) {
-            return LocationPermission.always
-        }
-
-        return LocationPermission.whileInUse
-    }
 
     fun requestPermission(
         errorCallback: ErrorCallback,
@@ -366,6 +327,54 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         private const val REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE = 35
 
         @JvmStatic
+        fun checkPermissionStatus(context: Context) : LocationPermission {
+            // If device is before Android 6.0(API 23)  , permission is always granted
+            // reference https://developer.android.com/training/permissions/requesting
+            if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                return LocationPermission.always
+            }
+
+            var permissionStatus = PackageManager.PERMISSION_DENIED
+
+            val permissions = getLocationPermissionsFromManifest(context)
+            for(permission in permissions) {
+                if (ContextCompat.checkSelfPermission(context, permission) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                    permissionStatus = PackageManager.PERMISSION_GRANTED
+                    break
+                }
+            }
+
+            if (permissionStatus == PackageManager.PERMISSION_DENIED) {
+                return LocationPermission.denied
+            }
+
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                return LocationPermission.always
+            }
+
+            val wantsBackgroundLocation = hasPermissionInManifest(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            if (!wantsBackgroundLocation) {
+                return LocationPermission.whileInUse
+            }
+
+            val permissionStatusBackground =
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            if(permissionStatusBackground == PackageManager.PERMISSION_GRANTED) {
+                return LocationPermission.always
+            }
+
+            return LocationPermission.whileInUse
+        }
+
+        @JvmStatic
+        fun hasPermission(context: Context): Boolean {
+            val permission = checkPermissionStatus(context)
+            return permission == LocationPermission.whileInUse || permission == LocationPermission.always
+        }
+
+
+        @JvmStatic
         fun hasPermissionInManifest(context: Context, permission: String) : Boolean {
             return try {
                 context.packageManager
@@ -436,14 +445,18 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
 
         @JvmStatic
         fun getAccuracyPermission(context: Context): AccuracyPermission {
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
-                return AccuracyPermission.precise
-            } else if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
-                return AccuracyPermission.approximate
-            } else {
-                return AccuracyPermission.denied
+            return when (PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                -> {
+                    AccuracyPermission.precise
+                }
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                -> {
+                    AccuracyPermission.approximate
+                }
+                else -> {
+                    AccuracyPermission.denied
+                }
             }
         }
     }

@@ -25,6 +25,10 @@ enum class ErrorCodes(val code: String, val description: String) {
         "LOCATION_SERVICES_DISABLED",
         "Neither GPS nor Network location service is enabled."
 
+    ),
+    errorWhileAcquiringPosition(
+        "ERROR_WHILE_ACQUIRING_POSITION",
+        "An unexpected error occurred while trying to acquire the device's position."
     )
 
 }

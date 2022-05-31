@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
-import 'package:simple_bg_location/simple_bg_location_platform_interface.dart';
 
 class OtherApiBody extends StatefulWidget {
   const OtherApiBody({Key? key}) : super(key: key);
@@ -27,7 +26,14 @@ class _OtherApiBodyState extends State<OtherApiBody> {
             children: [
               const Text("Method:"),
               const SizedBox(width: 4),
-              Text(_method),
+              Expanded(
+                child: Text(
+                  _method,
+                  overflow: TextOverflow.ellipsis,
+                  softWrap: true,
+                  maxLines: 5,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -61,6 +67,39 @@ class _OtherApiBodyState extends State<OtherApiBody> {
                   TextButton(
                     onPressed: _getAccuracyPermission,
                     child: const Text("getAccuracyPermission"),
+                  ),
+                  // PopupMenuButton<GetLastKnownPositionMenu>(
+                  //   itemBuilder: (context) =>
+                  //       <PopupMenuEntry<GetLastKnownPositionMenu>>[
+                  //     const PopupMenuItem<GetLastKnownPositionMenu>(
+                  //       value: GetLastKnownPositionMenu.normal,
+                  //       child: Text('normal'),
+                  //     ),
+                  //     const PopupMenuItem<GetLastKnownPositionMenu>(
+                  //       value: GetLastKnownPositionMenu.forceLocationManager,
+                  //       child: Text('forceLocationManager'),
+                  //     ),
+                  //   ],
+                  //   onSelected: (item) {
+                  //     _onGetLastKnownPosition(item ==
+                  //         GetLastKnownPositionMenu.forceLocationManager);
+                  //   },
+                  //   child: const Text('getLastKnownPosition'),
+                  // ),
+                  DropdownButton<GetLastKnownPositionMenu>(
+                    value: GetLastKnownPositionMenu.normal,
+                    icon: const Icon(Icons.arrow_downward),
+                    items: [
+                      GetLastKnownPositionMenu.normal,
+                      GetLastKnownPositionMenu.forceLocationManager
+                    ]
+                        .map((e) => DropdownMenuItem<GetLastKnownPositionMenu>(
+                            value: e, child: Text(e.name)))
+                        .toList(),
+                    onChanged: (item) {
+                      _onGetLastKnownPosition(item ==
+                          GetLastKnownPositionMenu.forceLocationManager);
+                    },
                   ),
                   TextButton(
                     onPressed: _openAppSettings,
@@ -205,4 +244,25 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       });
     }
   }
+
+  void _onGetLastKnownPosition(bool forceLocationManager) async {
+    _reset();
+    try {
+      setState(() {
+        _method =
+            "getLastKnownPosition(forceLocationManager = $forceLocationManager)";
+      });
+      final position = await _simpleBgLocation.getLastKnowPosition(
+          forceLocationManager: forceLocationManager);
+      setState(() {
+        _resultInfo = "$position";
+      });
+    } catch (e) {
+      setState(() {
+        _resultInfo = "failed. Exception: $e";
+      });
+    }
+  }
 }
+
+enum GetLastKnownPositionMenu { normal, forceLocationManager }

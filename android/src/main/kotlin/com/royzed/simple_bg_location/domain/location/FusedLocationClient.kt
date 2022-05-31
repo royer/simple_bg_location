@@ -1,5 +1,6 @@
 package com.royzed.simple_bg_location.domain.location
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.google.android.gms.location.*
 import com.royzed.simple_bg_location.errors.ErrorCallback
@@ -50,11 +51,16 @@ class FusedLocationClient(
             }
     }
 
+    @SuppressLint("MissingPermission")
     override fun getLastKnownLocation(
         positionChangedCallback: PositionChangedCallback,
         errorCallback: ErrorCallback
     ) {
-        TODO("Not yet implemented")
+        fusedProviderClient.lastLocation.addOnSuccessListener(positionChangedCallback)
+            .addOnFailureListener {
+                Log.e(TAG,"Error trying to get last known location")
+                errorCallback(ErrorCodes.errorWhileAcquiringPosition)
+            }
     }
 
     override fun startLoationUpdates(

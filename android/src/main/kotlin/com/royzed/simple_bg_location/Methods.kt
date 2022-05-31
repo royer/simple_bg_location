@@ -7,4 +7,5 @@ object Methods {
     const val getAccuracyPermission = "getAccuracyPermission"
     const val openAppSettings = "openAppSettings"
     const val openLocationSettings = "openLocationSettings"
+    const val getLastKnownPosition = "getLastKnownPosition"
 }

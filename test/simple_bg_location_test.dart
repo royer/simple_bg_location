@@ -38,6 +38,12 @@ class MockSimpleBgLocationPlatform
     // TODO: implement getAccuracyPermission
     throw UnimplementedError();
   }
+  
+  @override
+  Future<Position?> getLastKnownPosition({bool forceLocationManager = false}) {
+    // TODO: implement getLastKnownPosition
+    throw UnimplementedError();
+  }
 }
 
 void main() {

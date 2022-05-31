@@ -3,6 +3,7 @@ version '1.0-SNAPSHOT'
 
 buildscript {
     ext.kotlin_version = '1.6.21'
+    ext.room_version = '2.4.2'
     repositories {
         google()
         mavenCentral()
@@ -57,4 +58,9 @@ dependencies {
     implementation 'androidx.fragment:fragment-ktx:1.4.1'
 
     implementation 'com.google.android.gms:play-services-location:19.0.1'
+
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
+
 }

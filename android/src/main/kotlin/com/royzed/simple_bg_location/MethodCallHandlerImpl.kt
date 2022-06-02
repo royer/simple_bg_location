@@ -17,7 +17,8 @@ import io.flutter.plugin.common.MethodChannel
 private const val TAG = "MethodCallHandlerImpl"
 
 class MethodCallHandlerImpl(
-    private val permissionManager: PermissionManager
+    private val permissionManager: PermissionManager,
+    private val activityObserver: ActivityObserver
 ) : MethodChannel.MethodCallHandler {
 
 
@@ -62,6 +63,9 @@ class MethodCallHandlerImpl(
             Methods.getLastKnownPosition -> {
                 onGetLastKnownPosition(call, result)
             }
+            Methods.getCurrentPosition -> {
+                onGetCurrentPostioin(call, result)
+            }
             Methods.openAppSettings -> {
                 val hasOpenAppSettings = SettingsUtils.openAppSettings(context)
                 result.success(hasOpenAppSettings)
@@ -96,6 +100,7 @@ class MethodCallHandlerImpl(
 
         channel.setMethodCallHandler(null)
         _channel = null
+        _context = null
     }
 
     private fun onCheckPermission(result: MethodChannel.Result) {
@@ -126,7 +131,7 @@ class MethodCallHandlerImpl(
 
     private fun onIsLocationServiceEnable(result: MethodChannel.Result) {
         try {
-            SimpleBgLocationManager.isLocationServiceEnabled(activity, object : LocationServiceListener {
+            SimpleBgLocationManager.isLocationServiceEnabled(context, object : LocationServiceListener {
                 override fun onLocationServiceResult(isEnabled: Boolean) {
                     result.success(isEnabled)
                 }
@@ -174,6 +179,32 @@ class MethodCallHandlerImpl(
         }, errorCallback = {
             result.error(it.code, it.description,null)
         })
+    }
+
+    private fun onGetCurrentPostioin(call: MethodCall, result: MethodChannel.Result) {
+        try {
+            if (!PermissionManager.hasPermission(context)) {
+                result.error(
+                    ErrorCodes.permissionDenied.code,
+                    ErrorCodes.permissionDenied.description,
+                    null
+                )
+                return
+            }
+        } catch (e: PermissionUndefinedException) {
+            val errorCode = ErrorCodes.permissionDefinitionsNotFound
+            result.error(errorCode.code, errorCode.description, null)
+            return
+        }
+
+        val forceLocationManager: Boolean = call.argument<Boolean>("forceLocationManager") == true
+        activityObserver.getCurrentPosition(forceLocationManager, {
+            val position: Position? = if (it != null) Position.fromLocation(it) else null
+            result.success(position?.toMap())
+        }, {
+            result.error(it.code, it.description, null)
+        })
+
     }
 
 }

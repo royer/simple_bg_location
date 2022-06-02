@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.annotation.NonNull
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.royzed.simple_bg_location.permission.PermissionManager
 
@@ -11,7 +12,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
-
+import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
 
 private const val TAG = "SimpleBgLocationPlugin"
 
@@ -29,12 +30,13 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Log.d(TAG,"onAttachedToFlutterEngine()")
 
-    methodCallHandler = MethodCallHandlerImpl(permissionManager)
+    methodCallHandler = MethodCallHandlerImpl(permissionManager, activityObserver)
     methodCallHandler.startListening(flutterPluginBinding.applicationContext, flutterPluginBinding.binaryMessenger)
 
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    Log.d(TAG,"onDetachedFromEngine()")
     methodCallHandler.stopListening()
   }
 
@@ -49,7 +51,8 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
     activityPluginBinding = binding
     permissionManager.onAttachedToActivity(binding)
 
-    (binding.lifecycle as HiddenLifecycleReference).lifecycle.addObserver(activityObserver)
+    // (binding.lifecycle as HiddenLifecycleReference).lifecycle.addObserver(activityObserver)
+    FlutterLifecycleAdapter.getActivityLifecycle(binding).addObserver(activityObserver)
     //TODO binding Service
 
     registerListeners()
@@ -76,8 +79,8 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
 
 
     if (activityPluginBinding != null) {
+
       (activityPluginBinding!!.lifecycle as HiddenLifecycleReference).lifecycle.removeObserver(activityObserver)
-      // TODO "unbindService"
       activityPluginBinding = null
     }
   }
@@ -86,6 +89,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
     if (activityPluginBinding != null) {
       // register RequestPermissionResultListener move to PermissionManager
       //activityPluginBinding!!.addRequestPermissionsResultListener(permissionManager)
+      activityPluginBinding!!.addOnSaveStateListener(activityObserver)
     } else {
       Log.d(TAG, "SHOULDN'T -> registerListeners() activityPluginBinding = null!" )
     }
@@ -95,6 +99,7 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
     if (activityPluginBinding != null) {
       // removeRequestPermissionsResultListener move to PermissionManager.onActivityDetached()
       // activityPluginBinding!!.removeRequestPermissionsResultListener(permissionManager)
+      activityPluginBinding!!.removeOnSaveStateListener(activityObserver)
     } else {
       Log.d(TAG, "SHOULDN'T -> unregisterListeners() activityPluginBinding = null!")
     }

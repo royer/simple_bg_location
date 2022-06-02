@@ -8,4 +8,5 @@ object Methods {
     const val openAppSettings = "openAppSettings"
     const val openLocationSettings = "openLocationSettings"
     const val getLastKnownPosition = "getLastKnownPosition"
+    const val getCurrentPosition = "getCurrentPosition"
 }

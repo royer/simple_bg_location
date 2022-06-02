@@ -29,6 +29,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
               Expanded(
                 child: Text(
                   _method,
+                  style: const TextStyle(fontSize: 12.0),
                   overflow: TextOverflow.ellipsis,
                   softWrap: true,
                   maxLines: 5,
@@ -40,6 +41,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
           const Text("Returns:"),
           Container(
             height: 200,
+            width: double.infinity,
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.black, width: 1)),
             padding: const EdgeInsets.all(4),
@@ -86,21 +88,39 @@ class _OtherApiBodyState extends State<OtherApiBody> {
                   //   },
                   //   child: const Text('getLastKnownPosition'),
                   // ),
-                  DropdownButton<GetLastKnownPositionMenu>(
-                    value: GetLastKnownPositionMenu.normal,
+                  DropdownButton<String>(
+                    value: 'getLastKnownPosition',
                     icon: const Icon(Icons.arrow_downward),
-                    items: [
-                      GetLastKnownPositionMenu.normal,
-                      GetLastKnownPositionMenu.forceLocationManager
+                    items: <String>[
+                      'getLastKnownPosition',
+                      ForceLocationManagerOrNot.normal.name,
+                      ForceLocationManagerOrNot.forceLocationManager.name
                     ]
-                        .map((e) => DropdownMenuItem<GetLastKnownPositionMenu>(
-                            value: e, child: Text(e.name)))
+                        .map((e) =>
+                            DropdownMenuItem<String>(value: e, child: Text(e)))
                         .toList(),
                     onChanged: (item) {
                       _onGetLastKnownPosition(item ==
-                          GetLastKnownPositionMenu.forceLocationManager);
+                          ForceLocationManagerOrNot.forceLocationManager.name);
                     },
                   ),
+                  DropdownButton<String>(
+                    value: 'getCurrentPosition',
+                    icon: const Icon(Icons.arrow_downward),
+                    items: <String>[
+                      'getCurrentPosition',
+                      ForceLocationManagerOrNot.normal.name,
+                      ForceLocationManagerOrNot.forceLocationManager.name
+                    ]
+                        .map((e) =>
+                            DropdownMenuItem<String>(value: e, child: Text(e)))
+                        .toList(),
+                    onChanged: (item) {
+                      _onGetCurrentPosition(item ==
+                          ForceLocationManagerOrNot.forceLocationManager.name);
+                    },
+                  ),
+
                   TextButton(
                     onPressed: _openAppSettings,
                     child: const Text("openAppSettings"),
@@ -263,6 +283,25 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       });
     }
   }
+
+  void _onGetCurrentPosition(bool forceLocationManager) async {
+    _reset();
+    try {
+      setState(() {
+        _method =
+            "getCurrentPosition(forceLocationManager = $forceLocationManager)";
+      });
+      final position = await _simpleBgLocation.getCurrentPosition(
+          forceLocationManager: forceLocationManager);
+      setState(() {
+        _resultInfo = "$position";
+      });
+    } catch (e) {
+      setState(() {
+        _resultInfo = "failed. Exception: $e";
+      });
+    }
+  }
 }
 
-enum GetLastKnownPositionMenu { normal, forceLocationManager }
+enum ForceLocationManagerOrNot { normal, forceLocationManager }

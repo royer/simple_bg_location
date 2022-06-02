@@ -73,7 +73,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         val locationPermission: LocationPermission
         when {
             permissions.myGetOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                Log.d(TAG, "FINE Approved in $whichModule")
+                Log.d(TAG, "precise Approved in $whichModule mode")
                 locationPermission =
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
                         || permissions.getOrDefault(
@@ -86,7 +86,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
                         LocationPermission.whileInUse
             }
             permissions.myGetOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                Log.d(TAG, "approximate Approved in $whichModule")
+                Log.d(TAG, "approximate Approved in $whichModule mode")
                 locationPermission =
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
                         || permissions.getOrDefault(
@@ -130,7 +130,12 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             it.toString()
         }
         Log.d(TAG,"onRequestPermissionsResult() requestCode: $requestCode permissions: $permissionsString and grantResults: $grantsString")
-        Log.d(TAG,"activity != null? ${activity!=null} errorCallback != null? ${errorCallback!=null} resultCallBack != null? ${permissionResultCallback!=null}")
+        if (activity == null || errorCallback == null || permissionResultCallback == null) {
+            Log.d(
+                TAG,
+                "activity != null? ${activity != null} errorCallback != null? ${errorCallback != null} resultCallBack != null? ${permissionResultCallback != null}"
+            )
+        }
         if (requestCode != REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE && requestCode != REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE) {
             Log.w(TAG,"request code is not mine")
             return false
@@ -242,22 +247,20 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
     }
 
     private fun answerPermissionRequestResult(permission: LocationPermission? = null, errorCode: ErrorCodes? = null) {
-        Log.d(TAG,"permission: $permission, errorCode: $errorCode will send back to user")
+
         assert((permission != null && errorCode == null) || (permission == null && errorCode != null))
+        if (permission != null) {
+            Log.d(TAG,"Permission request result: $permission will send back to user.")
+        } else if (errorCode != null) {
+            Log.d(TAG, "Permission request failed. error code: $errorCode will send back to user.")
+        }
+
 
         if (permission != null) {
-            if (permissionResultCallback != null) {
-                permissionResultCallback!!(permission)
-            } else {
-                Log.w(TAG,"answerPermissionRequestResult but permissionResultCallback == null")
-            }
+            permissionResultCallback!!(permission)
         }
         if (errorCode != null) {
-            if (errorCallback != null) {
-                errorCallback!!(errorCode)
-            } else {
-                Log.w(TAG,"answerPermissionRequestResult but errorCallback == null")
-            }
+            errorCallback!!(errorCode)
         }
 
         permissionResultCallback = null

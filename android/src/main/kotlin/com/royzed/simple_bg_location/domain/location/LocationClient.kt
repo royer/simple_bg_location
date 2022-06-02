@@ -9,6 +9,8 @@ interface LocationClient {
 
     fun getLastKnownLocation(positionChangedCallback: PositionChangedCallback, errorCallback: ErrorCallback)
 
+    fun getCurrentPosition(positionChangedCallback: PositionChangedCallback, errorCallback: ErrorCallback)
+
     fun startLoationUpdates(positionChangedCallback: PositionChangedCallback, errorCallback: ErrorCallback)
 
     fun stopLocationUpdates()

@@ -16,6 +16,7 @@ class Methods {
   static const openAppSettings = "openAppSettings";
   static const openLocationSettings = "openLocationSettings";
   static const getLastKnownPosition = "getLastKnownPosition";
+  static const getCurrentPosition = "getCurrentPosition";
 }
 
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
@@ -85,6 +86,24 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
       final positionMap =
           result != null ? Map<String, dynamic>.from(result) : null;
       return positionMap != null ? Position.fromMap(positionMap) : null;
+    } on PlatformException catch (e) {
+      final error = _handlePlatformException(e);
+      throw error;
+    }
+  }
+
+  @override
+  Future<Position?> getCurrentPosition(
+      {bool forceLocationManager = false}) async {
+    try {
+      final params = <String, dynamic>{
+        'forceLocationManager': forceLocationManager
+      };
+
+      final result = await methodChannel.invokeMapMethod<String, dynamic>(
+          Methods.getCurrentPosition, params);
+
+      return result != null ? Position.fromMap(result) : null;
     } on PlatformException catch (e) {
       final error = _handlePlatformException(e);
       throw error;

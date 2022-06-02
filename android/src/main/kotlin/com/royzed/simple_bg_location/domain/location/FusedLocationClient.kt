@@ -3,6 +3,7 @@ package com.royzed.simple_bg_location.domain.location
 import android.annotation.SuppressLint
 import android.content.Context
 import com.google.android.gms.location.*
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.royzed.simple_bg_location.errors.ErrorCallback
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import io.flutter.Log
@@ -58,9 +59,34 @@ class FusedLocationClient(
     ) {
         fusedProviderClient.lastLocation.addOnSuccessListener(positionChangedCallback)
             .addOnFailureListener {
-                Log.e(TAG,"Error trying to get last known location")
+                Log.e(TAG,"Error trying to get last known location. $it")
                 errorCallback(ErrorCodes.errorWhileAcquiringPosition)
             }
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun getCurrentPosition(
+        positionChangedCallback: PositionChangedCallback,
+        errorCallback: ErrorCallback
+    ) {
+        val cts:CancellationTokenSource = CancellationTokenSource()
+        fusedProviderClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, cts.token)
+            .addOnSuccessListener {
+                positionChangedCallback(it)
+                cts.cancel()
+
+            }
+            .addOnFailureListener {
+                Log.e(TAG,"failed to try getCurrentPostion. $it")
+                errorCallback(ErrorCodes.errorWhileAcquiringPosition)
+                cts.cancel()
+            }
+            .addOnCanceledListener {
+                Log.e(TAG,"getCurrentPosition cancelled.")
+                errorCallback(ErrorCodes.errorWhileAcquiringPosition)
+                cts.cancel()
+            }
+        //cts.cancel()
     }
 
     override fun startLoationUpdates(

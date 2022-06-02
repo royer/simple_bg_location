@@ -18,7 +18,8 @@ data class Position(
     val floor: Int? = null,
     val speed: Double = -1.0,
     val speedAccuracy: Double = -1.0,
-    val isMocked: Boolean = false
+    val isMocked: Boolean = false,
+    val isForeground: Boolean = false
 ) {
     override fun toString(): String {
         val strTime = Date(timestamp).toIso8601String()

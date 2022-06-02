@@ -21,7 +21,6 @@ class SimpleBgLocationService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG,"Service created.")
-
         notification = ForegroundNotification(
             applicationContext,
             NOTIFICATION_ID,
@@ -31,7 +30,7 @@ class SimpleBgLocationService : Service() {
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.action?:"<null>"
-        Log.d(TAG, "onStartCommand(Intent.action: $action, flags: $flags, startId: $startId)")
+        Log.d(TAG, "Service onStartCommand(Intent.action: $action, flags: $flags, startId: $startId)")
 
         val cancelFromNotification = intent?.getBooleanExtra(
             EXTRA_CANCEL_LOCATION_UPDATE_FROM_NOTIFICATION, false) ?: false
@@ -42,7 +41,8 @@ class SimpleBgLocationService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        Log.d(TAG,"onBind() $intent")
+
+        Log.d(TAG,"Service onBind()")
         stopForeground(true)
         serviceRunningInForeground = false
         isConfigChanged = false
@@ -50,7 +50,7 @@ class SimpleBgLocationService : Service() {
     }
 
     override fun onRebind(intent: Intent?) {
-        Log.d(TAG, "onRebind()")
+        Log.d(TAG, "Service onRebind()")
         stopForeground(true)
         serviceRunningInForeground = false
         isConfigChanged = false
@@ -59,7 +59,7 @@ class SimpleBgLocationService : Service() {
 
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Log.d(TAG,"onUnbind()")
+        Log.d(TAG,"Service onUnbind()")
         if (!isConfigChanged && isTracking) {
             startForeground(NOTIFICATION_ID, notification.build())
             serviceRunningInForeground = true
@@ -68,14 +68,14 @@ class SimpleBgLocationService : Service() {
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
-        Log.d(TAG,"onConfigurationChanged()")
+        Log.d(TAG,"Service onConfigurationChanged()")
         isConfigChanged = true
         super.onConfigurationChanged(newConfig)
     }
 
 
     override fun onDestroy() {
-        Log.d(TAG,"onDestroy()")
+        Log.d(TAG,"Service onDestroy()")
         super.onDestroy()
     }
 

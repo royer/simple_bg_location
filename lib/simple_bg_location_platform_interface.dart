@@ -71,6 +71,10 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
         'getLastKnownPosition() has not been implemented.');
   }
 
+  Future<Position?> getCurrentPosition({bool forceLocationManager = false}) {
+    throw UnimplementedError('getCurrentPosition() has not been implemented.');
+  }
+
   /// Open the App settings page
   ///
   /// Returns [true] if app settings page could be opened, otherwise [false]

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_bg_location/src/errors/location_services_disabled_exception.dart';
+import 'package:simple_bg_location/src/extensions/extensions.dart';
 import 'src/errors/errors.dart';
 import 'src/enums/enums.dart';
 import 'src/models/models.dart';
@@ -19,11 +19,20 @@ class Methods {
   static const getCurrentPosition = "getCurrentPosition";
 }
 
+class Events {
+  static const positionUpdates = "position_updates";
+}
+
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
 class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('$_pluginPath/methods');
+
+  static const _eventChannelPosition =
+      EventChannel('$_pluginPath/event/${Events.positionUpdates}');
+
+  Stream<Position>? _positionStream;
 
   @override
   Future<LocationPermission> checkPermission() async {
@@ -111,6 +120,32 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
   }
 
   @override
+  Stream<Position> getPositionStream(
+    RequestSettings? requestSettings,
+  ) {
+    if (_positionStream != null) {
+      return _positionStream!;
+    }
+
+    var originalStream =
+        _eventChannelPosition.receiveBroadcastStream(requestSettings?.toMap());
+
+    var positionStream = _wrapStream(originalStream);
+
+    _positionStream = positionStream
+        .map<Position>(
+            (dynamic e) => Position.fromMap(e.cast<String, dynamic>()))
+        .handleError((error) {
+      if (error is PlatformException) {
+        error = _handlePlatformException(error);
+      }
+      throw error;
+    });
+
+    return _positionStream!;
+  }
+
+  @override
   Future<bool> openAppSettings() async {
     try {
       return await methodChannel.invokeMethod(Methods.openAppSettings);
@@ -128,6 +163,13 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
       final error = _handlePlatformException(e);
       throw error;
     }
+  }
+
+  Stream<dynamic> _wrapStream(Stream<dynamic> incoming) {
+    return incoming.asBroadcastStream(onCancel: (sub) {
+      sub.cancel();
+      _positionStream = null;
+    });
   }
 
   Exception _handlePlatformException(PlatformException exception) {

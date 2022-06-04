@@ -13,14 +13,13 @@ class InvalidPermissionException implements Exception {
 
   @override
   String toString() {
-    // ignore: lines_longer_than_80_chars
+    var dumps = <String>[];
+    for (final v in LocationPermission.values) {
+      dumps.add('${v.name}: ${v.index}');
+    }
+
     return 'Unable to convert the value "$valueToConvert" into a '
         'LocationPermission.\n'
-        '(${LocationPermission.denied.toString()}: ${LocationPermission.denied.index}; '
-        '${LocationPermission.deniedForever.toString()}: ${LocationPermission.deniedForever.index}; '
-        '${LocationPermission.whileInUse.toString()}: ${LocationPermission.whileInUse.index}; '
-        '${LocationPermission.always.toString()}: ${LocationPermission.always.index}; '
-        '${LocationPermission.unableToDetermine.toString()}: ${LocationPermission.unableToDetermine.index}; '
-        ')';
+        "(${dumps.join(', ')})";
   }
 }

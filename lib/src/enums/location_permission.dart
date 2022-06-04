@@ -22,19 +22,3 @@ enum LocationPermission {
   /// Permission status is cannot be determined.
   unableToDetermine
 }
-
-extension LocationPermissionXonInt on int {
-  LocationPermission toLocationPermission() {
-    if (this == LocationPermission.denied.index) {
-      return LocationPermission.denied;
-    } else if (this == LocationPermission.deniedForever.index) {
-      return LocationPermission.deniedForever;
-    } else if (this == LocationPermission.whileInUse.index) {
-      return LocationPermission.whileInUse;
-    } else if (this == LocationPermission.always.index) {
-      return LocationPermission.always;
-    } else {
-      throw InvalidPermissionException(this);
-    }
-  }
-}

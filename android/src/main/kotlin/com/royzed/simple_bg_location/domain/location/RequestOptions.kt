@@ -1,6 +1,6 @@
 package com.royzed.simple_bg_location.domain.location
 
-data class LocationOptions(
+data class RequestOptions(
     val accuracy: LocationAccuracy = LocationAccuracy.Best,
 
     /**
@@ -37,12 +37,12 @@ data class LocationOptions(
 
 )
 
-val DEFAULT_GET_CURRENT_POSITION_LOCATION_OPTIONS = LocationOptions(
+val DEFAULT_GET_CURRENT_POSITION_LOCATION_OPTIONS = RequestOptions(
     accuracy = LocationAccuracy.High,
     distanceFilter = 0,
-    interval = 10*1000,
-    minUpdateInterval = 20*1000,
-    duration = 60*1000,
-    maxUpdateDelay = 90*1000,
+    interval = 3*1000,
+    minUpdateInterval = 0,
+    duration = 0,
+    maxUpdateDelay = 0,
     maxUpdates = 1
 )

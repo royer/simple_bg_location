@@ -14,11 +14,14 @@ class InvalidAccuracyPermissionException implements Exception {
   @override
   String toString() {
     // ignore: lines_longer_than_80_chars
+
+    var dumps = <String>[];
+    for (final v in LocationAccuracyPermission.values) {
+      dumps.add('${v.name}: ${v.index}');
+    }
+
     return 'Unable to convert the value "$valueToConvert" into a '
         'LocationPermission.\n'
-        '(${LocationAccuracyPermission.precise.toString()}: ${LocationAccuracyPermission.precise.index}; '
-        '${LocationAccuracyPermission.precise.toString()}: ${LocationAccuracyPermission.precise.index}; '
-        '${LocationAccuracyPermission.denied.toString()}: ${LocationAccuracyPermission.denied.index}; '
-        ')';
+        "(${dumps.join(', ')})";
   }
 }

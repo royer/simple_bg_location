@@ -27,11 +27,16 @@ class SimpleBgLocation {
     return SimpleBgLocationPlatform.instance
         .getLastKnownPosition(forceLocationManager: forceLocationManager);
   }
+
   Future<Position?> getCurrentPosition({bool forceLocationManager = false}) {
     return SimpleBgLocationPlatform.instance
         .getCurrentPosition(forceLocationManager: forceLocationManager);
   }
 
+  Stream<Position> getPositionStream(RequestSettings? requestSettings) {
+    return SimpleBgLocationPlatform.instance
+        .getPositionStream(requestSettings);
+  }
 
   Future<bool> openAppSettings() {
     return SimpleBgLocationPlatform.instance.openAppSettings();

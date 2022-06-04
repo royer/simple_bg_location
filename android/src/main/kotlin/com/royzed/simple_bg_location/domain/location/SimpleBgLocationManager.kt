@@ -33,28 +33,28 @@ class SimpleBgLocationManager(
         private fun createLocationClient(
             context: Context,
             forceLocationManager: Boolean = false,
-            options: LocationOptions = LocationOptions(),
+            options: RequestOptions = RequestOptions(),
             forCurrentPosition: Boolean
         ) : LocationClient {
 
             if (forceLocationManager) {
                 Log.d(TAG,"Will create Android LocationManager Client because forced")
-                return LocationManagerClient(context, options ?: LocationOptions(), forCurrentPosition)
+                return LocationManagerClient(context, options ?: RequestOptions(), forCurrentPosition)
             }
 
             if (isGooglePlayServicesAvailable(context)) {
                 Log.d(TAG,"Will create Google FusedLocationClient.")
-                return FusedLocationClient(context, options?:LocationOptions())
+                return FusedLocationClient(context, options?:RequestOptions())
             } else {
                 Log.d(TAG,"Will create Android LocationManager because google play services is unavailable.")
-                return LocationManagerClient(context, options ?: LocationOptions(), forCurrentPosition)
+                return LocationManagerClient(context, options ?: RequestOptions(), forCurrentPosition)
             }
 
         }
 
         @JvmStatic
         fun isLocationServiceEnabled(context: Context, listener: LocationServiceListener) {
-            val client = createLocationClient(context, false, LocationOptions(), false)
+            val client = createLocationClient(context, false, RequestOptions(), false)
 
             client.isLocationServiceEnabled(listener)
         }

@@ -16,7 +16,7 @@ import java.util.*
 
 class LocationManagerClient(
     val context: Context,
-    private val options: LocationOptions = LocationOptions(),
+    private val options: RequestOptions = RequestOptions(),
     private val forCurrentPosition: Boolean,
 ) : LocationClient, LocationListener {
 
@@ -70,11 +70,16 @@ class LocationManagerClient(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val locationRequest = LocationRequest.Builder(options.interval).apply {
                 setQuality(options.accuracy.toLocationRequestQuality())
-                setDurationMillis(if (options.duration >= 1) options.duration else DEFAULT_DURATION)
-                setMaxUpdateDelayMillis(options.maxUpdateDelay)
-                setMaxUpdateDelayMillis(options.maxUpdates)
-                setMinUpdateDistanceMeters(options.distanceFilter.toFloat())
-                setMinUpdateIntervalMillis(options.minUpdateInterval)
+                if (options.duration >= 1)
+                    setDurationMillis(options.duration)
+                if (options.maxUpdateDelay > 0)
+                    setMaxUpdateDelayMillis(options.maxUpdateDelay)
+                if (options.maxUpdates >= 1)
+                    setMaxUpdates(options.maxUpdates.toInt())
+                if (options.distanceFilter >= 0.0)
+                    setMinUpdateDistanceMeters(options.distanceFilter.toFloat())
+                if (options.minUpdateInterval >= 0)
+                    setMinUpdateIntervalMillis(options.minUpdateInterval)
             }.build()
 
             manager.getCurrentLocation(provider, locationRequest, null, context.mainExecutor) {
@@ -121,7 +126,17 @@ class LocationManagerClient(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val locationRequest = LocationRequest.Builder(options.interval).apply {
-
+                setQuality(options.accuracy.toLocationRequestQuality())
+                if (options.duration >= 1)
+                    setDurationMillis(options.duration)
+                if (options.maxUpdateDelay > 0)
+                    setMaxUpdateDelayMillis(options.maxUpdateDelay)
+                if (options.maxUpdates >= 1)
+                    setMaxUpdates(options.maxUpdates.toInt())
+                if (options.distanceFilter >= 0.0)
+                    setMinUpdateDistanceMeters(options.distanceFilter.toFloat())
+                if (options.minUpdateInterval >= 0)
+                    setMinUpdateIntervalMillis(options.minUpdateInterval)
             }.build()
             manager.requestLocationUpdates(currentProvider!!, locationRequest, context.mainExecutor, this )
         } else {
@@ -190,7 +205,6 @@ class LocationManagerClient(
     companion object {
         private const val TAG = "LocationManagerClient"
         private const val ACCEPT_TIME_INTERVAL:Long = 2 * 60 * 1000
-        private const val DEFAULT_DURATION:Long = 30 * 1000
 
         @JvmStatic
         fun isBetterLocation(location: Location, bestLocation: Location?): Boolean {

@@ -10,7 +10,7 @@ import io.flutter.Log
 
 class FusedLocationClient(
     private val context: Context,
-    private val options: LocationOptions = LocationOptions()
+    private val options: RequestOptions = RequestOptions()
 ): LocationClient {
 
     private var postionChangedCallback: PositionChangedCallback? = null
@@ -18,17 +18,44 @@ class FusedLocationClient(
 
     private val fusedProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
-    private val locationCallback = object : LocationCallback() {
+    private lateinit var locationCallback: LocationCallback;
 
-        @Synchronized
-        override fun onLocationResult(locatoinResult: LocationResult)  {
+    init {
+        locationCallback = object : LocationCallback() {
 
+            override fun onLocationResult(locationResult: LocationResult)  {
+                if (postionChangedCallback == null) {
+                    Log.e(TAG,"LocationCallback was called with no postionChangedCallback registered.")
+                    fusedProviderClient.removeLocationUpdates(locationCallback)
+                    if (errorCallback != null) {
+                        errorCallback.invoke(ErrorCodes.errorWhileAcquiringPosition)
+                    }
+                    return
+                }
+                if (locationResult.locations.isNotEmpty()) {
+                    for(location in locationResult.locations) {
+                        postionChangedCallback!!(location)
+                    }
+                } else {
+                    postionChangedCallback!!(locationResult.lastLocation)
+                }
+            }
+
+            override fun onLocationAvailability(locationAvailability: LocationAvailability) {
+                // super.onLocationAvailability(locationAvailability)
+                Log.d(TAG,"onLocationAvailability called. $locationAvailability")
+                if (!locationAvailability.isLocationAvailable && !checkLocationService(context)) {
+                    if (errorCallback != null) {
+                        errorCallback!!(ErrorCodes.locationServicesDisabled)
+                    } else {
+                        Log.e(TAG,"onLocationAvailability called and no location available but errorCallback had not registered.")
+                    }
+                }
+            }
         }
 
-        override fun onLocationAvailability(p0: LocationAvailability) {
-            super.onLocationAvailability(p0)
-        }
     }
+
 
     override fun isLocationServiceEnabled(listener: LocationServiceListener) {
         LocationServices.getSettingsClient(context)

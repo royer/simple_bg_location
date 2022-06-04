@@ -61,18 +61,51 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
         'isLocationServiceEnable() has not been implemented.');
   }
 
+  /// Check which accuracy permission that user approved.
   Future<LocationAccuracyPermission> getAccuracyPermission() {
     throw UnimplementedError(
         'getAccuracyPermission() has not been implemented.');
   }
 
+  /// Get the best most recent location currently available.
+  ///
+  /// If a location is not available, which should happen very rarely, `null` will
+  /// be return. The best accuracy available while respecting the location
+  /// permissions will be returned.
+  ///
+  ///- Throws a [PermissionDeniedException] when user has not approved access.
+  ///- Throws a [LocationServiceDisabledException] when the user allowed access,
+  /// but the location services of the device are disabled.
   Future<Position?> getLastKnownPosition({bool forceLocationManager = false}) {
     throw UnimplementedError(
         'getLastKnownPosition() has not been implemented.');
   }
 
+  /// Get a single current location fix on the device.
+  ///
+  /// Unlike [getLastKnownPosition] that returns a cached location, this method
+  /// could cause active location computation on the device. If the device
+  /// location can be determined within reasonable time(tens of seconds),
+  /// otherwise `null` will be return
+  ///
+  ///- Throws a [PermissionDeniedException] when user has not approved access.
+  ///- Throws a [LocationServiceDisabledException] when the user allowed access,
+  /// but the location services of the device are disabled.
+
   Future<Position?> getCurrentPosition({bool forceLocationManager = false}) {
     throw UnimplementedError('getCurrentPosition() has not been implemented.');
+  }
+
+  /// The position update stream.
+  ///
+  /// Fires whenever the location changed inside the bounds of the
+  /// [RequestSettings.accuracy]
+  ///
+  ///- Throws a [PermissionDeniedException] when user has not approved access.
+  ///- Throws a [LocationServiceDisabledException] when the user allowed access,
+  /// but the location services of the device are disabled.
+  Stream<Position> getPositionStream(RequestSettings? requestSettings) {
+    throw UnimplementedError('getPositionStream() has not been implemented.');
   }
 
   /// Open the App settings page

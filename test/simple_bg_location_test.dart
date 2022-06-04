@@ -6,6 +6,13 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'package:simple_bg_location/src/enums/enums.dart';
 
+final Position fakePosition = Position(
+  uuid: '',
+  latitude: 30.00,
+  longitude: 30.00,
+  timestamp: DateTime(2022, 7, 1),
+);
+
 class MockSimpleBgLocationPlatform
     with MockPlatformInterfaceMixin
     implements SimpleBgLocationPlatform {
@@ -29,26 +36,34 @@ class MockSimpleBgLocationPlatform
 
   @override
   Future<bool> isLocationServiceEnabled() {
-    // TODO: implement isLocationServiceEnable
-    throw UnimplementedError();
+    return Future.value(true);
   }
-  
+
   @override
   Future<LocationAccuracyPermission> getAccuracyPermission() {
-    // TODO: implement getAccuracyPermission
-    throw UnimplementedError();
+    return Future.value(LocationAccuracyPermission.precise);
   }
-  
+
   @override
   Future<Position?> getLastKnownPosition({bool forceLocationManager = false}) {
-    // TODO: implement getLastKnownPosition
-    throw UnimplementedError();
+    return Future.value(fakePosition);
   }
-  
+
   @override
   Future<Position?> getCurrentPosition({forceLocationManager = false}) {
-    // TODO: implement getCurrentPosition
-    throw UnimplementedError();
+    return Future.value(fakePosition);
+  }
+
+  @override
+  Stream<Position> getPositionStream(RequestSettings? requestSettings) {
+    return Stream<Position>.periodic(
+        const Duration(milliseconds: 50),
+        (x) => fakePosition.copyWith(
+              uuid: x.toString(),
+              latitude: 30.0 + x / 10,
+              longitude: 30.0 + x / 10,
+              timestamp: DateTime.now(),
+            )).take(5);
   }
 }
 

@@ -2,6 +2,7 @@ package com.royzed.simple_bg_location.domain.location
 
 import android.annotation.SuppressLint
 import android.location.LocationRequest
+import io.flutter.Log
 
 enum class LocationAccuracy {
     Lowest {
@@ -43,4 +44,17 @@ enum class LocationAccuracy {
 
     abstract fun toLocationRequestQuality(): Int
     abstract fun toGoogleLocationRequestQuality(): Int
+
+    companion object {
+        private const val TAG = "LocationAccuracy"
+
+        fun fromInt(v: Int): LocationAccuracy {
+            return try {
+                LocationAccuracy.values()[v]
+            } catch(e: ArrayIndexOutOfBoundsException) {
+                Log.w(TAG,"$v out of bounds LocationAccuracy.")
+                LocationAccuracy.Lowest
+            }
+        }
+    }
 }

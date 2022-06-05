@@ -22,7 +22,7 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
         get() = _activity!!
 
     private lateinit var mService: SimpleBgLocationService
-    private lateinit var sbgLocationManager: SimpleBgLocationManager;
+    private lateinit var sbgLocationManager: SimpleBgLocationManager
     private var mBound = false
 
 

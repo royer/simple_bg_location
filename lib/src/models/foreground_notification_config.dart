@@ -36,7 +36,7 @@ class ForegroundNotificationConfig {
 
   /// The priority of notification
   ///
-  /// The following `priority` values defined as static constants upon the [Config] object:
+  /// The following `priority` values defined as static constants:
   ///
   /// | Value                                                   | Description                                                                                             |
   /// |---------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
@@ -46,7 +46,7 @@ class ForegroundNotificationConfig {
   /// | [NOTIFICATION_PRIORITY_MAX]     | Same as `NOTIFICATION_PRIORITY_HIGH`                                                                    |
   /// | [NOTIFICATION_PRIORITY_MIN]     | Notification **strongly** weighted to bottom of list; notification-bar icon **hidden**                  |
   ///
-  int? priority;
+  int priority;
 
   /// the Channel name of notification
   ///
@@ -83,7 +83,7 @@ class ForegroundNotificationConfig {
   ///
   /// Wifi lock permissions should be obtained first by using a permissions
   /// library.
-  bool? enableWifiLock;
+  bool enableWifiLock;
 
   /// When enabled, a Wakelock is acquired when background execution is
   /// started.
@@ -93,7 +93,7 @@ class ForegroundNotificationConfig {
   ///
   /// Wake lock permissions should be obtained first by using a permissions
   /// library.
-  bool? enableWakeLock;
+  bool enableWakeLock;
 
   ForegroundNotificationConfig({
     this.layout,
@@ -101,11 +101,11 @@ class ForegroundNotificationConfig {
     this.text,
     this.smallIcon,
     this.largeIcon,
-    this.priority,
+    this.priority = 0,
     this.channelName,
     this.actions,
-    this.enableWifiLock,
-    this.enableWakeLock,
+    this.enableWifiLock = false,
+    this.enableWakeLock = false,
   });
 
   static const int NOTIFICATION_PRIORITY_DEFAULT = 0;
@@ -113,7 +113,6 @@ class ForegroundNotificationConfig {
   static const int NOTIFICATION_PRIORITY_LOW = -1;
   static const int NOTIFICATION_PRIORITY_MAX = 2;
   static const int NOTIFICATION_PRIORITY_MIN = -2;
-
 
   Map<String, dynamic> toMap() {
     return {
@@ -141,11 +140,11 @@ class ForegroundNotificationConfig {
       largeIcon: map['largeIcon'] != null
           ? AndroidResource.fromMap(map['largeIcon'])
           : null,
-      priority: map['priority']?.toInt(),
+      priority: map['priority']?.toInt() ?? 0,
       channelName: map['channelName'],
       actions: List<String>.from(map['actions']),
-      enableWifiLock: map['enableWifiLock'],
-      enableWakeLock: map['enableWakeLock'],
+      enableWifiLock: map['enableWifiLock'] ?? false,
+      enableWakeLock: map['enableWakeLock'] ?? false,
     );
   }
 

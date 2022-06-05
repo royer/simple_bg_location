@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.royzed.simple_bg_location.domain.RequestOptions
 import com.royzed.simple_bg_location.errors.ErrorCallback
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import io.flutter.Log

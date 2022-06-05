@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import androidx.annotation.RequiresApi
+import com.royzed.simple_bg_location.domain.RequestOptions
 import com.royzed.simple_bg_location.errors.ErrorCallback
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.utils.toIso8601String

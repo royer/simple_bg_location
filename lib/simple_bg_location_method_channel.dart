@@ -7,6 +7,8 @@ import 'src/models/models.dart';
 import 'simple_bg_location_platform_interface.dart';
 
 const _pluginPath = "com.royzed.simple_bg_location";
+const _methodChannelName = '$_pluginPath/methods';
+const _eventChannelPath = "$_pluginPath/events";
 
 class Methods {
   static const checkPermission = 'checkPermission';
@@ -20,17 +22,17 @@ class Methods {
 }
 
 class Events {
-  static const positionUpdates = "position_updates";
+  static const position = "position";
 }
 
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
 class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
   /// The method channel used to interact with the native platform.
   @visibleForTesting
-  final methodChannel = const MethodChannel('$_pluginPath/methods');
+  final methodChannel = const MethodChannel(_methodChannelName);
 
   static const _eventChannelPosition =
-      EventChannel('$_pluginPath/event/${Events.positionUpdates}');
+      EventChannel('$_eventChannelPath/${Events.position}');
 
   Stream<Position>? _positionStream;
 

@@ -3,6 +3,8 @@ package com.royzed.simple_bg_location.domain.location
 import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.royzed.simple_bg_location.domain.DEFAULT_GET_CURRENT_POSITION_LOCATION_OPTIONS
+import com.royzed.simple_bg_location.domain.RequestOptions
 import com.royzed.simple_bg_location.errors.ErrorCallback
 import io.flutter.Log
 

@@ -1,17 +1,20 @@
 package com.royzed.simple_bg_location.domain
 
-class AndroidResource(private val _name: String, private val _defType: String) {
+class AndroidResource(val name: String = "", val defType: String = "") {
 
-    val name get() = _name
-    val defType get() = _defType
+    val isEmpty: Boolean
+    get() = name.isEmpty()
+
 
     companion object {
 
         @JvmStatic
-        fun parseArguments(arguments: Map<String, String>?): AndroidResource? {
+        fun fromMap(arguments: Map<String, Any?>?): AndroidResource {
             if (arguments == null)
-                return null
-            return AndroidResource(arguments["name"]?:"", arguments["defType"]?:"")
+                return AndroidResource()
+            return AndroidResource(arguments["name"] as? String ?:"", arguments["defType"] as? String ?:"")
         }
+
+        val defaultAppIcon = AndroidResource("mipmap/ic_launcher")
     }
 }

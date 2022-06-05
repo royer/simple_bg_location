@@ -21,11 +21,14 @@ class SimpleBgLocationService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG,"Service created.")
+
+        val appName = applicationInfo.nonLocalizedLabel.toString()
+
         notification = ForegroundNotification(
             applicationContext,
             NOTIFICATION_ID,
             NOTIFICATION_CHANNEL_ID,
-            ForegroundNotificationConfig("Tracking", "distance: 3.4km  Elapsed: 00:30:23")
+            ForegroundNotificationConfig(title = "Tracking", text = "distance: 3.4km  Elapsed: 00:30:23", channelName = appName)
         )
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

@@ -28,9 +28,6 @@ class ForegroundNotification(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(channelId, notificationConfig.channelName, importance)
-                .apply {
-                    description = notificationConfig.channelDescription
-                }
 
             // Register the channel with the system
             // It's safe to call this repeatedly because creating an existing notification
@@ -80,7 +77,7 @@ class ForegroundNotification(
     }
 
     private fun updateNotification(config: ForegroundNotificationConfig, notify: Boolean) {
-        val iconId = getIcon(config.icon.name, config.icon.defType)
+        val iconId = getIcon(config.smallIcon.name, config.smallIcon.defType)
 
 
         builder.apply {

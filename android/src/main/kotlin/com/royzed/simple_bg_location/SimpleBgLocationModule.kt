@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.royzed.simple_bg_location.callbacks.CallbacksManager
+import com.royzed.simple_bg_location.callbacks.PositionCallback
 import com.royzed.simple_bg_location.data.Position
 import com.royzed.simple_bg_location.domain.location.LocationServiceListener
 import com.royzed.simple_bg_location.domain.location.PositionChangedCallback
@@ -15,10 +17,12 @@ import com.royzed.simple_bg_location.errors.ErrorCallback
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
 import com.royzed.simple_bg_location.permission.PermissionManager
+import com.royzed.simple_bg_location.streams.PositionStreamHandler
 import com.royzed.simple_bg_location.utils.SettingsUtils
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
 import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
@@ -33,6 +37,10 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
     private val activityObserver: ActivityObserver = ActivityObserver()
 
     private val permissionManager: PermissionManager = PermissionManager()
+
+    private val streamHandlers: MutableList<EventChannel.StreamHandler> = mutableListOf()
+
+    val callbacksManager: CallbacksManager = CallbacksManager()
 
     fun onAttachedToEngine(context: Context, messenger: BinaryMessenger) {
         this.messenger = messenger
@@ -51,6 +59,10 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         activity = binding.activity
         FlutterLifecycleAdapter.getActivityLifecycle(binding).addObserver(activityObserver)
         permissionManager.onAttachedToActivity(binding)
+
+        synchronized(streamHandlers) {
+            streamHandlers.add(PositionStreamHandler().register(context, messenger))
+        }
     }
 
 
@@ -58,7 +70,16 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         assert(activity != null && activityBinding != null)
 
         permissionManager.onDetachedFromActivity()
-        FlutterLifecycleAdapter.getActivityLifecycle(activityBinding!!).removeObserver(activityObserver)
+        activityObserver.onDetachFromActivity()
+
+        //FlutterLifecycleAdapter.getActivityLifecycle(activityBinding!!).removeObserver(activityObserver)
+
+        callbacksManager.unregisterAll()
+
+        synchronized(streamHandlers) {
+            streamHandlers.clear()
+        }
+
         activityBinding = null
         activity = null
     }
@@ -204,13 +225,27 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         return true
     }
 
+
+
+    fun registerPositionListener(callback: PositionCallback) {
+        callbacksManager.registerPositionListener(callback)
+    }
+
+    fun unregisterListener(eventName: String, callback: Any) {
+        callbacksManager.unregisterListener(eventName, callback)
+    }
+
+    fun unregisterAllListener() {
+        callbacksManager.unregisterAll()
+    }
+
+
     companion object {
         private const val TAG = "SimpleBgLocationModule"
 
         @Volatile
         private var INSTANCE: SimpleBgLocationModule? = null
 
-        @JvmStatic
         fun getInstance(): SimpleBgLocationModule {
             return INSTANCE ?: synchronized(this) {
                 val instance = SimpleBgLocationModule()

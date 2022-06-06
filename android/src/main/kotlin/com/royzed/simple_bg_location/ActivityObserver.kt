@@ -89,6 +89,11 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
         _activity = null
     }
 
+    fun onDetachFromActivity() {
+        Log.d(TAG,"onDetachFromActivity")
+        _activity = null
+    }
+
     companion object {
         private const val TAG = "SimpleBgl.ActivityObserver"
 

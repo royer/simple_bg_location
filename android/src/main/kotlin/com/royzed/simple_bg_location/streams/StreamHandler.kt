@@ -2,6 +2,7 @@ package com.royzed.simple_bg_location.streams
 
 import android.content.Context
 import androidx.annotation.CallSuper
+import com.royzed.simple_bg_location.SimpleBgLocationModule
 import com.royzed.simple_bg_location.SimpleBgLocationPlugin
 import io.flutter.Log
 import io.flutter.plugin.common.BinaryMessenger
@@ -28,8 +29,8 @@ open class StreamHandler(val eventName: String) : EventChannel.StreamHandler {
 
     @CallSuper
     override fun onCancel(arguments: Any?) {
-        Log.d(TAG, "onCancel of EventStreamHandler")
-        //TODO remove from list
+        Log.d(TAG,"$eventName onCancel($arguments)")
+        SimpleBgLocationModule.getInstance().unregisterListener(eventName, this)
     }
 
     companion object {

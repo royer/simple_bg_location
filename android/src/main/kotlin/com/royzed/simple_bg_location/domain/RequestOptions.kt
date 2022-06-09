@@ -1,6 +1,9 @@
 package com.royzed.simple_bg_location.domain
 
+import android.content.Context
 import com.royzed.simple_bg_location.domain.location.LocationAccuracy
+import com.royzed.simple_bg_location.utils.parseFlutterIntToLong
+import io.flutter.Log
 
 data class RequestOptions(
     val accuracy: LocationAccuracy = LocationAccuracy.Best,
@@ -40,28 +43,60 @@ data class RequestOptions(
     val maxUpdates: Long = 0,
 
     val notificationConfig: ForegroundNotificationConfig = ForegroundNotificationConfig()
+
 ) {
+
+    fun toMap(): Map<String, Any>? {
+        val map: MutableMap<String, Any> = mutableMapOf()
+        map["accuracy"] = accuracy.ordinal
+        map["distanceFilter"] = distanceFilter
+        map["forceLocationManager"] = forceLocationManager
+        map["interval"] = interval
+        map["minUpdateInterval"] = minUpdateInterval
+        map["duration"] = duration
+        map["maxUpdateDelay"] = maxUpdateDelay
+        map["maxUpdates"] = maxUpdates
+        map["notificationConfig"] = notificationConfig.toMap()
+
+        return map.toMap()
+    }
 
     companion object {
 
         @Suppress("UNCHECKED_CAST")
         @JvmStatic
-        fun fromMap(map: Map<String, Any?>?): RequestOptions {
+        fun fromMap(context: Context, map: Map<String, Any?>?): RequestOptions {
             if (map == null) {
-                return RequestOptions()
+                return makeDefault(context)
             }
+
 
             return RequestOptions(
                 accuracy = LocationAccuracy.fromInt((map["accuracy"] as? Int)?:0),
-                distanceFilter = (map["distanceFilter"] as? Long) ?: 0,
+                distanceFilter = parseFlutterIntToLong(map["distanceFilter"]) ?: 0,
                 forceLocationManager = (map["forceLocationManager"] as? Boolean) == true,
-                interval = (map["interval"] as? Long) ?: 0,
-                minUpdateInterval = (map["minUpdateInterval"] as? Long) ?: 0,
-                duration = (map["duration"] as? Long) ?: 0,
-                maxUpdateDelay = (map["maxUpdateDelay"] as? Long) ?: 0,
-                maxUpdates = (map["maxUpdates"] as? Long) ?: 0,
-                notificationConfig = ForegroundNotificationConfig.fromMap(map["notificationConfig"] as Map<String, Any?>?)
-            );
+                interval = parseFlutterIntToLong(map["interval"]) ?: 0,
+                minUpdateInterval = parseFlutterIntToLong(map["minUpdateInterval"]) ?: 0,
+                duration = parseFlutterIntToLong(map["duration"]) ?: 0,
+                maxUpdateDelay = parseFlutterIntToLong(map["maxUpdateDelay"]) ?: 0,
+                maxUpdates = parseFlutterIntToLong(map["maxUpdates"]) ?: 0,
+                notificationConfig = ForegroundNotificationConfig.fromMap(context, map["notificationConfig"] as Map<String, Any?>?)
+            )
+        }
+
+        @JvmStatic
+        fun makeDefault(context: Context): RequestOptions {
+            return RequestOptions(
+                accuracy = LocationAccuracy.Medium,
+                distanceFilter = 0,
+                forceLocationManager = false,
+                interval = 0,
+                minUpdateInterval = 0,
+                duration = 0,
+                maxUpdateDelay = 0,
+                maxUpdates = 0,
+                notificationConfig = ForegroundNotificationConfig.makeDefaultConfig(context)
+            )
         }
     }
 }

@@ -55,7 +55,7 @@ class MockSimpleBgLocationPlatform
   }
 
   @override
-  Stream<Position> getPositionStream(RequestSettings? requestSettings) {
+  Stream<Position> getPositionStream([Function(PositionError)? handleError]) {
     return Stream<Position>.periodic(
         const Duration(milliseconds: 50),
         (x) => fakePosition.copyWith(
@@ -64,6 +64,30 @@ class MockSimpleBgLocationPlatform
               longitude: 30.0 + x / 10,
               timestamp: DateTime.now(),
             )).take(5);
+  }
+
+  @override
+  void onPosition(Function(Position p1) success,
+      [Function(PositionError p1)? failure]) {
+    // TODO: implement onPosition
+  }
+
+  @override
+  Future<bool> requestPositionUpdate(RequestSettings requestSettings) {
+    // TODO: implement requestPositionUpdate
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> stopPositionUpdate() {
+    // TODO: implement stopPositionUpdate
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<SBGLState> ready() {
+    // TODO: implement ready
+    throw UnimplementedError();
   }
 }
 
@@ -76,12 +100,10 @@ void main() {
   });
 
   test('checkPermission', () async {
-    SimpleBgLocation simpleBgLocationPlugin = SimpleBgLocation();
     MockSimpleBgLocationPlatform fakePlatform = MockSimpleBgLocationPlatform();
     SimpleBgLocationPlatform.instance = fakePlatform;
 
-    expect(await simpleBgLocationPlugin.checkPermission(),
-        LocationPermission.always);
+    expect(await SimpleBgLocation.checkPermission(), LocationPermission.always);
   });
 
   test('requestPermission', () async {
@@ -89,7 +111,7 @@ void main() {
     MockSimpleBgLocationPlatform fakePlatform = MockSimpleBgLocationPlatform();
     SimpleBgLocationPlatform.instance = fakePlatform;
 
-    expect(await simpleBgLocationPlugin.requestPermission(),
-        LocationPermission.always);
+    expect(
+        await SimpleBgLocation.requestPermission(), LocationPermission.always);
   });
 }

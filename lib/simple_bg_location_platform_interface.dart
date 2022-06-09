@@ -2,6 +2,7 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'simple_bg_location_method_channel.dart';
 import 'src/enums/enums.dart';
+import 'src/errors/errors.dart';
 import 'src/models/models.dart';
 
 abstract class SimpleBgLocationPlatform extends PlatformInterface {
@@ -101,11 +102,39 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
   /// Fires whenever the location changed inside the bounds of the
   /// [RequestSettings.accuracy]
   ///
-  ///- Throws a [PermissionDeniedException] when user has not approved access.
-  ///- Throws a [LocationServiceDisabledException] when the user allowed access,
-  /// but the location services of the device are disabled.
-  Stream<Position> getPositionStream(RequestSettings? requestSettings) {
+  Stream<Position> getPositionStream([Function(PositionError)? failure]) {
     throw UnimplementedError('getPositionStream() has not been implemented.');
+  }
+
+  /// Initialize plugin for prepare requestPositionUpdate
+  ///
+  /// Before call requestPositionUpdate must call ready() to get current plugin
+  /// state.
+  /// In android when user use back button quit app, flutter will shutdown all
+  /// dart code. use ready() notify plugin and check whether the last position
+  /// update is sill tracking, and get positions updates in plugin cache.
+  ///
+  /// No position updated event will send if miss called ready()
+  Future<SBGLState> ready() {
+    throw UnimplementedError('getPositionStream() has not been implemented.');
+  }
+
+  /// Register Position stream listener
+  ///
+  /// This method offer a direct way to register a listener of Stream<Position>
+  /// which got by [getPositionStream].
+  void onPosition(Function(Position) success,
+      [Function(PositionError)? failure]) {
+    throw UnimplementedError('onPosition() has not been implemented.');
+  }
+
+  Future<bool> requestPositionUpdate(RequestSettings requestSettings) {
+    throw UnimplementedError(
+        'requestPositionUpdate() has not been implemented');
+  }
+
+  Future<bool> stopPositionUpdate() {
+    throw UnimplementedError('stopPositionUpdate() has not been implemented');
   }
 
   /// Open the App settings page

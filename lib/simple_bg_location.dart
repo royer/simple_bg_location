@@ -1,4 +1,5 @@
 import 'simple_bg_location_platform_interface.dart';
+import 'src/errors/errors.dart';
 import 'src/models/models.dart';
 import 'src/enums/enums.dart';
 
@@ -7,42 +8,62 @@ export 'src/models/models.dart';
 export 'src/enums/enums.dart';
 
 class SimpleBgLocation {
-  Future<LocationPermission> checkPermission() {
+  static Future<LocationPermission> checkPermission() {
     return SimpleBgLocationPlatform.instance.checkPermission();
   }
 
-  Future<LocationPermission> requestPermission() {
+  static Future<LocationPermission> requestPermission() {
     return SimpleBgLocationPlatform.instance.requestPermission();
   }
 
-  Future<bool> isLocationServiceEnabled() {
+  static Future<bool> isLocationServiceEnabled() {
     return SimpleBgLocationPlatform.instance.isLocationServiceEnabled();
   }
 
-  Future<LocationAccuracyPermission> getAccuracyPermission() {
+  static Future<LocationAccuracyPermission> getAccuracyPermission() {
     return SimpleBgLocationPlatform.instance.getAccuracyPermission();
   }
 
-  Future<Position?> getLastKnowPosition({bool forceLocationManager = false}) {
+  static Future<Position?> getLastKnowPosition(
+      {bool forceLocationManager = false}) {
     return SimpleBgLocationPlatform.instance
         .getLastKnownPosition(forceLocationManager: forceLocationManager);
   }
 
-  Future<Position?> getCurrentPosition({bool forceLocationManager = false}) {
+  static Future<Position?> getCurrentPosition(
+      {bool forceLocationManager = false}) {
     return SimpleBgLocationPlatform.instance
         .getCurrentPosition(forceLocationManager: forceLocationManager);
   }
 
-  Stream<Position> getPositionStream(RequestSettings? requestSettings) {
-    return SimpleBgLocationPlatform.instance
-        .getPositionStream(requestSettings);
+  static Future<SBGLState> ready() {
+    return SimpleBgLocationPlatform.instance.ready();
   }
 
-  Future<bool> openAppSettings() {
+  static Stream<Position> getPositionStream(
+      [Function(PositionError)? handleError]) {
+    return SimpleBgLocationPlatform.instance.getPositionStream(handleError);
+  }
+
+  static void onPosition(Function(Position) success,
+      [Function(PositionError)? failure]) {
+    return SimpleBgLocationPlatform.instance.onPosition(success, failure);
+  }
+
+  static Future<bool> requestPositionUpdate(RequestSettings requestSettings) {
+    return SimpleBgLocationPlatform.instance
+        .requestPositionUpdate(requestSettings);
+  }
+
+  static Future<bool> stopPositionUpdate() {
+    return SimpleBgLocationPlatform.instance.stopPositionUpdate();
+  }
+
+  static Future<bool> openAppSettings() {
     return SimpleBgLocationPlatform.instance.openAppSettings();
   }
 
-  Future<bool> openLocationSettings() {
+  static Future<bool> openLocationSettings() {
     return SimpleBgLocationPlatform.instance.openLocationSettings();
   }
 }

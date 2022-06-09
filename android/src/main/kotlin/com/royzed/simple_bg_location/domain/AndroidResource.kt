@@ -1,10 +1,17 @@
 package com.royzed.simple_bg_location.domain
 
-class AndroidResource(val name: String = "", val defType: String = "") {
+data class AndroidResource(val name: String = "", val defType: String = "") {
 
     val isEmpty: Boolean
     get() = name.isEmpty()
 
+    fun toMap(): Map<String, Any> {
+        val map: MutableMap<String, Any> = mutableMapOf()
+        map["name"] = name
+        map["defType"] = defType
+
+        return map.toMap()
+    }
 
     companion object {
 

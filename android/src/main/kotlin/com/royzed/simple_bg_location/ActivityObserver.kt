@@ -9,6 +9,8 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.royzed.simple_bg_location.domain.RequestOptions
+import com.royzed.simple_bg_location.domain.State
 import com.royzed.simple_bg_location.domain.location.PositionChangedCallback
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
 import com.royzed.simple_bg_location.errors.ErrorCallback
@@ -24,6 +26,15 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     private lateinit var mService: SimpleBgLocationService
     private lateinit var sbgLocationManager: SimpleBgLocationManager
     private var mBound = false
+
+    val isTracking: Boolean
+    get() {
+        if (mBound) {
+            return mService.isTracking
+        } else {
+            return false
+        }
+    }
 
 
     private val serviceConnection = object : ServiceConnection {
@@ -55,6 +66,28 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     ) {
 
         sbgLocationManager.getCurrentPosition(forceLocationManager, positionChangedCallback, errorCallback)
+    }
+
+    fun requestPositionUpdate(requestOptions: RequestOptions): Boolean {
+        if (!mBound) {
+            return false
+        }
+
+        return mService.requestPositionUpdate(requestOptions)
+    }
+
+    fun stopPositionUpdate() {
+        mService.stopPositionUpdate()
+    }
+
+    fun getState(): State {
+        if (mBound) {
+            return mService.getState()
+        } else {
+            val state = State();
+            state.isTracking = false
+            return state
+        }
     }
 
     override fun onStart(owner: LifecycleOwner) {

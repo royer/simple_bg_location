@@ -5,8 +5,11 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Binder
 import android.os.IBinder
+import com.royzed.simple_bg_location.data.Position
 import com.royzed.simple_bg_location.domain.ForegroundNotification
-import com.royzed.simple_bg_location.domain.ForegroundNotificationConfig
+import com.royzed.simple_bg_location.domain.RequestOptions
+import com.royzed.simple_bg_location.domain.State
+import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
 import io.flutter.Log
 
 class SimpleBgLocationService : Service() {
@@ -14,22 +17,24 @@ class SimpleBgLocationService : Service() {
 
     private var isConfigChanged = false
     private var serviceRunningInForeground = false
-    private var isTracking = false
+    private var _isTracking = false
+    val isTracking: Boolean get() = _isTracking
+
+    private val positions: MutableList<Position> = mutableListOf()
+
 
     private lateinit var notification: ForegroundNotification
+
+    private lateinit var requestOptions: RequestOptions
+
+    private lateinit var locationManager: SimpleBgLocationManager
 
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG,"Service created.")
 
-        val appName = applicationInfo.nonLocalizedLabel.toString()
+        locationManager = SimpleBgLocationManager(applicationContext)
 
-        notification = ForegroundNotification(
-            applicationContext,
-            NOTIFICATION_ID,
-            NOTIFICATION_CHANNEL_ID,
-            ForegroundNotificationConfig(title = "Tracking", text = "distance: 3.4km  Elapsed: 00:30:23", channelName = appName)
-        )
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.action?:"<null>"
@@ -63,7 +68,7 @@ class SimpleBgLocationService : Service() {
 
     override fun onUnbind(intent: Intent?): Boolean {
         Log.d(TAG,"Service onUnbind()")
-        if (!isConfigChanged && isTracking) {
+        if (!isConfigChanged && _isTracking) {
             startForeground(NOTIFICATION_ID, notification.build())
             serviceRunningInForeground = true
         }
@@ -82,15 +87,36 @@ class SimpleBgLocationService : Service() {
         super.onDestroy()
     }
 
-    fun startLocationUpdate() {
-        isTracking = true
-        startService(Intent(applicationContext, SimpleBgLocationService::class.java))
+    fun requestPositionUpdate(options: RequestOptions): Boolean {
+        return if (!_isTracking) {
+            requestOptions = options
+            notification = ForegroundNotification(applicationContext, NOTIFICATION_ID, NOTIFICATION_CHANNEL_ID, requestOptions.notificationConfig)
+
+
+            startService(Intent(applicationContext, SimpleBgLocationService::class.java))
+            _isTracking = true
+            true
+        } else {
+            false
+        }
 
     }
 
-    fun stopLocationUpdate() {
-        isTracking = false
+    fun stopPositionUpdate() {
+        _isTracking = false
         stopSelf()
+    }
+
+    fun getState(): State {
+        val state = State();
+
+        state.isTracking = isTracking;
+        if (isTracking) {
+            state.positions = positions;
+            state.requestOptions = requestOptions;
+        }
+
+        return state;
     }
 
 

@@ -54,7 +54,7 @@ class ForegroundNotificationConfig {
   /// The name of this channel can be seen in:
   /// > `Settings->App & Notifications->Your App.`
   ///
-  /// Defaults to your application's name from `AndroidManifest`.
+  /// Defaults is "Position Update".
   String? channelName;
 
   /// Your custom action button on notification

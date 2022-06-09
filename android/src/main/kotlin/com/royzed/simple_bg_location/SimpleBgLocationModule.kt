@@ -10,6 +10,8 @@ import androidx.lifecycle.LifecycleOwner
 import com.royzed.simple_bg_location.callbacks.CallbacksManager
 import com.royzed.simple_bg_location.callbacks.PositionCallback
 import com.royzed.simple_bg_location.data.Position
+import com.royzed.simple_bg_location.domain.RequestOptions
+import com.royzed.simple_bg_location.domain.State
 import com.royzed.simple_bg_location.domain.location.LocationServiceListener
 import com.royzed.simple_bg_location.domain.location.PositionChangedCallback
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
@@ -41,6 +43,8 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
     private val streamHandlers: MutableList<EventChannel.StreamHandler> = mutableListOf()
 
     val callbacksManager: CallbacksManager = CallbacksManager()
+
+    private var isready: Boolean = false
 
     fun onAttachedToEngine(context: Context, messenger: BinaryMessenger) {
         this.messenger = messenger
@@ -80,6 +84,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
             streamHandlers.clear()
         }
 
+        isready = false
         activityBinding = null
         activity = null
     }
@@ -119,6 +124,15 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
             Methods.openLocationSettings -> {
                 val hasOpenLocationSettings = SettingsUtils.openLocationSettings(context)
                 result.success(hasOpenLocationSettings)
+            }
+            Methods.requestPositionUpdate -> {
+                onRequestPositionUpdate(call, result)
+            }
+            Methods.stopPositionUpdate -> {
+                onStopPositionUpdate(result)
+            }
+            Methods.ready -> {
+                onReady(result)
             }
             else -> {
                 result.notImplemented()
@@ -203,6 +217,30 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         }, {
             result.error(it.code, it.description, null)
         })
+
+    }
+
+    private fun onRequestPositionUpdate(call: MethodCall, result: MethodChannel.Result) {
+        if (!hasPermission(result)) {
+            return
+        }
+
+        val requestOptions: RequestOptions = RequestOptions.fromMap(context, call.arguments())
+        // Log.d(TAG,"onRequestPositionUpdate: $requestOptions")
+        activityObserver.requestPositionUpdate(requestOptions)
+        result.success(true)
+    }
+
+    private fun onStopPositionUpdate(result: MethodChannel.Result) {
+        activityObserver.stopPositionUpdate()
+        result.success(true)
+    }
+
+    private fun onReady(result: MethodChannel.Result) {
+        isready = true
+        val state = activityObserver.getState()
+        Log.d(TAG,"onReady, state: $state")
+        result.success(state.toMap())
 
     }
 

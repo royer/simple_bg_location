@@ -9,4 +9,7 @@ object Methods {
     const val openLocationSettings = "openLocationSettings"
     const val getLastKnownPosition = "getLastKnownPosition"
     const val getCurrentPosition = "getCurrentPosition"
+    const val requestPositionUpdate = "requestPositionUpdate"
+    const val stopPositionUpdate = "stopPositionUpdate"
+    const val ready = "ready"
 }

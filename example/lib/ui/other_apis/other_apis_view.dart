@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 
-class OtherApiBody extends StatefulWidget {
-  const OtherApiBody({Key? key}) : super(key: key);
+class OtherApiView extends StatefulWidget {
+  const OtherApiView({Key? key}) : super(key: key);
 
   @override
-  State<OtherApiBody> createState() => _OtherApiBodyState();
+  State<OtherApiView> createState() => _OtherApiViewState();
 }
 
-class _OtherApiBodyState extends State<OtherApiBody> {
-  final _simpleBgLocation = SimpleBgLocation();
-
+class _OtherApiViewState extends State<OtherApiView> {
   String _resultInfo = "";
   String _method = "";
 
@@ -151,7 +149,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       setState(() {
         _method = "checkPermission";
       });
-      final result = await _simpleBgLocation.checkPermission();
+      final result = await SimpleBgLocation.checkPermission();
       setState(() {
         _resultInfo += "$result";
       });
@@ -175,7 +173,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       setState(() {
         _method = "requestPermission";
       });
-      final result = await _simpleBgLocation.requestPermission();
+      final result = await SimpleBgLocation.requestPermission();
       setState(() {
         _resultInfo += "$result";
       });
@@ -199,7 +197,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       setState(() {
         _method = "openAppSettings";
       });
-      final result = await _simpleBgLocation.openAppSettings();
+      final result = await SimpleBgLocation.openAppSettings();
       setState(() {
         _resultInfo = "$result";
       });
@@ -218,7 +216,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
         _method = "openLocationSettings";
       });
 
-      final result = await _simpleBgLocation.openLocationSettings();
+      final result = await SimpleBgLocation.openLocationSettings();
       setState(() {
         _resultInfo = "$result";
       });
@@ -236,7 +234,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       setState(() {
         _method = "isLocationServiceEnabled";
       });
-      final result = await _simpleBgLocation.isLocationServiceEnabled();
+      final result = await SimpleBgLocation.isLocationServiceEnabled();
       setState(() {
         _resultInfo = '$result';
       });
@@ -254,7 +252,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
       setState(() {
         _method = "getAccuracyPermission";
       });
-      final result = await _simpleBgLocation.getAccuracyPermission();
+      final result = await SimpleBgLocation.getAccuracyPermission();
       setState(() {
         _resultInfo = "$result";
       });
@@ -272,7 +270,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
         _method =
             "getLastKnownPosition(forceLocationManager = $forceLocationManager)";
       });
-      final position = await _simpleBgLocation.getLastKnowPosition(
+      final position = await SimpleBgLocation.getLastKnowPosition(
           forceLocationManager: forceLocationManager);
       setState(() {
         _resultInfo = "$position";
@@ -291,7 +289,7 @@ class _OtherApiBodyState extends State<OtherApiBody> {
         _method =
             "getCurrentPosition(forceLocationManager = $forceLocationManager)";
       });
-      final position = await _simpleBgLocation.getCurrentPosition(
+      final position = await SimpleBgLocation.getCurrentPosition(
           forceLocationManager: forceLocationManager);
       setState(() {
         _resultInfo = "$position";

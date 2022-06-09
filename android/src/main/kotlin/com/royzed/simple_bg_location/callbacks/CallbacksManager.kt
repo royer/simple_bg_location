@@ -21,6 +21,8 @@ class CallbacksManager {
                     val finded = _positionCallbacks.remove(callback)
                     if (finded == false) {
                         Log.d(TAG, "remove PositionCallback failed.")
+                    } else {
+                        Log.d(TAG,"one PositionCallback removed.")
                     }
                 }
             }
@@ -30,6 +32,7 @@ class CallbacksManager {
     fun unregisterAll() {
         synchronized(_positionCallbacks) {
             _positionCallbacks.clear()
+            Log.d(TAG,"All PositionCallback removed")
         }
     }
 

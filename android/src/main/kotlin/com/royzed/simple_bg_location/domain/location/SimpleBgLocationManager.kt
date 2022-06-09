@@ -11,7 +11,7 @@ import io.flutter.Log
 class SimpleBgLocationManager(
     private val context: Context
 ) {
-    private lateinit var mainLocationClient: LocationClient
+    private var mainLocationClient: LocationClient? = null
 
     fun getCurrentPosition(
         forceLocationManager: Boolean,
@@ -26,6 +26,23 @@ class SimpleBgLocationManager(
             locationOptions,
             true)
         client.getCurrentPosition(positionChangedCallback, errorCallback)
+    }
+
+    fun startPositionUpdate(
+        options: RequestOptions,
+        positionChangedCallback: PositionChangedCallback,
+        errorCallback: ErrorCallback ) {
+
+        assert(mainLocationClient == null)
+
+        mainLocationClient = createLocationClient(context, options.forceLocationManager, options, false);
+        mainLocationClient!!.startLoationUpdates(positionChangedCallback, errorCallback);
+    }
+
+    fun stopPosition() {
+
+        mainLocationClient!!.stopLocationUpdates()
+        mainLocationClient = null
     }
 
     companion object {

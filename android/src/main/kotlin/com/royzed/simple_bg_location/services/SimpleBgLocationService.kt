@@ -5,11 +5,14 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Binder
 import android.os.IBinder
+import com.royzed.simple_bg_location.SimpleBgLocationModule
 import com.royzed.simple_bg_location.data.Position
 import com.royzed.simple_bg_location.domain.ForegroundNotification
 import com.royzed.simple_bg_location.domain.RequestOptions
 import com.royzed.simple_bg_location.domain.State
+import com.royzed.simple_bg_location.domain.location.PositionChangedCallback
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
+import com.royzed.simple_bg_location.errors.ErrorCallback
 import io.flutter.Log
 
 class SimpleBgLocationService : Service() {
@@ -29,6 +32,24 @@ class SimpleBgLocationService : Service() {
 
     private lateinit var locationManager: SimpleBgLocationManager
 
+    private val positionCallback: PositionChangedCallback = { location ->
+
+        if (location != null) {
+            val position = Position.fromLocation(location)
+            positions.add(position)
+            SimpleBgLocationModule.getInstance().dispatchPositionEvent(position)
+        } else {
+            Log.w(TAG,"got location is null. do nothing!")
+
+        }
+
+    }
+    private val errorCallback: ErrorCallback = {
+        SimpleBgLocationModule.getInstance().dispatchPositionErrorEvent(it)
+        Log.d(TAG,"Position Update hit error: code: $it")
+        stopPositionUpdate()
+    }
+
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG,"Service created.")
@@ -43,7 +64,7 @@ class SimpleBgLocationService : Service() {
         val cancelFromNotification = intent?.getBooleanExtra(
             EXTRA_CANCEL_LOCATION_UPDATE_FROM_NOTIFICATION, false) ?: false
         if (cancelFromNotification) {
-            stopSelf()
+            stopPositionUpdate()
         }
         return START_NOT_STICKY
     }
@@ -94,6 +115,8 @@ class SimpleBgLocationService : Service() {
 
 
             startService(Intent(applicationContext, SimpleBgLocationService::class.java))
+
+            locationManager.startPositionUpdate(options, positionCallback, errorCallback)
             _isTracking = true
             true
         } else {
@@ -104,6 +127,9 @@ class SimpleBgLocationService : Service() {
 
     fun stopPositionUpdate() {
         _isTracking = false
+        positions.clear()
+        locationManager.stopPositionUpdate()
+        Log.d(TAG, "Position Update Stopped.")
         stopSelf()
     }
 

@@ -27,7 +27,9 @@ class SBGLState {
           ? RequestSettings.fromMap(map['requestSettings'])
           : null,
       positions: map['positions'] != null
-          ? (map['positions'] as List).map((e) => Position.fromMap(e)).toList()
+          ? (map['positions'] as List)
+              .map((e) => Position.fromMap(Map<String, dynamic>.from(e)))
+              .toList()
           : null,
     );
   }

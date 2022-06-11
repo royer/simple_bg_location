@@ -2,6 +2,7 @@ package com.royzed.simple_bg_location.domain.location
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Looper
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.royzed.simple_bg_location.domain.RequestOptions
@@ -14,43 +15,47 @@ class FusedLocationClient(
     private val options: RequestOptions = RequestOptions()
 ): LocationClient {
 
-    private var postionChangedCallback: PositionChangedCallback? = null
-    private val errorCallback: ErrorCallback? = null
+    private var _postionChangedCallback: PositionChangedCallback? = null
+    private var _errorCallback: ErrorCallback? = null
 
     private val fusedProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
     private lateinit var locationCallback: LocationCallback;
 
+
+
     init {
         locationCallback = object : LocationCallback() {
 
             override fun onLocationResult(locationResult: LocationResult)  {
-                if (postionChangedCallback == null) {
+                if (_postionChangedCallback == null) {
                     Log.e(TAG,"LocationCallback was called with no postionChangedCallback registered.")
                     fusedProviderClient.removeLocationUpdates(locationCallback)
-                    if (errorCallback != null) {
-                        errorCallback.invoke(ErrorCodes.errorWhileAcquiringPosition)
+                    if (_errorCallback != null) {
+                        _errorCallback!!(ErrorCodes.errorWhileAcquiringPosition)
                     }
                     return
                 }
                 if (locationResult.locations.isNotEmpty()) {
+
                     for(location in locationResult.locations) {
-                        postionChangedCallback!!(location)
+                        _postionChangedCallback!!(location)
                     }
                 } else {
-                    postionChangedCallback!!(locationResult.lastLocation)
+                    _postionChangedCallback!!(locationResult.lastLocation)
                 }
             }
 
             override fun onLocationAvailability(locationAvailability: LocationAvailability) {
                 // super.onLocationAvailability(locationAvailability)
-                Log.d(TAG,"onLocationAvailability called. $locationAvailability")
+
                 if (!locationAvailability.isLocationAvailable && !checkLocationService(context)) {
-                    if (errorCallback != null) {
-                        errorCallback!!(ErrorCodes.locationServicesDisabled)
+                    if (_errorCallback != null) {
+                        _errorCallback!!(ErrorCodes.locationServicesDisabled)
                     } else {
                         Log.e(TAG,"onLocationAvailability called and no location available but errorCallback had not registered.")
                     }
+                    stopLocationUpdates()
                 }
             }
         }
@@ -117,15 +122,57 @@ class FusedLocationClient(
         //cts.cancel()
     }
 
+    @SuppressLint("MissingPermission")
     override fun startLoationUpdates(
         positionChangedCallback: PositionChangedCallback,
         errorCallback: ErrorCallback
     ) {
-        TODO("Not yet implemented")
+        assert(_postionChangedCallback == null && _errorCallback == null)
+
+        if (!checkLocationService(context)) {
+            errorCallback(ErrorCodes.locationServicesDisabled)
+            return
+        }
+
+        val locationRequest: LocationRequest = LocationRequest.create().apply {
+            priority = options.accuracy.toGoogleLocationRequestQuality()
+            if (options.interval>0) {
+                interval = options.interval
+            }
+            if (options.distanceFilter > 0) {
+                smallestDisplacement = options.distanceFilter.toFloat()
+            }
+            if (options.minUpdateInterval > 0) {
+                fastestInterval = options.minUpdateInterval
+            }
+            if (options.duration > 0) {
+                setExpirationDuration(options.duration)
+            }
+            if (options.maxUpdateDelay > 0) {
+                maxWaitTime = options.maxUpdateDelay
+            }
+            if (options.maxUpdates > 0) {
+                numUpdates = options.maxUpdates.toInt()
+            }
+        }
+
+        try {
+            _postionChangedCallback = positionChangedCallback
+            _errorCallback = errorCallback
+            fusedProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+
+        } catch (e: SecurityException) {
+            _errorCallback!!(ErrorCodes.permissionDenied)
+            _errorCallback = null
+            _postionChangedCallback = null
+        }
+
     }
 
     override fun stopLocationUpdates() {
-        TODO("Not yet implemented")
+        fusedProviderClient.removeLocationUpdates(locationCallback)
+        _postionChangedCallback = null
+        _errorCallback = null
     }
 
     override fun checkLocationService(context: Context): Boolean {

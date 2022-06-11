@@ -15,9 +15,7 @@ class State(
         state["requestOptions"] = requestOptions?.toMap()
         state["positions"] = positions?.map { it.toMap() }
 
-        val retmap =  state.toMap()
-        Log.d("State","$retmap")
-        return retmap
+        return state.toMap()
     }
 
     override fun toString(): String {

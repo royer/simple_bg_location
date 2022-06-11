@@ -68,13 +68,17 @@ class RequestSettings  {
   /// ⚠️ Note: support by FusedLocationProviderClient. in LocationManager is only
   /// support by Android 12(Api 31) and later.
   ///
-  /// If you pass a value at least 2x larger than the interval, then location
+  /// If you pass a value at least 2x larger than the [interval], then location
   /// delivery may be delayed and multiple locations can be delivered at once.
   /// Locations are determined at the interval rate, but can be delivered in
   /// batch after the interval you set in this method. This can consume less
   /// battery and give more accurate locations, depending on the device's
   /// hardware capabilities. You should set this value to be as large as
   /// possible for your needs if you don't need immediate location delivery.
+  /// 
+  /// ⚠️ Note: Consider also setting an explicit `[duration]` on a request, so that 
+  /// if locations cannot be derived for whatever reason, this location request 
+  /// does not continue to use power indefinitely.
   ///
   /// ⚠️ Note: This batch mode only happened in plugin side. your application
   /// still receive location update one by one.

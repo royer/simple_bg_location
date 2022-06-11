@@ -12,7 +12,7 @@ class MapView extends StatefulWidget {
   State<MapView> createState() => _MapViewState();
 }
 
-class _MapViewState extends State<MapView> {
+class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
   late MapController _mapController;
 
   final _center = LatLng(49.284260, -123.132448);
@@ -42,9 +42,7 @@ class _MapViewState extends State<MapView> {
     return BlocListener<PositionCubit, PositionState>(
       listener: (context, state) {
         if (state is PositionArrived) {
-          final position = state.position;
-          dev.log(
-              "position arrived at MapView. [${position.latitude}, ${position.longitude}]");
+          final position = state.newPosition;
         }
       },
       child: FlutterMap(
@@ -76,4 +74,7 @@ class _MapViewState extends State<MapView> {
   void _onPositionChanged(MapPosition pos, bool hasGesture) {
     _mapOptions.crs.scale(_mapController.zoom);
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

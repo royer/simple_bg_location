@@ -1,16 +1,35 @@
 package com.royzed.simple_bg_location.callbacks
 
 import com.royzed.simple_bg_location.Events
+import com.royzed.simple_bg_location.data.Position
+import com.royzed.simple_bg_location.errors.ErrorCodes
 import io.flutter.Log
 
 class CallbacksManager {
 
     private val _positionCallbacks: MutableList<PositionCallback> = mutableListOf()
-    val positionCallback: List<PositionCallback> = _positionCallbacks.toList()
+    val positionCallbacks: List<PositionCallback> = _positionCallbacks.toList()
 
     fun registerPositionListener(callback: PositionCallback) {
         synchronized(_positionCallbacks) {
+            Log.d(TAG, "A PositionCallback registered. $callback")
             _positionCallbacks.add(callback)
+        }
+    }
+
+    fun dispatchPostionEvent(position: Position) {
+        synchronized(_positionCallbacks) {
+            for(callback in _positionCallbacks) {
+                callback.onPosition(position)
+            }
+        }
+    }
+
+    fun dispatchPositionErrorEvent(errorCode: ErrorCodes) {
+        synchronized(_positionCallbacks) {
+            for(callback in _positionCallbacks) {
+                callback.onError(errorCode)
+            }
         }
     }
 

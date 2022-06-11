@@ -39,7 +39,7 @@ class SimpleBgLocationManager(
         mainLocationClient!!.startLoationUpdates(positionChangedCallback, errorCallback);
     }
 
-    fun stopPosition() {
+    fun stopPositionUpdate() {
 
         mainLocationClient!!.stopLocationUpdates()
         mainLocationClient = null

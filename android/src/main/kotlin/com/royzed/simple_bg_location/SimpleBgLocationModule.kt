@@ -1,21 +1,14 @@
 package com.royzed.simple_bg_location
 
 import android.app.Activity
-import android.app.Application
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import com.royzed.simple_bg_location.callbacks.CallbacksManager
 import com.royzed.simple_bg_location.callbacks.PositionCallback
 import com.royzed.simple_bg_location.data.Position
 import com.royzed.simple_bg_location.domain.RequestOptions
-import com.royzed.simple_bg_location.domain.State
 import com.royzed.simple_bg_location.domain.location.LocationServiceListener
-import com.royzed.simple_bg_location.domain.location.PositionChangedCallback
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
-import com.royzed.simple_bg_location.errors.ErrorCallback
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
 import com.royzed.simple_bg_location.permission.PermissionManager
@@ -44,7 +37,8 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
     val callbacksManager: CallbacksManager = CallbacksManager()
 
-    private var isready: Boolean = false
+    private var _isReady: Boolean = false
+    val isReady: Boolean get() = _isReady
 
     fun onAttachedToEngine(context: Context, messenger: BinaryMessenger) {
         this.messenger = messenger
@@ -84,7 +78,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
             streamHandlers.clear()
         }
 
-        isready = false
+        _isReady = false
         activityBinding = null
         activity = null
     }
@@ -237,7 +231,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
     }
 
     private fun onReady(result: MethodChannel.Result) {
-        isready = true
+        _isReady = true
         val state = activityObserver.getState()
         Log.d(TAG,"onReady, state: $state")
         result.success(state.toMap())
@@ -267,6 +261,17 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
     fun registerPositionListener(callback: PositionCallback) {
         callbacksManager.registerPositionListener(callback)
+    }
+
+    fun dispatchPositionEvent(position: Position) {
+        if (isReady) {
+            callbacksManager.dispatchPostionEvent(position)
+        }
+    }
+    fun dispatchPositionErrorEvent(errorCode: ErrorCodes) {
+        if (isReady) {
+            callbacksManager.dispatchPositionErrorEvent(errorCode)
+        }
     }
 
     fun unregisterListener(eventName: String, callback: Any) {

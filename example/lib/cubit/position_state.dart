@@ -2,26 +2,39 @@ part of 'position_cubit.dart';
 
 @immutable
 abstract class PositionState {
-  const PositionState([this.isTracking = false]);
-  final isTracking ;
+  const PositionState({
+    this.isTracking = false,
+    this.positions = const [],
+  });
+  final bool isTracking;
+  final List<Position> positions;
 }
 
 @immutable
 class PositionInitial extends PositionState {}
 
 class PositionArrived extends PositionState with EquatableMixin {
-  final Position position;
+  final Position newPosition;
 
-  const PositionArrived(this.position, {required bool isTracking}): super(isTracking);
+  const PositionArrived(
+    this.newPosition, {
+    required bool isTracking,
+    required List<Position> positions,
+  }) : super(
+          isTracking: isTracking,
+          positions: positions,
+        );
 
   @override
-  List<Object?> get props => [position, isTracking];
+  List<Object?> get props => [newPosition, isTracking, positions];
 }
 
 class PositionUpdateState extends PositionState with EquatableMixin {
-
-  const PositionUpdateState(bool isTracking): super(isTracking);
+  const PositionUpdateState({
+    required bool isTracking,
+    required List<Position> positions,
+  }) : super(isTracking: isTracking, positions: positions);
 
   @override
-  List<Object?> get props => [isTracking];
+  List<Object?> get props => [isTracking, positions];
 }

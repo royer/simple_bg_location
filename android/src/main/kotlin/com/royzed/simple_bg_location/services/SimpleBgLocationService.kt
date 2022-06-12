@@ -1,7 +1,9 @@
 package com.royzed.simple_bg_location.services
 
 import android.app.*
+import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.content.res.Configuration
 import android.os.Binder
 import android.os.IBinder
@@ -13,6 +15,7 @@ import com.royzed.simple_bg_location.domain.State
 import com.royzed.simple_bg_location.domain.location.PositionChangedCallback
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
 import com.royzed.simple_bg_location.errors.ErrorCallback
+import com.royzed.simple_bg_location.errors.ErrorCodes
 import io.flutter.Log
 
 class SimpleBgLocationService : Service() {
@@ -59,12 +62,15 @@ class SimpleBgLocationService : Service() {
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val action = intent?.action?:"<null>"
-        Log.d(TAG, "Service onStartCommand(Intent.action: $action, flags: $flags, startId: $startId)")
-
+        Log.d(TAG, "Service onStartCommand(intent:$intent, Intent.action: $action, flags: $flags, startId: $startId)")
+        val comp = ComponentName(this.applicationContext, SimpleBgLocationService::class.java)
         val cancelFromNotification = intent?.getBooleanExtra(
             EXTRA_CANCEL_LOCATION_UPDATE_FROM_NOTIFICATION, false) ?: false
         if (cancelFromNotification) {
             stopPositionUpdate()
+            SimpleBgLocationModule.getInstance().dispatchPositionErrorEvent(ErrorCodes.canceled)
+        } else if (action == ACTION_START && intent?.component == comp) {
+            startForeground(NOTIFICATION_ID, notification.build(), FOREGROUND_SERVICE_TYPE_LOCATION)
         }
         return START_NOT_STICKY
     }
@@ -72,7 +78,7 @@ class SimpleBgLocationService : Service() {
     override fun onBind(intent: Intent?): IBinder {
 
         Log.d(TAG,"Service onBind()")
-        stopForeground(true)
+        //stopForeground(true)
         serviceRunningInForeground = false
         isConfigChanged = false
         return localBinder
@@ -80,7 +86,7 @@ class SimpleBgLocationService : Service() {
 
     override fun onRebind(intent: Intent?) {
         Log.d(TAG, "Service onRebind()")
-        stopForeground(true)
+        //stopForeground(true)
         serviceRunningInForeground = false
         isConfigChanged = false
         super.onRebind(intent)
@@ -90,7 +96,7 @@ class SimpleBgLocationService : Service() {
     override fun onUnbind(intent: Intent?): Boolean {
         Log.d(TAG,"Service onUnbind()")
         if (!isConfigChanged && _isTracking) {
-            startForeground(NOTIFICATION_ID, notification.build())
+            //startForeground(NOTIFICATION_ID, notification.build(), FOREGROUND_SERVICE_TYPE_LOCATION)
             serviceRunningInForeground = true
         }
         return true
@@ -113,8 +119,10 @@ class SimpleBgLocationService : Service() {
             requestOptions = options
             notification = ForegroundNotification(applicationContext, NOTIFICATION_ID, NOTIFICATION_CHANNEL_ID, requestOptions.notificationConfig)
 
-
-            startService(Intent(applicationContext, SimpleBgLocationService::class.java))
+            val startIntent = Intent(applicationContext, SimpleBgLocationService::class.java).apply {
+                action = ACTION_START
+            }
+            startService(startIntent)
 
             locationManager.startPositionUpdate(options, positionCallback, errorCallback)
             _isTracking = true
@@ -130,6 +138,7 @@ class SimpleBgLocationService : Service() {
         positions.clear()
         locationManager.stopPositionUpdate()
         Log.d(TAG, "Position Update Stopped.")
+        stopForeground(true)
         stopSelf()
     }
 
@@ -154,6 +163,7 @@ class SimpleBgLocationService : Service() {
     companion object {
         private const val TAG = "SimpleBgLocationService"
 
+        const val ACTION_START = "Start"
         const val PACKAGE_NAME = "com.royzed.simple_bg_location"
         const val NOTIFICATION_ID = 373737
         const val NOTIFICATION_CHANNEL_ID = "simple_background_location_channel_01"

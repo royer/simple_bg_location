@@ -2,4 +2,7 @@
 <resources>
     <string name="simple_bg_location_full_name">Simple Background Location Plugin</string>
     <string name="simple_bg_location_cancel_text">Cancel</string>
+    <string name="sbl_background_rationale_title">Require background permission</string>
+    <string name="sbl_background_rationale_text">In order to some function work, background location permission is needed.</string>
+    <string name="sbl_background_rationale_postive_btn_text">Change to %s</string>
 </resources>

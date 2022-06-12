@@ -14,6 +14,7 @@ import io.flutter.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.royzed.simple_bg_location.R
 import com.royzed.simple_bg_location.errors.ErrorCallback
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
@@ -274,7 +275,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             Log.d(TAG,"get system permissionOptionLabel ${activity.packageManager.backgroundPermissionOptionLabel}")
             activity.applicationContext.packageManager.backgroundPermissionOptionLabel
         } else {
-            // TODO("VERSION.SDK_INT < R")
+            // "VERSION.SDK_INT < R"
             "Always"
         }
         Log.d(TAG,"resultCallback: $permissionResultCallback ; errorCallback: $errorCallback")
@@ -282,6 +283,8 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         val rationalDialog = activity.let {
             val builder = AlertDialog.Builder(it)
             builder.apply {
+                val inflater = activity.layoutInflater
+                setView(inflater.inflate(R.layout.bg_permission_rationale, null))
                 setPositiveButton("Change to \"$permissionLabel\"") { _, _ ->
                     Log.d(TAG, "Background Permission Rationale Dialog user clicked PositiveButton")
                     if (jetPackResultLauncher != null) {
@@ -299,8 +302,8 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
                     Log.d(TAG, "Background Permission rationale Dialog user clicked NegativeButton")
                     answerPermissionRequestResult(permission)
                 }
-                setTitle("Allow Title")
-                setMessage("need background location form the feature.")
+                //setTitle("Allow Title")
+                //setMessage("need background location form the feature.")
 //                setOnDismissListener(DialogInterface.OnDismissListener { dialog ->
 //                    run {
 //                        Log.i(TAG, "dismiss")

@@ -67,12 +67,6 @@ class MockSimpleBgLocationPlatform
   }
 
   @override
-  void onPosition(Function(Position p1) success,
-      [Function(PositionError p1)? failure]) {
-    // TODO: implement onPosition
-  }
-
-  @override
   Future<bool> requestPositionUpdate(RequestSettings requestSettings) {
     // TODO: implement requestPositionUpdate
     throw UnimplementedError();

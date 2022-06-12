@@ -119,15 +119,6 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
     throw UnimplementedError('getPositionStream() has not been implemented.');
   }
 
-  /// Register Position stream listener
-  ///
-  /// This method offer a direct way to register a listener of Stream<Position>
-  /// which got by [getPositionStream].
-  void onPosition(Function(Position) success,
-      [Function(PositionError)? failure]) {
-    throw UnimplementedError('onPosition() has not been implemented.');
-  }
-
   Future<bool> requestPositionUpdate(RequestSettings requestSettings) {
     throw UnimplementedError(
         'requestPositionUpdate() has not been implemented');

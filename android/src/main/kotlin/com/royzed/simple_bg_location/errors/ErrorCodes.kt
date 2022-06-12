@@ -29,6 +29,10 @@ enum class ErrorCodes(val code: String, val description: String) {
     errorWhileAcquiringPosition(
         "ERROR_WHILE_ACQUIRING_POSITION",
         "An unexpected error occurred while trying to acquire the device's position."
+    ),
+    canceled(
+        "CANCELED",
+        "operator canceled."
     )
 
 }

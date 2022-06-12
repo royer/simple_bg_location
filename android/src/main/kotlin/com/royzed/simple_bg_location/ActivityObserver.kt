@@ -27,14 +27,14 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     private lateinit var sbgLocationManager: SimpleBgLocationManager
     private var mBound = false
 
-    val isTracking: Boolean
-    get() {
-        if (mBound) {
-            return mService.isTracking
-        } else {
-            return false
-        }
-    }
+//    val isTracking: Boolean
+//    get() {
+//        if (mBound) {
+//            return mService.isTracking
+//        } else {
+//            return false
+//        }
+//    }
 
 
     private val serviceConnection = object : ServiceConnection {
@@ -55,8 +55,7 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     override fun onCreate(owner: LifecycleOwner) {
         Log.d(TAG, "activity onCreated($owner) and _activity = $_activity")
         super.onCreate(owner)
-        _activity = owner as Activity
-        sbgLocationManager = SimpleBgLocationManager(owner.applicationContext)
+        //_activity = owner.lifecycle.
     }
 
     fun getCurrentPosition(
@@ -84,7 +83,7 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
         if (mBound) {
             return mService.getState()
         } else {
-            val state = State();
+            val state = State()
             state.isTracking = false
             return state
         }
@@ -122,6 +121,12 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
         _activity = null
     }
 
+    fun attachActivity(activity: Activity) {
+        assert(_activity == null)
+        _activity = activity
+        sbgLocationManager = SimpleBgLocationManager(activity.applicationContext)
+
+    }
     fun onDetachFromActivity() {
         Log.d(TAG,"onDetachFromActivity")
         _activity = null

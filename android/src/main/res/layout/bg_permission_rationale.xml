@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/CardView.Light"
+        app:cardCornerRadius="11dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_simple_bg_location_location"
+                tools:ignore="ContentDescription"
+                android:tint="#000075"
+                app:tint = "@android:color/holo_blue_dark"
+                 />
+
+            <TextView
+                android:id="@+id/simple_bg_location_rationale_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:textSize="20sp"
+                android:textColor="#757575"
+                android:textStyle="bold"
+                android:text="@string/sbl_background_rationale_title"/>
+
+            <TextView
+                android:id="@+id/simple_bg_location_rationale_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:padding="12dp"
+                android:text="@string/sbl_background_rationale_text"
+                android:textColor="#757575"
+                android:textSize="18sp" />
+<!--            <com.google.android.material.divider.MaterialDivider-->
+<!--                android:layout_marginTop="30dp"-->
+
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"/>-->
+
+            <Button
+                android:id="@+id/btn_sbgl_positive"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sbl_background_rationale_postive_btn_text"
+                android:textColor="#0277BD"
+                tools:text="Change to always" />
+
+<!--            <com.google.android.material.divider.MaterialDivider-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"/>-->
+
+            <Button
+                android:id="@+id/btn_sbgl_negative"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#0277BD"
+                tools:text="No, Thanks"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

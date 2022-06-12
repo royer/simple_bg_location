@@ -55,6 +55,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         assert(activity == null && activityBinding == null)
         activityBinding = binding
         activity = binding.activity
+        activityObserver.attachActivity(activity!!)
         FlutterLifecycleAdapter.getActivityLifecycle(binding).addObserver(activityObserver)
         permissionManager.onAttachedToActivity(binding)
 

@@ -17,12 +17,12 @@ class PositionError {
   static const otherPlatformException = "OTHER_ERROR";
   static const permissionDenied = "PERMISSION_DENIED";
   static const timeOut = "TIME_OUT";
-  static const requestCancelled = "CANCELLED";
+  static const canceled = "CANCELED";
 
   static const _errorCodes = [
     permissionDenied,
     timeOut,
-    requestCancelled,
+    canceled,
   ];
 
   PositionError(PlatformException e) {
@@ -31,11 +31,10 @@ class PositionError {
       orElse: () => otherPlatformException,
     );
     message = e.message ?? '';
+  }
 
-    @override
-    // ignore: unused_element
-    String toString() {
-      return 'Position Error: code: $code, message: $message';
-    }
+  @override
+  String toString() {
+    return 'Position Error: code: $code, message: $message';
   }
 }

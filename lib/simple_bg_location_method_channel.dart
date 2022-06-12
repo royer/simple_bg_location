@@ -33,11 +33,6 @@ class Events {
   static const position = "position";
 }
 
-class _Subscription {
-  final StreamSubscription<dynamic> subscription;
-  final Function callback;
-  _Subscription(this.subscription, this.callback);
-}
 
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
 class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
@@ -50,51 +45,7 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
 
   static Stream<Position>? _positionStream;
 
-  static void _registerSubscription(
-      StreamSubscription<dynamic> sub, Function callback) {
-    _subscriptions.add(_Subscription(sub, callback));
-  }
 
-  static List<_Subscription> _subscriptions = [];
-
-  /// Remove a single event listener.
-  ///
-  /// ## Example
-  ///
-  /// ```dart
-  ///
-  /// // Create a position callback
-  /// Function(Position) callback = (Position position) {
-  ///   print('Position: $position')
-  /// }
-  ///
-  /// SimpleBgLocation.onPosition(callback)
-  /// .
-  /// .
-  /// .
-  /// .
-  /// SimpleBgLocation.removeListener(callback)
-  /// ```
-  static bool removeListener(Function callback) {
-    _Subscription? found = _subscriptions
-        .firstWhereOrNull((element) => element.callback == callback);
-    if (found != null) {
-      found.subscription.cancel();
-      _subscriptions.remove(found);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /// Remove all registered event listener
-  ///
-  /// - [onPosition]
-  ///
-  static Future<void> removeListeners() async {
-    await Future.wait(_subscriptions.map((e) => e.subscription.cancel()));
-    _subscriptions.clear();
-  }
 
   @override
   Future<LocationPermission> checkPermission() async {
@@ -223,12 +174,6 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
     }
   }
 
-  @override
-  void onPosition(Function(Position) success,
-      [Function(PositionError)? failure]) {
-    final stream = getPositionStream(failure);
-    _registerSubscription(stream.listen(success), success);
-  }
 
   @override
   Future<bool> requestPositionUpdate(RequestSettings requestSettings) async {

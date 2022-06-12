@@ -1,21 +1,26 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as dev;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 
 part 'position_state.dart';
 
 class PositionCubit extends Cubit<PositionState> {
-  late final StreamSubscription<Position> _positionSub;
+  // If use SimpleBgLocation.getPositionStream, define your owner stream
+  // subscription
+  // late final StreamSubscription<Position> _positionSub;
+
   bool isTracking = false;
   List<Position> positions = [];
 
   PositionCubit() : super(PositionInitial()) {
-    _positionSub = SimpleBgLocation.getPositionStream(_positionErrorHandle)
-        .listen(_onPosition);
+    // _positionSub = SimpleBgLocation.getPositionStream(_positionErrorHandle)
+    //     .listen(_onPosition);
+
+    SimpleBgLocation.onPosition(_onPosition, _positionErrorHandle);
 
     SimpleBgLocation.ready().then((sbglState) {
       isTracking = sbglState.isTracking;
@@ -31,8 +36,8 @@ class PositionCubit extends Cubit<PositionState> {
 
   @override
   Future<void> close() {
-    _positionSub.cancel();
-    dev.log('cubit closed');
+    // _positionSub.cancel();
+    SimpleBgLocation.removeListener(_onPosition);
     return super.close();
   }
 
@@ -51,8 +56,9 @@ class PositionCubit extends Cubit<PositionState> {
   }
 
   void _positionErrorHandle(PositionError err) {
-    dev.log('Listen position error: $err');
-    //TODO set error state
+    dev.log('_onPositionError, errorCode: $err');
+    isTracking = false;
+    emit(PositionUpdateState(isTracking: isTracking, positions: positions));
   }
 
   void _onPosition(Position position) {

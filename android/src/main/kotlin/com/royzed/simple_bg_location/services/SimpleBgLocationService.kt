@@ -70,6 +70,7 @@ class SimpleBgLocationService : Service() {
             stopPositionUpdate()
             SimpleBgLocationModule.getInstance().dispatchPositionErrorEvent(ErrorCodes.canceled)
         } else if (action == ACTION_START && intent?.component == comp) {
+            Log.d(TAG,"service will start: service: $this")
             startForeground(NOTIFICATION_ID, notification.build(), FOREGROUND_SERVICE_TYPE_LOCATION)
         }
         return START_NOT_STICKY
@@ -115,7 +116,7 @@ class SimpleBgLocationService : Service() {
     }
 
     fun requestPositionUpdate(options: RequestOptions): Boolean {
-        Log.d(TAG,"requestPositionUpdate ")
+        Log.d(TAG,"requestPositionUpdate this time service is: $this ")
         return if (!_isTracking) {
             requestOptions = options
             notification = ForegroundNotification(applicationContext, NOTIFICATION_ID, NOTIFICATION_CHANNEL_ID, requestOptions.notificationConfig)

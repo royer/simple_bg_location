@@ -55,6 +55,17 @@ class PositionCubit extends Cubit<PositionState> {
     emit(PositionUpdateState(isTracking: false, positions: positions));
   }
 
+  double distance() {
+    if (positions.length >= 2) {
+      final first = positions.first;
+      final end = positions.last;
+      return SimpleBgLocation.distance(
+          first.latitude, first.longitude, end.latitude, end.longitude);
+    } else {
+      return 0;
+    }
+  }
+
   void _positionErrorHandle(PositionError err) {
     dev.log('_onPositionError, errorCode: $err');
     isTracking = false;

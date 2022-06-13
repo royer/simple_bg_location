@@ -16,7 +16,6 @@ private const val TAG = "SimpleBgLocationPlugin"
 /** SimpleBgLocationPlugin */
 class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
 
-  private val activityLifecycleMonitor: ActivityLifecycleMonitor = ActivityLifecycleMonitor()
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Log.d(TAG,"onAttachedToFlutterEngine()")
@@ -42,26 +41,22 @@ class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
     }
 
     SimpleBgLocationModule.getInstance().onAttachedToActivity(binding)
-    activityLifecycleMonitor.setActivity(binding.activity)
   }
 
 
   override fun onDetachedFromActivityForConfigChanges() {
     Log.d(TAG, "onDetachedFromActivityForConfigChanges()")
     SimpleBgLocationModule.getInstance().onDetachedFromActivityForConfigChanges()
-    activityLifecycleMonitor.setActivity(null)
   }
 
   override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
     Log.d(TAG, "onReattachedToActivityForConfigChanges()")
     SimpleBgLocationModule.getInstance().onReattachedToActivityForConfigChanges(binding)
-    activityLifecycleMonitor.setActivity(binding.activity)
   }
 
   override fun onDetachedFromActivity() {
     Log.d(TAG,"onDetachFromActivity()")
     SimpleBgLocationModule.getInstance().onDetachedFromActivity()
-    activityLifecycleMonitor.setActivity(null)
   }
 
   companion object {

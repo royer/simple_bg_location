@@ -56,6 +56,10 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
         Log.d(TAG, "activity onCreated($owner) and _activity = $_activity")
         super.onCreate(owner)
         //_activity = owner.lifecycle.
+        Intent(activity, SimpleBgLocationService::class.java).also {
+            activity.bindService(it, serviceConnection, Context.BIND_AUTO_CREATE)
+        }
+
     }
 
     fun getCurrentPosition(
@@ -92,9 +96,9 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     override fun onStart(owner: LifecycleOwner) {
         Log.d(TAG,"onStart($owner)")
         super.onStart(owner)
-        Intent(activity, SimpleBgLocationService::class.java).also {
-            activity.bindService(it, serviceConnection, Context.BIND_AUTO_CREATE)
-        }
+//        Intent(activity, SimpleBgLocationService::class.java).also {
+//            activity.bindService(it, serviceConnection, Context.BIND_AUTO_CREATE)
+//        }
     }
 
     override fun onResume(owner: LifecycleOwner) {
@@ -109,14 +113,17 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
 
     override fun onStop(owner: LifecycleOwner) {
         Log.d(TAG,"onStop($owner)")
-        if (mBound) {
-            activity.unbindService(serviceConnection)
-        }
+//        if (mBound) {
+//            activity.unbindService(serviceConnection)
+//        }
         super.onStop(owner)
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
         Log.d(TAG,"onDestroy($owner)")
+        if (mBound) {
+            activity.unbindService(serviceConnection)
+        }
         super.onDestroy(owner)
         _activity = null
     }

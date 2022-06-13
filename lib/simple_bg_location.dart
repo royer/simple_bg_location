@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
 
@@ -123,5 +124,34 @@ class SimpleBgLocation {
 
   static Future<bool> openLocationSettings() {
     return SimpleBgLocationPlatform.instance.openLocationSettings();
+  }
+
+  /// Calculates the distance between the supplied coordinates in meters.
+  ///
+  /// The distance between the coordinates is calculated using the Haversine
+  /// formula (see https://en.wikipedia.org/wiki/Haversine_formula). The
+  /// supplied coordinates [startLatitude], [startLongitude], [endLatitude] and
+  /// [endLongitude] should be supplied in degrees.
+  static double distance(
+    double startLatitude,
+    double startLongitude,
+    double endLatitude,
+    double endLongitude,
+  ) {
+    const earthRadius = 6378137.0;
+    final dLat = _toRadians(endLatitude - startLatitude);
+    final dLon = _toRadians(endLongitude - startLongitude);
+
+    final a = pow(sin(dLat / 2), 2) +
+        pow(sin(dLon / 2), 2) *
+            cos(_toRadians(startLatitude)) *
+            cos(_toRadians(endLatitude));
+    final c = 2 * asin(sqrt(a));
+
+    return earthRadius * c;
+  }
+
+  static _toRadians(double degree) {
+    return degree * pi / 180.0;
   }
 }

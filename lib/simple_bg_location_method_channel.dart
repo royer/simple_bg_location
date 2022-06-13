@@ -33,7 +33,6 @@ class Events {
   static const position = "position";
 }
 
-
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
 class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
   /// The method channel used to interact with the native platform.
@@ -44,8 +43,6 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
       EventChannel('$_eventChannelPath/${Events.position}');
 
   static Stream<Position>? _positionStream;
-
-
 
   @override
   Future<LocationPermission> checkPermission() async {
@@ -84,10 +81,12 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
   }
 
   @override
-  Future<LocationPermission> requestPermission() async {
+  Future<LocationPermission> requestPermission(
+      [BackgroundPermissionRationale? rationale]) async {
     try {
+      final param = (rationale != null) ? rationale.toMap() : null;
       final int permission =
-          await methodChannel.invokeMethod(Methods.requestPermission);
+          await methodChannel.invokeMethod(Methods.requestPermission, param);
       return permission.toLocationPermission();
     } on PlatformException catch (e) {
       final error = _handlePlatformException(e);
@@ -173,7 +172,6 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
       throw error;
     }
   }
-
 
   @override
   Future<bool> requestPositionUpdate(RequestSettings requestSettings) async {

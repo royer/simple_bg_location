@@ -173,7 +173,11 @@ class _OtherApiViewState extends State<OtherApiView> {
       setState(() {
         _method = "requestPermission";
       });
-      final result = await SimpleBgLocation.requestPermission();
+      final result = await SimpleBgLocation.requestPermission(
+          const BackgroundPermissionRationale(
+        title: 'This is demo of request background location permission rationale',
+        message: 'Keep share your location to your family need background location permission',
+      ));
       setState(() {
         _resultInfo += "$result";
       });

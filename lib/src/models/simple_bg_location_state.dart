@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:simple_bg_location/simple_bg_location.dart';
 
 class SBGLState {

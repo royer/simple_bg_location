@@ -21,7 +21,7 @@ class MockSimpleBgLocationPlatform
       Future.value(LocationPermission.always);
 
   @override
-  Future<LocationPermission> requestPermission() =>
+  Future<LocationPermission> requestPermission([BackgroundPermissionRationale? rationale]) =>
       Future.value(LocationPermission.always);
 
   @override

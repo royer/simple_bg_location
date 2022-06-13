@@ -52,7 +52,7 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
   /// to upgrade to 'always' permission, but user do not approve upgrade to
   /// 'always', then [requestPermission] while return 'denied' or 'deniedForever'
   /// indicates this request failed.
-  Future<LocationPermission> requestPermission() {
+  Future<LocationPermission> requestPermission([BackgroundPermissionRationale? rationale]) {
     throw UnimplementedError('requestPermission() has not been implemented.');
   }
 

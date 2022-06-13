@@ -11,6 +11,7 @@ import com.royzed.simple_bg_location.domain.location.LocationServiceListener
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
+import com.royzed.simple_bg_location.permission.BackgroundPermissionRationale
 import com.royzed.simple_bg_location.permission.PermissionManager
 import com.royzed.simple_bg_location.streams.PositionStreamHandler
 import com.royzed.simple_bg_location.utils.SettingsUtils
@@ -98,7 +99,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
                 onCheckPermission(result)
             }
             Methods.requestPermission -> {
-                onRequestPermission(result)
+                onRequestPermission(call, result)
             }
             Methods.isLocationServiceEnabled -> {
                 onIsLocationServiceEnable(result)
@@ -147,9 +148,10 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         }
     }
 
-    private fun onRequestPermission(result: MethodChannel.Result) {
+    private fun onRequestPermission(call: MethodCall, result: MethodChannel.Result) {
         try {
-            permissionManager.requestPermission( {
+            val rationale = BackgroundPermissionRationale.fromMap(call.arguments())
+            permissionManager.requestPermission(rationale, {
                 result.error(it.code, it.description, null)
             }) {
                 result.success(it.ordinal)

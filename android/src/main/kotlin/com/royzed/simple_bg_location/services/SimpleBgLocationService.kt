@@ -115,6 +115,7 @@ class SimpleBgLocationService : Service() {
     }
 
     fun requestPositionUpdate(options: RequestOptions): Boolean {
+        Log.d(TAG,"requestPositionUpdate ")
         return if (!_isTracking) {
             requestOptions = options
             notification = ForegroundNotification(applicationContext, NOTIFICATION_ID, NOTIFICATION_CHANNEL_ID, requestOptions.notificationConfig)

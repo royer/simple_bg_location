@@ -17,9 +17,7 @@ class _Subscription {
   _Subscription(this.subscription, this.callback);
 }
 
-
 class SimpleBgLocation {
-
   static void _registerSubscription(
       StreamSubscription<dynamic> sub, Function callback) {
     _subscriptions.add(_Subscription(sub, callback));
@@ -66,13 +64,13 @@ class SimpleBgLocation {
     _subscriptions.clear();
   }
 
-
   static Future<LocationPermission> checkPermission() {
     return SimpleBgLocationPlatform.instance.checkPermission();
   }
 
-  static Future<LocationPermission> requestPermission() {
-    return SimpleBgLocationPlatform.instance.requestPermission();
+  static Future<LocationPermission> requestPermission(
+      [BackgroundPermissionRationale? rationale]) {
+    return SimpleBgLocationPlatform.instance.requestPermission(rationale);
   }
 
   static Future<bool> isLocationServiceEnabled() {
@@ -104,13 +102,11 @@ class SimpleBgLocation {
     return SimpleBgLocationPlatform.instance.getPositionStream(handleError);
   }
 
-
   static void onPosition(Function(Position) success,
       [Function(PositionError)? failure]) {
     final stream = getPositionStream(failure);
     _registerSubscription(stream.listen(success), success);
   }
-
 
   static Future<bool> requestPositionUpdate(RequestSettings requestSettings) {
     return SimpleBgLocationPlatform.instance
@@ -120,7 +116,6 @@ class SimpleBgLocation {
   static Future<bool> stopPositionUpdate() {
     return SimpleBgLocationPlatform.instance.stopPositionUpdate();
   }
-
 
   static Future<bool> openAppSettings() {
     return SimpleBgLocationPlatform.instance.openAppSettings();

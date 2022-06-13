@@ -6,6 +6,9 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,6 +33,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
     private var jetPackResultLauncher: ActivityResultLauncher<Array<String>>? = null
     private var permissionResultCallback: PermissionResultCallback? = null
     private var errorCallback: ErrorCallback? = null
+    private var rationale: BackgroundPermissionRationale? = null
 
     fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
@@ -111,10 +115,21 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
                     if (showRationale)
                         break
                 }
-                locationPermission = if (showRationale) LocationPermission.denied
-                else LocationPermission.deniedForever
+//                locationPermission = if (showRationale) LocationPermission.denied
+//                else LocationPermission.deniedForever
+                locationPermission = if (showRationale) {
+                    if (rationale != null) {
+                        showBackgroundPermissionRationale(activity!!, rationale!!)
+                        return
+                    } else {
+                        LocationPermission.denied
+                    }
+                } else {
+                    LocationPermission.deniedForever
+                }
             }
         }
+        rationale = null
         answerPermissionRequestResult(locationPermission)
     }
 
@@ -168,6 +183,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
 
 
     fun requestPermission(
+        rationale: BackgroundPermissionRationale?,
         errorCallback: ErrorCallback,
         resultCallback: PermissionResultCallback) {
 
@@ -184,6 +200,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
 
         this.permissionResultCallback = resultCallback
         this.errorCallback = errorCallback
+        this.rationale = rationale
         handleRequestPermission()
 
     }
@@ -201,7 +218,16 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             && hasPermissionInManifest(activity!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
             if (alreadyHasPermission == LocationPermission.whileInUse) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-                    showBackgroundPermissionRationale(activity!!)
+                    if (jetPackResultLauncher != null) {
+                        jetPackResultLauncher!!.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+                    } else {
+                        ActivityCompat.requestPermissions(
+                            activity!!,
+                            arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                            REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE
+                        )
+                    }
+
                 } else {
                     answerPermissionRequestResult(LocationPermission.deniedForever)
                 }
@@ -268,8 +294,10 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         errorCallback = null
     }
 
+
+
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun showBackgroundPermissionRationale(activity: Activity) {
+    private fun showBackgroundPermissionRationale(activity: Activity, rationale: BackgroundPermissionRationale) {
 
         val permissionLabel  = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Log.d(TAG,"get system permissionOptionLabel ${activity.packageManager.backgroundPermissionOptionLabel}")
@@ -279,31 +307,40 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             "Always"
         }
         Log.d(TAG,"resultCallback: $permissionResultCallback ; errorCallback: $errorCallback")
+
         val permission = checkPermissionStatus(activity.applicationContext)
+        val contentView: View
         val rationalDialog = activity.let {
-            val builder = AlertDialog.Builder(it)
+            val builder = AlertDialog.Builder(it, R.style.sbgl_style_dialog_rounded_coner)
+            //val builder = MaterialAlertDialogBuilder(it, R.style.sbgl_style_dialog_rounded_coner)
             builder.apply {
                 val inflater = activity.layoutInflater
-                setView(inflater.inflate(R.layout.bg_permission_rationale, null))
-                setPositiveButton("Change to \"$permissionLabel\"") { _, _ ->
-                    Log.d(TAG, "Background Permission Rationale Dialog user clicked PositiveButton")
-                    if (jetPackResultLauncher != null) {
-                        jetPackResultLauncher!!.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
-                    } else {
-                        ActivityCompat.requestPermissions(
-                            activity,
-                            arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-                            REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE
-                        )
-                    }
-
-                }
-                setNegativeButton("No, Thanks!") { _, _ ->
-                    Log.d(TAG, "Background Permission rationale Dialog user clicked NegativeButton")
-                    answerPermissionRequestResult(permission)
-                }
-                //setTitle("Allow Title")
-                //setMessage("need background location form the feature.")
+                contentView = inflater.inflate(R.layout.bg_permission_rationale, null)
+                val titleView = contentView.findViewById<TextView>(R.id.simple_bg_location_rationale_title)
+                titleView.text = rationale.title.ifEmpty { activity.getString(R.string.sbl_background_rationale_title) }
+                val messageView = contentView.findViewById<TextView>(R.id.simple_bg_location_rationale_text)
+                messageView.text = rationale.message.ifEmpty { activity.getString(R.string.sbl_background_rationale_text) }
+                setView(contentView)
+                //setIcon(R.drawable.ic_simple_bg_location_location)
+//                setPositiveButton("Change to \"$permissionLabel\"") { _, _ ->
+//                    Log.d(TAG, "Background Permission Rationale Dialog user clicked PositiveButton")
+//                    if (jetPackResultLauncher != null) {
+//                        jetPackResultLauncher!!.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+//                    } else {
+//                        ActivityCompat.requestPermissions(
+//                            activity,
+//                            arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+//                            REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE
+//                        )
+//                    }
+//
+//                }
+//                setNegativeButton("No, Thanks!") { _, _ ->
+//                    Log.d(TAG, "Background Permission rationale Dialog user clicked NegativeButton")
+//                    answerPermissionRequestResult(permission)
+//                }
+//                setTitle("Allow Title")
+//                setMessage("need background location form the feature.")
 //                setOnDismissListener(DialogInterface.OnDismissListener { dialog ->
 //                    run {
 //                        Log.i(TAG, "dismiss")
@@ -318,10 +355,41 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
                     Log.d(TAG, "Background Permission rationale dialog canceled")
                     answerPermissionRequestResult(permission)
                 }
-                setCancelable(false)
+                //setCancelable(false)
             }
             builder.create()
         }
+        //rationalDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//        val positiveButton = rationalDialog.findViewById<Button>(R.id.btn_sbgl_positive)
+//        Log.d(TAG,"postiveButton: $positiveButton")
+//        val negativeButton = rationalDialog.findViewById<Button>(R.id.btn_sbgl_negative)
+//        Log.d(TAG,"negativeButton: $negativeButton")
+
+        val pButton = contentView.findViewById<Button>(R.id.btn_sbgl_positive)
+        val pButtonText = activity.getString(R.string.sbl_background_rationale_postive_btn_text, permissionLabel)
+        pButton.text = pButtonText
+        val nButton = contentView.findViewById<Button>(R.id.btn_sbgl_negative)
+        pButton.setOnClickListener {
+            Log.d(TAG, "Background Permission Rationale Dialog user clicked PositiveButton")
+            rationalDialog.dismiss()
+            if (jetPackResultLauncher != null) {
+                jetPackResultLauncher!!.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+            } else {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                    REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE
+                )
+            }
+
+        }
+        nButton.setOnClickListener {
+            Log.d(TAG, "Background Permission rationale Dialog user clicked NegativeButton")
+            rationalDialog.dismiss()
+            answerPermissionRequestResult(permission)
+
+        }
+
         rationalDialog.show()
     }
 
@@ -466,6 +534,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             }
         }
     }
+
 
 }
 

@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:simple_bg_location/src/models/foreground_notification_config.dart';
 
 

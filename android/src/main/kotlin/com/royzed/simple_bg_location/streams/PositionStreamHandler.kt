@@ -21,6 +21,7 @@ class PositionStreamHandler : StreamHandler(Events.position), PositionCallback  
 //    }
 
     override fun onPosition(position: Position) {
+
         eventSink.success(position.toMap())
     }
 

@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
-import 'package:simple_bg_location_example/cubit/position_cubit.dart';
+import 'package:simple_bg_location_example/cubit/position/position_cubit.dart';
+import 'package:simple_bg_location_example/cubit/settings/settings_cubit.dart';
 
 class MyBottomBar extends StatelessWidget {
   const MyBottomBar({
@@ -20,17 +21,20 @@ class MyBottomBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              onPressed: () {},
+              onPressed: () =>
+                  context.read<PositionCubit>().getCurrentPosition(),
               icon: const Icon(Icons.gps_fixed),
             ),
             BlocBuilder<PositionCubit, PositionState>(
+              buildWhen: (previous, current) =>
+                  previous.odometer != current.odometer,
               builder: (context, state) {
-                final distance = context.read<PositionCubit>().distance();
+                final distance = state.odometer;
                 var text = 'distance: ';
                 if (distance > 1000) {
-                  text += "${(distance / 1000.0).toStringAsFixed(3)}km";
+                  text += "${(distance / 1000.0).toStringAsFixed(1)}km";
                 } else {
-                  text += '${distance.toStringAsPrecision(3)}m';
+                  text += '${distance.toStringAsFixed(0)}m';
                 }
                 return Text(text);
               },
@@ -60,9 +64,31 @@ class MyBottomBar extends StatelessWidget {
   }
 
   void _requestPositionUpdate(BuildContext context) async {
+    final accuracy = context.read<SettingsCubit>().state.accuracy;
+
     final allow = await _checkAndRequestPermission(context);
     if (allow) {
-      context.read<PositionCubit>().requestPositionUpdate(RequestSettings());
+      
+      late final RequestSettings requestSettings;
+      switch (accuracy) {
+        case CustomAccuracy.best:
+          requestSettings = RequestSettings();
+          break;
+        case CustomAccuracy.good:
+          requestSettings = RequestSettings.good();
+          break;
+        case CustomAccuracy.balance:
+          //!! Does not worked on Android Emulator
+          requestSettings = RequestSettings.balance();
+          break;
+        case CustomAccuracy.lowest:
+          //!! Does not worked on Android Emulator
+          requestSettings = RequestSettings.lowPower();
+          break;
+      }
+      // ignore: use_build_context_synchronously
+      context.read<PositionCubit>().requestPositionUpdate(
+          requestSettings);
     }
   }
 
@@ -71,13 +97,13 @@ class MyBottomBar extends StatelessWidget {
   }
 
   Future<bool> _checkAndRequestPermission(BuildContext context) async {
-    /// Since Android 6.0 (API level 23) or high, you must request any dangerous
-    /// permission at runtime.
-    /// more detail description:
-    /// https://developer.android.com/training/permissions/requesting#manage-request-code-yourself
-    /// and request location permission
-    /// https://developer.android.com/training/location/permissions
-    ///
+    // Since Android 6.0 (API level 23) or high, you must request any dangerous
+    // permission at runtime.
+    // more detail description:
+    // https://developer.android.com/training/permissions/requesting#manage-request-code-yourself
+    // and request location permission
+    // https://developer.android.com/training/location/permissions
+    //
     var requestResult = await SimpleBgLocation.requestPermission();
 
     if (requestResult == LocationPermission.always ||
@@ -135,8 +161,8 @@ class MyBottomBar extends StatelessWidget {
         return false;
       }
     } else if (requestResult == LocationPermission.deniedForever) {
-      /// User denied same permission more than one times. system will never
-      /// bring permission setting dialog.
+      // User denied same permission more than one times. system will never
+      // bring permission setting dialog.
       final alreadyHasPermission = await SimpleBgLocation.checkPermission();
       if (alreadyHasPermission == LocationPermission.denied) {
         return false;
@@ -162,9 +188,8 @@ class MyBottomBar extends StatelessWidget {
                       ),
                       TextButton(
                         child: const Text('No, Never ask me again!'),
-                        onPressed: () async {
-                          await prefs.setBool(
-                              'dont_ask_open_app_settings', true);
+                        onPressed: () {
+                          prefs.setBool('dont_ask_open_app_settings', true);
                           Navigator.pop(context, false);
                         },
                       ),

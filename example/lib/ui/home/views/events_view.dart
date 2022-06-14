@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as dev;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
-import 'package:simple_bg_location_example/cubit/position_cubit.dart';
+import 'package:simple_bg_location_example/cubit/position/position_cubit.dart';
 
 class EventsView extends StatefulWidget {
   const EventsView({Key? key}) : super(key: key);

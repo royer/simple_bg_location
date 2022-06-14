@@ -38,6 +38,9 @@ class FusedLocationClient(
                 }
                 if (locationResult.locations.isNotEmpty()) {
 
+                    if (locationResult.locations.size > 1) {
+                        Log.d(TAG,"batch location update arrived: size: ${locationResult.locations.size}")
+                    }
                     for(location in locationResult.locations) {
                         _postionChangedCallback!!(location)
                     }
@@ -136,8 +139,13 @@ class FusedLocationClient(
 
         val locationRequest: LocationRequest = LocationRequest.create().apply {
             priority = options.accuracy.toGoogleLocationRequestQuality()
+            if (priority == com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY) {
+                isWaitForAccurateLocation = true
+            }
             if (options.interval>0) {
                 interval = options.interval
+            }else {
+                interval = 1
             }
             if (options.distanceFilter > 0) {
                 smallestDisplacement = options.distanceFilter.toFloat()

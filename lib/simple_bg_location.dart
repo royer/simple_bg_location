@@ -65,10 +65,12 @@ class SimpleBgLocation {
     _subscriptions.clear();
   }
 
+  /// see [SimpleBgLocationPlatform.checkPermission]
   static Future<LocationPermission> checkPermission() {
     return SimpleBgLocationPlatform.instance.checkPermission();
   }
 
+  /// Wraps the [SimpleBgLocationPlatform.requestPermission]
   static Future<LocationPermission> requestPermission(
       [BackgroundPermissionRationale? rationale]) {
     return SimpleBgLocationPlatform.instance.requestPermission(rationale);

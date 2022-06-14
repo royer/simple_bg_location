@@ -4,7 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 import 'dart:developer' as dev;
-import 'package:simple_bg_location_example/cubit/position_cubit.dart';
+import 'package:simple_bg_location_example/cubit/position/position_cubit.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -23,6 +23,8 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
   final List<LatLng> _trace = [];
 
   final List<CircleMarker> _positions = [];
+
+  final List<CircleMarker> _currentPositionResult = [];
 
   @override
   void initState() {
@@ -59,6 +61,10 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
             _clear();
             setState(() {});
           }
+        } else if (state is PositionCurrentPositionResult) {
+          final ll = LatLng(
+              state.currentResult.latitude, state.currentResult.longitude);
+          _updateCurrentPositionResultMarker(ll);
         }
       },
       child: FlutterMap(
@@ -87,6 +93,10 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
               circles: _positions,
             ),
           ),
+          CircleLayerWidget(
+              options: CircleLayerOptions(
+            circles: _currentPositionResult,
+          )),
         ],
       ),
     );
@@ -109,6 +119,13 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
         color: Colors.amber,
         borderColor: Colors.black,
         borderStrokeWidth: 1));
+  }
+
+  void _updateCurrentPositionResultMarker(LatLng ll) {
+    _currentPositionResult.clear();
+    _mapController.move(ll, 13);
+    _currentPositionResult.add(
+        CircleMarker(point: ll, radius: 15, color: const Color(0x80FF0000)));
   }
 
   void _clear() {

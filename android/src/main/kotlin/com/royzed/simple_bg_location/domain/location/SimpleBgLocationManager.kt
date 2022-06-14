@@ -41,7 +41,7 @@ class SimpleBgLocationManager(
 
     fun stopPositionUpdate() {
 
-        mainLocationClient!!.stopLocationUpdates()
+        mainLocationClient?.stopLocationUpdates()
         mainLocationClient = null
     }
 

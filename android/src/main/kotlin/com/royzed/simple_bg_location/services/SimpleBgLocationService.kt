@@ -71,7 +71,7 @@ class SimpleBgLocationService : Service() {
             SimpleBgLocationModule.getInstance().dispatchPositionErrorEvent(ErrorCodes.canceled)
         } else if (action == ACTION_START && intent?.component == comp) {
             Log.d(TAG,"service will start: service: $this")
-            startForeground(NOTIFICATION_ID, notification.build(), FOREGROUND_SERVICE_TYPE_LOCATION)
+            startForeground(NOTIFICATION_ID, notification.build())
         }
         return START_NOT_STICKY
     }

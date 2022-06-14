@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:simple_bg_location/src/models/foreground_notification_config.dart';
 
-
 import '../enums/enums.dart';
 
 /// The RequestSetting for Android.
@@ -10,8 +9,7 @@ import '../enums/enums.dart';
 /// The Android specific request settings which you can set other then the
 /// default value of [RequestSettings]
 ///
-class RequestSettings  {
-  
+class RequestSettings {
   LocationAccuracy accuracy;
 
   int distanceFilter;
@@ -74,9 +72,9 @@ class RequestSettings  {
   /// battery and give more accurate locations, depending on the device's
   /// hardware capabilities. You should set this value to be as large as
   /// possible for your needs if you don't need immediate location delivery.
-  /// 
-  /// ⚠️ Note: Consider also setting an explicit `[duration]` on a request, so that 
-  /// if locations cannot be derived for whatever reason, this location request 
+  ///
+  /// ⚠️ Note: Consider also setting an explicit `[duration]` on a request, so that
+  /// if locations cannot be derived for whatever reason, this location request
   /// does not continue to use power indefinitely.
   ///
   /// ⚠️ Note: This batch mode only happened in plugin side. your application
@@ -106,19 +104,47 @@ class RequestSettings  {
 
   /// create a request location update setting.
   ///
-  /// default is balance power and accuracy
+  /// default is for best accuracy. it use a lot battery power.
   RequestSettings({
     this.accuracy = LocationAccuracy.best,
-    this.distanceFilter = 50,
+    this.distanceFilter = 0,
     this.forceLocationManager = false,
-    this.interval = 5000,
-    this.minUpdateInterval = 0,
+    this.interval = 1000,
+    this.minUpdateInterval = 1000,
     this.duration = 0,
     this.maxUpdateDelay = 0,
     this.maxUpdates = 0,
     this.notificationConfig,
-  });
+  }) : assert(interval > 0, 'interval must great than 0');
 
+  /// best accuracy, 10 seconds interval, minUpdateInterval 5 seconds.
+  RequestSettings.good()
+      : this(
+            accuracy: LocationAccuracy.best,
+            distanceFilter: 5,
+            interval: 10 * 1000,
+            minUpdateInterval: 5 * 1000);
+
+  /// medium accuracy, half hour interval, minUpdateInterval 10 minutes
+  RequestSettings.balance()
+      : this(
+          accuracy: LocationAccuracy.medium,
+          forceLocationManager: false,
+          interval: 15 * 60 * 1000,
+          minUpdateInterval: 8 * 60 * 1000,
+          duration: 0,
+          maxUpdateDelay: 0,
+          maxUpdates: 0,
+          notificationConfig: null,
+        );
+
+  /// lowest accuracy, one hour interval, minUpdateInterval as soon as.
+  RequestSettings.lowPower()
+      : this(
+          accuracy: LocationAccuracy.lowest,
+          interval: 30 * 60 * 1000,
+          minUpdateInterval: 15 * 60 * 1000,
+        );
   @override
   Map<String, dynamic> toMap() {
     return {

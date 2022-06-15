@@ -21,7 +21,8 @@ class MockSimpleBgLocationPlatform
       Future.value(LocationPermission.always);
 
   @override
-  Future<LocationPermission> requestPermission([BackgroundPermissionRationale? rationale]) =>
+  Future<LocationPermission> requestPermission(
+          [BackgroundPermissionRationale? rationale]) =>
       Future.value(LocationPermission.always);
 
   @override
@@ -81,6 +82,12 @@ class MockSimpleBgLocationPlatform
   @override
   Future<SBGLState> ready() {
     // TODO: implement ready
+    throw UnimplementedError();
+  }
+
+  @override
+  Stream<String> getNotificationActionStream() {
+    // TODO: implement getNotificationActionStream
     throw UnimplementedError();
   }
 }

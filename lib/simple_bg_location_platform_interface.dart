@@ -52,7 +52,8 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
   /// to upgrade to 'always' permission, but user do not approve upgrade to
   /// 'always', then [requestPermission] while return 'denied' or 'deniedForever'
   /// indicates this request failed.
-  Future<LocationPermission> requestPermission([BackgroundPermissionRationale? rationale]) {
+  Future<LocationPermission> requestPermission(
+      [BackgroundPermissionRationale? rationale]) {
     throw UnimplementedError('requestPermission() has not been implemented.');
   }
 
@@ -104,6 +105,12 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
   ///
   Stream<Position> getPositionStream([Function(PositionError)? failure]) {
     throw UnimplementedError('getPositionStream() has not been implemented.');
+  }
+
+  /// __Android Only__ The custom notification action button click event stream.
+  Stream<String> getNotificationActionStream() {
+    throw UnimplementedError(
+        'getNotificationActionStream() has not been implemented.');
   }
 
   /// Initialize plugin for prepare requestPositionUpdate

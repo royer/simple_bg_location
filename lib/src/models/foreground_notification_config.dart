@@ -57,8 +57,9 @@ class ForegroundNotificationConfig {
   /// Defaults is "Position Update".
   String? channelName;
 
-  /// Your custom action button on notification
+  /// Your custom up to three action buttons on notification
   ///
+  ///If you provide a [layout], this actions is Button's id.
   /// Declare click listeners for `<Button />` elements of a custom notification [layout].
   ///
   /// ℹ️ See [Android Custom Notification Layout](https://github.com/transistorsoft/flutter_background_geolocation/wiki/Android-Custom-Notification-Layout) for setup instructions.
@@ -73,7 +74,6 @@ class ForegroundNotificationConfig {
   ///     android:layout_height="40dp"
   ///     android:text="Foo" />
   /// ```
-
   List<String>? actions;
 
   /// When enabled, a WifiLock is acquired when background execution is started.
@@ -106,7 +106,7 @@ class ForegroundNotificationConfig {
     this.actions,
     this.enableWifiLock = false,
     this.enableWakeLock = false,
-  });
+  }) : assert(actions == null || actions.length <= 3, 'notification actions is up to three.');
 
   static const int NOTIFICATION_PRIORITY_DEFAULT = 0;
   static const int NOTIFICATION_PRIORITY_HIGH = 1;

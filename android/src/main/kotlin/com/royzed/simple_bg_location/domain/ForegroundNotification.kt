@@ -76,6 +76,18 @@ class ForegroundNotification(
 
     }
 
+    private fun buildActionIntent(actionId: String): PendingIntent {
+        val actionIntent = Intent(context, SimpleBgLocationService::class.java).apply {
+            action = makeActionName(actionId)
+        }
+        var flags = 0
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            flags = flags or PendingIntent.FLAG_IMMUTABLE
+        }
+        return PendingIntent.getService(context, 0, actionIntent, flags)
+
+    }
+
     private fun updateNotification(config: ForegroundNotificationConfig, notify: Boolean) {
         val iconId = getIcon(config.smallIcon.name, config.smallIcon.defType)
 
@@ -90,11 +102,19 @@ class ForegroundNotification(
             priority = NotificationCompat.PRIORITY_DEFAULT
             setStyle(NotificationCompat.BigTextStyle().bigText(config.text))
             setContentIntent(buildBringToFrontIntent())
-            addAction(
-                R.drawable.ic_simple_bg_location_cancel,
-                context.getString(R.string.simple_bg_location_cancel_text),
-                buildCancelIntent()
-            )
+
+//            addAction(
+//                R.drawable.ic_simple_bg_location_cancel,
+//                context.getString(R.string.simple_bg_location_cancel_text),
+//                buildCancelIntent()
+//            )
+
+            for(actionName in config.actions) {
+                addAction(R.drawable.ic_simple_bg_location_location,
+                actionName,
+                    buildActionIntent(actionName)
+                )
+            }
         }
 
         if (notify) {
@@ -114,6 +134,15 @@ class ForegroundNotification(
     companion object {
 
         private const val TAG = "ForegroundNotification"
+        const val ACTION_PREFIX = "com.royzed.simple_bg_location/custom_action/"
+
+        fun makeActionName(actionId: String): String {
+            return "$ACTION_PREFIX$actionId"
+        }
+
+        fun extractActionId(fullActionName: String): String {
+            return fullActionName.removePrefix("$ACTION_PREFIX")
+        }
 
     }
 }

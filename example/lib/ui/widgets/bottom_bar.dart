@@ -68,7 +68,6 @@ class MyBottomBar extends StatelessWidget {
 
     final allow = await _checkAndRequestPermission(context);
     if (allow) {
-      
       late final RequestSettings requestSettings;
       switch (accuracy) {
         case CustomAccuracy.best:
@@ -86,9 +85,13 @@ class MyBottomBar extends StatelessWidget {
           requestSettings = RequestSettings.lowPower();
           break;
       }
+      requestSettings.notificationConfig = ForegroundNotificationConfig(
+        title: "Simple BG Location",
+        text: "distance: 34.8km elapsed 34min",
+        actions: ['Action1', 'Action2', 'Action3']
+      );
       // ignore: use_build_context_synchronously
-      context.read<PositionCubit>().requestPositionUpdate(
-          requestSettings);
+      context.read<PositionCubit>().requestPositionUpdate(requestSettings);
     }
   }
 

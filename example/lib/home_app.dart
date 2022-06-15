@@ -20,7 +20,7 @@ class HomeApp extends StatelessWidget {
           //         width: 2.0, color: Theme.of(context).primaryColor)),
         ),
       ),
-      home: const HomePage(),
+      home: HomePage(),
     );
   }
 }

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.royzed.simple_bg_location.callbacks.CallbacksManager
+import com.royzed.simple_bg_location.callbacks.NotificationActionCallback
 import com.royzed.simple_bg_location.callbacks.PositionCallback
 import com.royzed.simple_bg_location.data.Position
 import com.royzed.simple_bg_location.domain.RequestOptions
@@ -13,6 +14,7 @@ import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
 import com.royzed.simple_bg_location.permission.BackgroundPermissionRationale
 import com.royzed.simple_bg_location.permission.PermissionManager
+import com.royzed.simple_bg_location.streams.NotificationActionStreamHandler
 import com.royzed.simple_bg_location.streams.PositionStreamHandler
 import com.royzed.simple_bg_location.utils.SettingsUtils
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -62,6 +64,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
         synchronized(streamHandlers) {
             streamHandlers.add(PositionStreamHandler().register(context, messenger))
+            streamHandlers.add(NotificationActionStreamHandler().register(context, messenger))
         }
     }
 
@@ -74,7 +77,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
         //FlutterLifecycleAdapter.getActivityLifecycle(activityBinding!!).removeObserver(activityObserver)
 
-        callbacksManager.unregisterAll()
+        unregisterAllListener()
 
         synchronized(streamHandlers) {
             streamHandlers.clear()
@@ -275,6 +278,13 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         if (isReady) {
             callbacksManager.dispatchPositionErrorEvent(errorCode)
         }
+    }
+
+    fun registerNotificationActionListener(callback: NotificationActionCallback) {
+        callbacksManager.registerNotificationActionListener(callback)
+    }
+    fun dispatchNotificationActionEvent(action: String) {
+        callbacksManager.dispatchNotificationAction(action)
     }
 
     fun unregisterListener(eventName: String, callback: Any) {

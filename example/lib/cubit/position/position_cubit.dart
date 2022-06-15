@@ -13,8 +13,6 @@ class PositionCubit extends Cubit<PositionState> {
   // subscription
   // late final StreamSubscription<Position> _positionSub;
 
-  // bool isTracking = false;
-  // List<Position> positions = [];
 
   PositionCubit() : super(const PositionInitial()) {
     // _positionSub = SimpleBgLocation.getPositionStream(_positionErrorHandle)

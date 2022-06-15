@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:simple_bg_location/simple_bg_location.dart';
 import 'package:simple_bg_location_example/constants.dart';
 import 'package:simple_bg_location_example/ui/other_apis/other_apis_page.dart';
 import '../../cubit/settings/settings_cubit.dart';
@@ -9,7 +11,9 @@ import 'views/views.dart';
 enum _Menu { best, good, balance, lowest, otherApi }
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  HomePage({Key? key}) : super(key: key) {
+    SimpleBgLocation.onNotificationAction(_onNotificationAction);
+  }
 
   static String pageNme = "OtherApisPage";
 
@@ -109,5 +113,9 @@ class HomePage extends StatelessWidget {
         bottomNavigationBar: MyBottomBar(),
       ),
     );
+  }
+
+  void _onNotificationAction(String action) {
+    Fluttertoast.showToast(msg: 'Notification button($action) clicked.');
   }
 }

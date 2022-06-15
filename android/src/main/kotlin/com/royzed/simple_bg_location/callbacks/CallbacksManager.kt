@@ -10,9 +10,12 @@ class CallbacksManager {
     private val _positionCallbacks: MutableList<PositionCallback> = mutableListOf()
     val positionCallbacks: List<PositionCallback> = _positionCallbacks.toList()
 
+    private val _notificationCallbacks: MutableList<NotificationActionCallback> = mutableListOf()
+    val nofificationActionCallbacks: List<NotificationActionCallback> = _notificationCallbacks.toList()
+
     fun registerPositionListener(callback: PositionCallback) {
+        Log.d(TAG, "A PositionCallback registered. $callback")
         synchronized(_positionCallbacks) {
-            Log.d(TAG, "A PositionCallback registered. $callback")
             _positionCallbacks.add(callback)
         }
     }
@@ -33,15 +36,40 @@ class CallbacksManager {
         }
     }
 
+    fun registerNotificationActionListener(callback: NotificationActionCallback) {
+        Log.d(TAG,"A notificationActionCallback registered. $callback")
+        synchronized(_notificationCallbacks) {
+            _notificationCallbacks.add(callback)
+        }
+    }
+
+    fun dispatchNotificationAction(action: String) {
+        synchronized(_notificationCallbacks) {
+            for (callback in _notificationCallbacks) {
+                callback.onClick(action)
+            }
+        }
+    }
+
     fun unregisterListener(eventName: String, callback: Any) {
         when(eventName) {
             Events.position -> {
                 synchronized(_positionCallbacks) {
                     val finded = _positionCallbacks.remove(callback)
                     if (finded == false) {
-                        Log.d(TAG, "remove PositionCallback failed.")
+                        Log.w(TAG, "remove PositionCallback failed.")
                     } else {
-                        Log.d(TAG,"one PositionCallback removed.")
+                        Log.d(TAG,"A PositionCallback removed.")
+                    }
+                }
+            }
+            Events.notificationAction -> {
+                synchronized(_notificationCallbacks) {
+                    val finded = _notificationCallbacks.remove(callback)
+                    if (finded == false) {
+                        Log.w(TAG,"remove notificationActionCallback failed.")
+                    } else {
+                        Log.d(TAG,"A NotificationActionCallback removed.")
                     }
                 }
             }
@@ -51,7 +79,11 @@ class CallbacksManager {
     fun unregisterAll() {
         synchronized(_positionCallbacks) {
             _positionCallbacks.clear()
-            Log.d(TAG,"All PositionCallback removed")
+            Log.d(TAG,"All PositionCallback removed.")
+        }
+        synchronized(_notificationCallbacks) {
+            _notificationCallbacks.clear()
+            Log.d(TAG,"All NotificationActionCallback removed.")
         }
     }
 

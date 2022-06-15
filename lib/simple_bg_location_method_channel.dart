@@ -31,6 +31,7 @@ class Methods {
 @visibleForTesting
 class Events {
   static const position = "position";
+  static const notificationAction = 'notificationAction';
 }
 
 /// An implementation of [SimpleBgLocationPlatform] that uses method channels.
@@ -41,8 +42,11 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
 
   static const _eventChannelPosition =
       EventChannel('$_eventChannelPath/${Events.position}');
+  static const _eventChannelNotifyAction =
+      EventChannel('$_eventChannelPath/${Events.notificationAction}');
 
   static Stream<Position>? _positionStream;
+  static Stream<String>? _notifyActionStream;
 
   @override
   Future<LocationPermission> checkPermission() async {
@@ -144,7 +148,7 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
         failure(PositionError(error as PlatformException));
       } else {
         dev.log(
-            'getPositionStream error!!! Uncaught position error: $error. You should provide a failure callback as 2nd argument.');
+            'getPositionStream error!!! Uncaught position error: $error. You should provide a failure callback.');
         throw error;
       }
     });
@@ -159,6 +163,39 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
         (dynamic e) => Position.fromMap(e.cast<String, dynamic>()));
 
     return _positionStream!;
+  }
+
+  @override
+  Stream<String> getNotificationActionStream([Function(dynamic p1)? failure]) {
+    if (_notifyActionStream != null) {
+      return _notifyActionStream!;
+    }
+
+    var originalStream = _eventChannelNotifyAction
+        .receiveBroadcastStream()
+        .handleError((dynamic error) {
+      if (failure != null) {
+        failure(error);
+      } else {
+        dev.log(
+            'NotificationActionStream has error!!!. Uncaught error: $error. You shouid provide a failure callback');
+        throw error;
+      }
+    });
+
+    _notifyActionStream =
+        originalStream.asBroadcastStream(onCancel: (controller) {
+      controller.cancel();
+      _notifyActionStream = null;
+    }).map<String>((dynamic e) {
+      if (e is String) {
+        return e;
+      } else {
+        return e.toString();
+      }
+    });
+
+    return _notifyActionStream!;
   }
 
   @override

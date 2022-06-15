@@ -72,6 +72,9 @@ class SimpleBgLocationService : Service() {
         } else if (action == ACTION_START && intent?.component == comp) {
             Log.d(TAG,"service will start: service: $this")
             startForeground(NOTIFICATION_ID, notification.build())
+        } else if (action.contains(ForegroundNotification.ACTION_PREFIX)) {
+            val actionId = ForegroundNotification.extractActionId(action)
+            SimpleBgLocationModule.getInstance().dispatchNotificationActionEvent(actionId)
         }
         return START_NOT_STICKY
     }

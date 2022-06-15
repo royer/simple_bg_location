@@ -105,9 +105,20 @@ class SimpleBgLocation {
     return SimpleBgLocationPlatform.instance.getPositionStream(handleError);
   }
 
+  static Stream<String> getNotificationStream() {
+    return SimpleBgLocationPlatform.instance.getNotificationActionStream();
+  }
+
   static void onPosition(Function(Position) success,
       [Function(PositionError)? failure]) {
     final stream = getPositionStream(failure);
+    _registerSubscription(stream.listen(success), success);
+  }
+
+  static void onNotificationAction(
+    Function(String) success,
+  ) {
+    final stream = getNotificationStream();
     _registerSubscription(stream.listen(success), success);
   }
 

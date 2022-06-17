@@ -107,7 +107,7 @@ class RequestSettings {
   /// default is for best accuracy. it use a lot battery power.
   RequestSettings({
     this.accuracy = LocationAccuracy.best,
-    this.distanceFilter = 0,
+    this.distanceFilter = 5,
     this.forceLocationManager = false,
     this.interval = 1000,
     this.minUpdateInterval = 1000,
@@ -129,6 +129,7 @@ class RequestSettings {
   RequestSettings.balance()
       : this(
           accuracy: LocationAccuracy.medium,
+          distanceFilter: 5,
           forceLocationManager: false,
           interval: 15 * 60 * 1000,
           minUpdateInterval: 8 * 60 * 1000,
@@ -142,10 +143,11 @@ class RequestSettings {
   RequestSettings.lowPower()
       : this(
           accuracy: LocationAccuracy.lowest,
+          distanceFilter: 5,
           interval: 30 * 60 * 1000,
           minUpdateInterval: 15 * 60 * 1000,
         );
-  @override
+        
   Map<String, dynamic> toMap() {
     return {
       'accuracy': accuracy.index,

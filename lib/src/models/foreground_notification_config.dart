@@ -10,15 +10,9 @@ import 'package:simple_bg_location/src/models/android_resource.dart';
 /// notification when running a foreground service.
 ///
 class ForegroundNotificationConfig {
-  /// Specifies the name of your custom Android Layout XML file.
-  ///
-  /// ℹ️ See [Android Custom Notification Layout](https://github.com/transistorsoft/flutter_background_geolocation/wiki/Android-Custom-Notification-Layout)
-  /// for setup instructions.
-  String? layout;
-
   /// The unique notification ID
   ///
-  /// default 198964
+  /// default is `198964`
   final int notificationId;
 
   /// The title of notification
@@ -36,7 +30,7 @@ class ForegroundNotificationConfig {
   /// |------------------|---------------------------------------------------|
   /// | __`{distance}`__ | distance traced since start position update listening
   /// | __`{elapsed}`__  | elapsed time since start position update listening
-  /// 
+  ///
   String? text;
 
   /// the notification small icon. if null plugin will use app launcher icon.
@@ -85,8 +79,8 @@ class ForegroundNotificationConfig {
   /// __`"cancel"`__ action name is special action. if you provide "cancel"
   /// unlike other action, plugin will not send NotificationAction event, instead
   /// plugin will cancel current position update, and your location stream will
-  /// got a [PositionError] which errorCode is __"CANCELED"__. 
-  /// 
+  /// got a [PositionError] which errorCode is __"CANCELED"__.
+  ///
   ///If you provide a [layout], this actions is Button's id.
   /// Declare click listeners for `<Button />` elements of a custom notification [layout].
   ///
@@ -104,27 +98,7 @@ class ForegroundNotificationConfig {
   /// ```
   List<String>? actions;
 
-  /// When enabled, a WifiLock is acquired when background execution is started.
-  /// This allows the application to keep the Wi-Fi radio awake, even when the
-  /// user has not used the device in a while (e.g. for background network
-  /// communications).
-  ///
-  /// Wifi lock permissions should be obtained first by using a permissions
-  /// library.
-  bool enableWifiLock;
-
-  /// When enabled, a Wakelock is acquired when background execution is
-  /// started.
-  ///
-  /// If this is false then the system can still sleep and all location
-  /// events will be received at once when the system wakes up again.
-  ///
-  /// Wake lock permissions should be obtained first by using a permissions
-  /// library.
-  bool enableWakeLock;
-
   ForegroundNotificationConfig({
-    this.layout,
     this.notificationId = defaultNotificationId,
     this.title,
     this.text,
@@ -135,8 +109,6 @@ class ForegroundNotificationConfig {
     this.channelName,
     this.channelDescription,
     this.actions,
-    this.enableWifiLock = false,
-    this.enableWakeLock = false,
   })  : assert(actions == null || actions.length <= 3,
             'notification actions is up to three.'),
         assert(channelId.isNotEmpty, "channelId can not empty string."),
@@ -153,7 +125,6 @@ class ForegroundNotificationConfig {
 
   Map<String, dynamic> toMap() {
     return {
-      'layout': layout,
       'notificationId': notificationId,
       'title': title,
       'text': text,
@@ -164,14 +135,11 @@ class ForegroundNotificationConfig {
       'channelName': channelName,
       'channelDescription': channelDescription,
       'actions': actions,
-      'enableWifiLock': enableWifiLock,
-      'enableWakeLock': enableWakeLock,
     };
   }
 
   factory ForegroundNotificationConfig.fromMap(Map<String, dynamic> map) {
     return ForegroundNotificationConfig(
-      layout: map['layout'],
       notificationId: map['notificationId'] ?? defaultNotificationId,
       title: map['title'],
       text: map['text'],
@@ -186,8 +154,6 @@ class ForegroundNotificationConfig {
       channelName: map['channelName'],
       channelDescription: map['channelDescription'],
       actions: List<String>.from(map['actions']),
-      enableWifiLock: map['enableWifiLock'] ?? false,
-      enableWakeLock: map['enableWakeLock'] ?? false,
     );
   }
 
@@ -198,7 +164,7 @@ class ForegroundNotificationConfig {
 
   @override
   String toString() {
-    return 'ForegroundNotificationConfig(layout: $layout, notificationId: $notificationId, title: $title, text: $text, smallIcon: $smallIcon, largeIcon: $largeIcon, priority: $priority, channelId: $channelId, channelName: $channelName, channelDescription: $channelDescription, actions: $actions, enableWifiLock: $enableWifiLock, enableWakeLock: $enableWakeLock)';
+    return 'ForegroundNotificationConfig(notificationId: $notificationId, title: $title, text: $text, smallIcon: $smallIcon, largeIcon: $largeIcon, priority: $priority, channelId: $channelId, channelName: $channelName, channelDescription: $channelDescription, actions: $actions)';
   }
 
   @override
@@ -206,7 +172,6 @@ class ForegroundNotificationConfig {
     if (identical(this, other)) return true;
 
     return other is ForegroundNotificationConfig &&
-        other.layout == layout &&
         other.notificationId == notificationId &&
         other.title == title &&
         other.text == text &&
@@ -216,15 +181,12 @@ class ForegroundNotificationConfig {
         other.channelId == channelId &&
         other.channelName == channelName &&
         other.channelDescription == channelDescription &&
-        listEquals(other.actions, actions) &&
-        other.enableWifiLock == enableWifiLock &&
-        other.enableWakeLock == enableWakeLock;
+        listEquals(other.actions, actions);
   }
 
   @override
   int get hashCode {
-    return layout.hashCode ^
-        notificationId.hashCode ^
+    return notificationId.hashCode ^
         title.hashCode ^
         text.hashCode ^
         smallIcon.hashCode ^
@@ -233,8 +195,6 @@ class ForegroundNotificationConfig {
         channelId.hashCode ^
         channelName.hashCode ^
         channelDescription.hashCode ^
-        actions.hashCode ^
-        enableWifiLock.hashCode ^
-        enableWakeLock.hashCode;
+        actions.hashCode;
   }
 }

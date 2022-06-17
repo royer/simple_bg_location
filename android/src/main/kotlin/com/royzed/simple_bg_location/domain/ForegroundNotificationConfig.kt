@@ -1,15 +1,10 @@
 package com.royzed.simple_bg_location.domain
 
-import android.content.ClipDescription
 import android.content.Context
 import com.royzed.simple_bg_location.utils.getAppName
 
 data class ForegroundNotificationConfig(
 
-    /**
-     * name of custom layout xml file name
-     */
-    val layout: String = "",
     val notificationId: Int = DEFAULT_NOTIFICATION_ID,
     /**
      * default applicationName from manifest file.
@@ -51,14 +46,10 @@ data class ForegroundNotificationConfig(
      */
     val actions: List<String> = emptyList(),
 
-    val enableWifiLock: Boolean = false,
-
-    val enableWakeLock: Boolean = false,
     ) {
 
     fun toMap(): Map<String, Any> {
         val map : MutableMap<String, Any> = mutableMapOf()
-        map["layout"] = layout
         map["notificationId"] = notificationId
         map["title"] = title
         map["text"] = text
@@ -69,8 +60,6 @@ data class ForegroundNotificationConfig(
         map["channelName"] = channelName
         map["channelDescription"] = channelDescription
         map["actions"] = actions
-        map["enableWifiLock"] = enableWifiLock
-        map["enableWakeLock"] = enableWakeLock
 
         return map.toMap()
     }
@@ -85,10 +74,10 @@ data class ForegroundNotificationConfig(
     }
 
     companion object {
-        const val NOTIFICATION_PRIORITY_DEFAULT: Int = 0;
-        const val NOTIFICATION_PRIORITY_HIGH: Int = 1;
-        const val NOTIFICATION_PRIORITY_LOW: Int = -1;
-        const val NOTIFICATION_PRIORITY_MAX: Int = 2;
+        const val NOTIFICATION_PRIORITY_DEFAULT: Int = 0
+        const val NOTIFICATION_PRIORITY_HIGH: Int = 1
+        const val NOTIFICATION_PRIORITY_LOW: Int = -1
+        const val NOTIFICATION_PRIORITY_MAX: Int = 2
 
         const val DEFAULT_NOTIFICATION_ID = 198964
         const val DEFAULT_CHANNEL_ID = "com.royzed.simple_bg_location.channel_1989.6.4"
@@ -113,7 +102,6 @@ data class ForegroundNotificationConfig(
             } ?: AndroidResource()
 
             return ForegroundNotificationConfig(
-                layout = (map["layout"] as? String) ?: "",
                 notificationId = (map["notificationId"] as? Int) ?: DEFAULT_NOTIFICATION_ID,
                 title = map["title"] as? String ?: getAppName(context),
                 text = map["text"] as? String ?: DEFAULT_TEXT,
@@ -123,9 +111,7 @@ data class ForegroundNotificationConfig(
                 channelId = map["channelId"] as? String ?: DEFAULT_CHANNEL_ID,
                 channelName = map["channelName"] as? String ?: DEFAULT_CHANNEL_NAME,
                 channelDescription = map["channelDescription"] as? String ?: DEFAULT_CHANNEL_DESCRIPTION,
-                actions = map["actions"] as? List<String> ?: emptyList(),
-                enableWifiLock = map["enableWifiLock"] as? Boolean ?: false,
-                enableWakeLock = map["enableWakeLock"] as? Boolean ?: false
+                actions = map["actions"] as? List<String> ?: emptyList()
             )
         }
 
@@ -133,7 +119,6 @@ data class ForegroundNotificationConfig(
         fun makeDefaultConfig(context: Context): ForegroundNotificationConfig {
             val appName = getAppName(context)
             return ForegroundNotificationConfig(
-                layout = "",
                 notificationId = DEFAULT_NOTIFICATION_ID,
                 title = appName,
                 text = DEFAULT_TEXT,
@@ -143,9 +128,7 @@ data class ForegroundNotificationConfig(
                 channelId = DEFAULT_CHANNEL_ID,
                 channelName = DEFAULT_CHANNEL_NAME,
                 channelDescription = DEFAULT_CHANNEL_DESCRIPTION,
-                actions = emptyList(),
-                enableWifiLock =  false,
-                enableWakeLock = false
+                actions = emptyList()
             )
         }
 

@@ -30,9 +30,9 @@ class ForegroundNotification(
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val importance = when(_config.priority) {
-                NotificationCompat.PRIORITY_HIGH -> NotificationManager.IMPORTANCE_HIGH
-                NotificationCompat.PRIORITY_LOW -> NotificationManager.IMPORTANCE_LOW
-                NotificationCompat.PRIORITY_MAX -> NotificationManager.IMPORTANCE_MAX
+                ForegroundNotificationConfig.NOTIFICATION_PRIORITY_HIGH -> NotificationManager.IMPORTANCE_HIGH
+                ForegroundNotificationConfig.NOTIFICATION_PRIORITY_LOW -> NotificationManager.IMPORTANCE_LOW
+                ForegroundNotificationConfig.NOTIFICATION_PRIORITY_MAX -> NotificationManager.IMPORTANCE_MAX
                 else -> NotificationManager.IMPORTANCE_DEFAULT
             }
             val channel = NotificationChannel(_config.channelId, _config.channelName, importance)
@@ -155,10 +155,9 @@ class ForegroundNotification(
         }
     }
 
-    /// accepct new config, ignore notificationId, channelId and channelName
+    /// accept new config, ignore notificationId, channelId and channelName
     fun updateConfig(config: ForegroundNotificationConfig, visible: Boolean) {
         this._config = this._config.copy(
-            layout = config.layout,
             title = config.title,
             text = config.text,
             smallIcon = config.smallIcon,

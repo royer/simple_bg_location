@@ -16,6 +16,11 @@ class ForegroundNotificationConfig {
   /// for setup instructions.
   String? layout;
 
+  /// The unique notification ID
+  ///
+  /// default 198964
+  final int notificationId;
+
   /// The title of notification
   ///
   ///Defaults to the application name from `AndroidManifest`
@@ -23,7 +28,15 @@ class ForegroundNotificationConfig {
 
   /// The content of notification
   ///
-  /// Defaults to *"Location service activated"*.
+  /// Defaults to *"traced: {distance}  elapsed time: {elapsed}"*.
+  ///
+  /// ## Template Tags
+  /// A limited number of template-tags are support. format: __`{tagName}`__
+  /// | template Tag     | Description
+  /// |------------------|---------------------------------------------------|
+  /// | __`{distance}`__ | distance traced since start position update listening
+  /// | __`{elapsed}`__  | elapsed time since start position update listening
+  /// 
   String? text;
 
   /// the notification small icon. if null plugin will use app launcher icon.
@@ -31,7 +44,7 @@ class ForegroundNotificationConfig {
 
   /// The large icon in notification body.
   ///
-  ///
+  /// __DO NOT use Application Launch Icon__
   AndroidResource? largeIcon;
 
   /// The priority of notification
@@ -44,21 +57,36 @@ class ForegroundNotificationConfig {
   /// | [NOTIFICATION_PRIORITY_HIGH]    | Notification **strongly** weighted to top of list; notification-bar icon **strongly** weighted to left  |
   /// | [NOTIFICATION_PRIORITY_LOW]     | Notification weighted to bottom of list; notification-bar icon weighted right                           |
   /// | [NOTIFICATION_PRIORITY_MAX]     | Same as `NOTIFICATION_PRIORITY_HIGH`                                                                    |
-  /// | [NOTIFICATION_PRIORITY_MIN]     | Notification **strongly** weighted to bottom of list; notification-bar icon **hidden**                  |
   ///
-  int priority;
+  final int priority;
+
+  /// The Notification channel id
+  ///
+  /// Since Android 8.0 (API level 26) and higher, channel ID is required.
+  /// default is 'com.royzed.simple_bg_location.channel_1989.6.4'
+  final String channelId;
 
   /// the Channel name of notification
   ///
-  /// On Android O+, oreground-service needs to create a "Notification Channel".
+  /// On Android O+, foreground-service needs to create a "Notification Channel".
   /// The name of this channel can be seen in:
   /// > `Settings->App & Notifications->Your App.`
   ///
   /// Defaults is "Position Update".
   String? channelName;
 
+  /// the channel description of notification
+  ///
+  /// default is "Notify user location service is running."
+  String? channelDescription;
+
   /// Your custom up to three action buttons on notification
   ///
+  /// __`"cancel"`__ action name is special action. if you provide "cancel"
+  /// unlike other action, plugin will not send NotificationAction event, instead
+  /// plugin will cancel current position update, and your location stream will
+  /// got a [PositionError] which errorCode is __"CANCELED"__. 
+  /// 
   ///If you provide a [layout], this actions is Button's id.
   /// Declare click listeners for `<Button />` elements of a custom notification [layout].
   ///
@@ -97,32 +125,44 @@ class ForegroundNotificationConfig {
 
   ForegroundNotificationConfig({
     this.layout,
+    this.notificationId = defaultNotificationId,
     this.title,
     this.text,
     this.smallIcon,
     this.largeIcon,
-    this.priority = 0,
+    this.priority = NOTIFICATION_PRIORITY_DEFAULT,
+    this.channelId = defaultChannelId,
     this.channelName,
+    this.channelDescription,
     this.actions,
     this.enableWifiLock = false,
     this.enableWakeLock = false,
-  }) : assert(actions == null || actions.length <= 3, 'notification actions is up to three.');
+  })  : assert(actions == null || actions.length <= 3,
+            'notification actions is up to three.'),
+        assert(channelId.isNotEmpty, "channelId can not empty string."),
+        assert(priority >= -1 && priority <= 2, 'priority must be in [-1, 2]');
 
   static const int NOTIFICATION_PRIORITY_DEFAULT = 0;
   static const int NOTIFICATION_PRIORITY_HIGH = 1;
   static const int NOTIFICATION_PRIORITY_LOW = -1;
   static const int NOTIFICATION_PRIORITY_MAX = 2;
-  static const int NOTIFICATION_PRIORITY_MIN = -2;
+
+  static const int defaultNotificationId = 198964;
+  static const String defaultChannelId =
+      'com.royzed.simple_bg_location.channel_1989.6.4';
 
   Map<String, dynamic> toMap() {
     return {
       'layout': layout,
+      'notificationId': notificationId,
       'title': title,
       'text': text,
       'smallIcon': smallIcon?.toMap(),
       'largeIcon': largeIcon?.toMap(),
       'priority': priority,
+      'channelId': channelId,
       'channelName': channelName,
+      'channelDescription': channelDescription,
       'actions': actions,
       'enableWifiLock': enableWifiLock,
       'enableWakeLock': enableWakeLock,
@@ -132,6 +172,7 @@ class ForegroundNotificationConfig {
   factory ForegroundNotificationConfig.fromMap(Map<String, dynamic> map) {
     return ForegroundNotificationConfig(
       layout: map['layout'],
+      notificationId: map['notificationId'] ?? defaultNotificationId,
       title: map['title'],
       text: map['text'],
       smallIcon: map['smallIcon'] != null
@@ -141,7 +182,9 @@ class ForegroundNotificationConfig {
           ? AndroidResource.fromMap(map['largeIcon'])
           : null,
       priority: map['priority']?.toInt() ?? 0,
+      channelId: map['channelId'] ?? defaultChannelId,
       channelName: map['channelName'],
+      channelDescription: map['channelDescription'],
       actions: List<String>.from(map['actions']),
       enableWifiLock: map['enableWifiLock'] ?? false,
       enableWakeLock: map['enableWakeLock'] ?? false,
@@ -155,7 +198,7 @@ class ForegroundNotificationConfig {
 
   @override
   String toString() {
-    return 'ForegroundNotificationConfig(layout: $layout, title: $title, text: $text, smallIcon: $smallIcon, largeIcon: $largeIcon, priority: $priority, channelName: $channelName, actions: $actions, enableWifiLock: $enableWifiLock, enableWakeLock: $enableWakeLock)';
+    return 'ForegroundNotificationConfig(layout: $layout, notificationId: $notificationId, title: $title, text: $text, smallIcon: $smallIcon, largeIcon: $largeIcon, priority: $priority, channelId: $channelId, channelName: $channelName, channelDescription: $channelDescription, actions: $actions, enableWifiLock: $enableWifiLock, enableWakeLock: $enableWakeLock)';
   }
 
   @override
@@ -164,12 +207,15 @@ class ForegroundNotificationConfig {
 
     return other is ForegroundNotificationConfig &&
         other.layout == layout &&
+        other.notificationId == notificationId &&
         other.title == title &&
         other.text == text &&
         other.smallIcon == smallIcon &&
         other.largeIcon == largeIcon &&
         other.priority == priority &&
+        other.channelId == channelId &&
         other.channelName == channelName &&
+        other.channelDescription == channelDescription &&
         listEquals(other.actions, actions) &&
         other.enableWifiLock == enableWifiLock &&
         other.enableWakeLock == enableWakeLock;
@@ -178,12 +224,15 @@ class ForegroundNotificationConfig {
   @override
   int get hashCode {
     return layout.hashCode ^
+        notificationId.hashCode ^
         title.hashCode ^
         text.hashCode ^
         smallIcon.hashCode ^
         largeIcon.hashCode ^
         priority.hashCode ^
+        channelId.hashCode ^
         channelName.hashCode ^
+        channelDescription.hashCode ^
         actions.hashCode ^
         enableWifiLock.hashCode ^
         enableWakeLock.hashCode;

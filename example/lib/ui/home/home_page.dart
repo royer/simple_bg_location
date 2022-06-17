@@ -110,7 +110,7 @@ class HomePage extends StatelessWidget {
             EventsView(),
           ],
         ),
-        bottomNavigationBar: MyBottomBar(),
+        bottomNavigationBar: const MyBottomBar(),
       ),
     );
   }

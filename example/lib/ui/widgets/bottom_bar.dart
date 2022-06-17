@@ -86,10 +86,10 @@ class MyBottomBar extends StatelessWidget {
           break;
       }
       requestSettings.notificationConfig = ForegroundNotificationConfig(
-        title: "Simple BG Location",
-        text: "distance: 34.8km elapsed 34min",
-        actions: ['Action1', 'Action2', 'Action3']
-      );
+          smallIcon:
+              const AndroidResource(name: 'drawable/ic_baseline_route_24'),
+          title: "Simple BG Location",
+          actions: ['Action1', 'Action2', 'cancel']);
       // ignore: use_build_context_synchronously
       context.read<PositionCubit>().requestPositionUpdate(requestSettings);
     }

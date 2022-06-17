@@ -3,20 +3,29 @@ package com.royzed.simple_bg_location.services
 import android.app.*
 import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
 import android.content.res.Configuration
+import android.location.Location
 import android.os.Binder
 import android.os.IBinder
+import androidx.annotation.MainThread
 import com.royzed.simple_bg_location.SimpleBgLocationModule
 import com.royzed.simple_bg_location.data.Position
 import com.royzed.simple_bg_location.domain.ForegroundNotification
+import com.royzed.simple_bg_location.domain.ForegroundNotificationConfig
 import com.royzed.simple_bg_location.domain.RequestOptions
 import com.royzed.simple_bg_location.domain.State
 import com.royzed.simple_bg_location.domain.location.PositionChangedCallback
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
 import com.royzed.simple_bg_location.errors.ErrorCallback
 import com.royzed.simple_bg_location.errors.ErrorCodes
+import com.royzed.simple_bg_location.utils.distanceToString
 import io.flutter.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.util.*
+import kotlin.concurrent.timer
+import kotlin.math.min
 
 class SimpleBgLocationService : Service() {
     private val localBinder: LocalBinder = LocalBinder()
@@ -27,6 +36,9 @@ class SimpleBgLocationService : Service() {
     val isTracking: Boolean get() = _isTracking
 
     private val positions: MutableList<Position> = mutableListOf()
+    private var distance: Double = 0.0
+    private var elapsedSeconds: Long = 0
+    private var timer: Timer? = null
 
 
     private lateinit var notification: ForegroundNotification
@@ -40,7 +52,11 @@ class SimpleBgLocationService : Service() {
         if (location != null) {
             val position = Position.fromLocation(location)
             positions.add(position)
+            accumulateDistance()
             SimpleBgLocationModule.getInstance().dispatchPositionEvent(position)
+            if (notification.config.textHasTemplateTag()) {
+                replaceNotifyByTemplate()
+            }
         } else {
             Log.w(TAG,"got location is null. do nothing!")
 
@@ -52,6 +68,7 @@ class SimpleBgLocationService : Service() {
         Log.d(TAG,"Position Update hit error: code: $it")
         stopPositionUpdate()
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -71,7 +88,7 @@ class SimpleBgLocationService : Service() {
             SimpleBgLocationModule.getInstance().dispatchPositionErrorEvent(ErrorCodes.canceled)
         } else if (action == ACTION_START && intent?.component == comp) {
             Log.d(TAG,"service will start: service: $this")
-            startForeground(NOTIFICATION_ID, notification.build())
+            startForeground(notification.id, notification.build())
         } else if (action.contains(ForegroundNotification.ACTION_PREFIX)) {
             val actionId = ForegroundNotification.extractActionId(action)
             SimpleBgLocationModule.getInstance().dispatchNotificationActionEvent(actionId)
@@ -122,12 +139,22 @@ class SimpleBgLocationService : Service() {
         Log.d(TAG,"requestPositionUpdate this time service is: $this ")
         return if (!_isTracking) {
             requestOptions = options
-            notification = ForegroundNotification(applicationContext, NOTIFICATION_ID, NOTIFICATION_CHANNEL_ID, requestOptions.notificationConfig)
+            notification = ForegroundNotification(applicationContext, requestOptions.notificationConfig)
 
             val startIntent = Intent(applicationContext, SimpleBgLocationService::class.java).apply {
                 action = ACTION_START
             }
             startService(startIntent)
+            if (notification.config.textHasElapsedTemplateTag()) {
+                timer = timer(period = 1000)  {
+
+                    runBlocking(Dispatchers.Main) {
+                        elapsedSeconds++
+                        replaceNotifyByTemplate()
+                    }
+
+                }
+            }
 
             locationManager.startPositionUpdate(options, positionCallback, errorCallback)
             _isTracking = true
@@ -141,6 +168,12 @@ class SimpleBgLocationService : Service() {
     fun stopPositionUpdate() {
         _isTracking = false
         positions.clear()
+        distance = 0.0
+        elapsedSeconds = 0
+        if (timer != null) {
+            timer!!.cancel()
+            timer = null
+        }
         locationManager.stopPositionUpdate()
         Log.d(TAG, "Position Update Stopped.")
         stopForeground(true)
@@ -148,18 +181,49 @@ class SimpleBgLocationService : Service() {
     }
 
     fun getState(): State {
-        val state = State();
+        val state = State()
 
-        state.isTracking = isTracking;
+        state.isTracking = isTracking
         if (isTracking) {
-            state.positions = positions;
-            state.requestOptions = requestOptions;
+            state.positions = positions
+            state.requestOptions = requestOptions
         }
 
-        return state;
+        return state
+    }
+
+    private fun accumulateDistance() {
+        if (positions.size < 2) {
+            return
+        }
+        val length = positions.size
+        val result: FloatArray = FloatArray(3)
+        Location.distanceBetween(positions[length-2].latitude, positions[length-2].longitude,
+        positions[length-1].latitude, positions[length-1].longitude, result)
+
+        distance += result[0].toDouble()
+
+    }
+    @MainThread
+    private fun replaceNotifyByTemplate() {
+        if (notification.config.textHasTemplateTag()) {
+            var newText = notification.config.text.replace(ForegroundNotificationConfig.distance_tag, distanceToString(distance), true)
+            if (timer != null) {
+                newText = newText.replace(ForegroundNotificationConfig.elapsed_tag, formatElapsedTime(), true)
+            }
+            val newConfig = notification.config.copy(text = newText)
+            notification.updateNotification(newConfig, true)
+        }
     }
 
 
+    private fun formatElapsedTime(): String {
+        val seconds: Long = elapsedSeconds % 60
+        val minutes: Long = (elapsedSeconds / 60) % 60
+        val hours: Long = elapsedSeconds / 3600
+
+        return (String.format("%02d:%02d:%02d", hours, minutes, seconds))
+    }
 
     inner class LocalBinder : Binder() {
         internal val service: SimpleBgLocationService
@@ -170,9 +234,9 @@ class SimpleBgLocationService : Service() {
 
         const val ACTION_START = "Start"
         const val PACKAGE_NAME = "com.royzed.simple_bg_location"
-        const val NOTIFICATION_ID = 373737
-        const val NOTIFICATION_CHANNEL_ID = "simple_background_location_channel_01"
         const val EXTRA_CANCEL_LOCATION_UPDATE_FROM_NOTIFICATION =
             "$PACKAGE_NAME.extra.cancel_location_update_from_notification"
+
+
     }
 }

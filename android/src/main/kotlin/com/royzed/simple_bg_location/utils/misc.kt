@@ -16,3 +16,11 @@ fun parseFlutterIntToLong(value: Any?): Long? {
         else -> null
     }
 }
+
+fun distanceToString(d: Double): String {
+    if (d < 1000) {
+        return String.format("%.0fm", d)
+    } else {
+        return String.format("%.1fkm", d / 1000)
+    }
+}

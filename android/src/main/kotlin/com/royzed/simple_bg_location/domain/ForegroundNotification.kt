@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -15,20 +17,28 @@ import io.flutter.Log
 
 class ForegroundNotification(
     private val context: Context,
-    private val notficationId: Int,
-    channelId: String,
-    private val notificationConfig: ForegroundNotificationConfig,
+    private var _config: ForegroundNotificationConfig,
 
-) {
+    ) {
 
-    private val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, channelId)
+    val id: Int get() = _config.notificationId
+    val config: ForegroundNotificationConfig get() = _config
+
+    private val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, _config.channelId)
     init {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(channelId, notificationConfig.channelName, importance)
-
+            val importance = when(_config.priority) {
+                NotificationCompat.PRIORITY_HIGH -> NotificationManager.IMPORTANCE_HIGH
+                NotificationCompat.PRIORITY_LOW -> NotificationManager.IMPORTANCE_LOW
+                NotificationCompat.PRIORITY_MAX -> NotificationManager.IMPORTANCE_MAX
+                else -> NotificationManager.IMPORTANCE_DEFAULT
+            }
+            val channel = NotificationChannel(_config.channelId, _config.channelName, importance)
+            channel.description = _config.channelDescription
+            channel.enableLights(true)
+            channel.enableVibration(true)
             // Register the channel with the system
             // It's safe to call this repeatedly because creating an existing notification
             // channel performs no operation.
@@ -36,7 +46,7 @@ class ForegroundNotification(
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.createNotificationChannel(channel)
         }
-        updateNotification(notificationConfig, false)
+        updateNotification(_config,false)
     }
 
     private fun buildBringToFrontIntent(): PendingIntent? {
@@ -76,6 +86,14 @@ class ForegroundNotification(
 
     }
 
+    private fun getBitmap(name: String, defType: String): Bitmap? {
+        val id = context.resources.getIdentifier(name, defType, context.packageName)
+        if (id == 0) {
+            return null
+        }
+        return BitmapFactory.decodeResource(context.resources, id)
+    }
+
     private fun buildActionIntent(actionId: String): PendingIntent {
         val actionIntent = Intent(context, SimpleBgLocationService::class.java).apply {
             action = makeActionName(actionId)
@@ -88,19 +106,23 @@ class ForegroundNotification(
 
     }
 
-    private fun updateNotification(config: ForegroundNotificationConfig, notify: Boolean) {
-        val iconId = getIcon(config.smallIcon.name, config.smallIcon.defType)
+    fun updateNotification(newConfig: ForegroundNotificationConfig , notify: Boolean) {
+        val iconId = getIcon(newConfig.smallIcon.name, newConfig.smallIcon.defType)
+        val largeIcon: Bitmap? = getBitmap(newConfig.largeIcon.name, newConfig.largeIcon.defType)
 
-
+        var replacedText = newConfig.text.replace(ForegroundNotificationConfig.distance_tag, "0m", true)
+        replacedText = replacedText.replace(ForegroundNotificationConfig.elapsed_tag, "00:00:00", true)
         builder.apply {
-            setContentText(config.text)
+            setContentTitle(newConfig.title)
+            setContentText(replacedText)
             setSmallIcon(iconId)
-            setContentTitle(config.title)
+            if (largeIcon != null)
+                setLargeIcon(largeIcon)
             setDefaults(NotificationCompat.DEFAULT_ALL)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             setOngoing(true)
-            priority = NotificationCompat.PRIORITY_DEFAULT
-            setStyle(NotificationCompat.BigTextStyle().bigText(config.text))
+            priority = newConfig.priority
+            setStyle(NotificationCompat.BigTextStyle().bigText(replacedText))
             setContentIntent(buildBringToFrontIntent())
 
 //            addAction(
@@ -109,22 +131,42 @@ class ForegroundNotification(
 //                buildCancelIntent()
 //            )
 
-            for(actionName in config.actions) {
-                addAction(R.drawable.ic_simple_bg_location_location,
-                actionName,
-                    buildActionIntent(actionName)
-                )
+            for(actionName in newConfig.actions) {
+                if (actionName.equals("cancel", true)) {
+                    addAction(
+                        R.drawable.ic_simple_bg_location_cancel,
+                        actionName,
+                        buildCancelIntent()
+                    )
+
+                } else {
+                    addAction(
+                        0,
+                        actionName,
+                        buildActionIntent(actionName)
+                    )
+                }
             }
         }
 
         if (notify) {
             val manager = NotificationManagerCompat.from(context)
-            manager.notify(notficationId, builder.build())
+            manager.notify(_config.notificationId, builder.build())
         }
     }
 
+    /// accepct new config, ignore notificationId, channelId and channelName
     fun updateConfig(config: ForegroundNotificationConfig, visible: Boolean) {
-        updateNotification(config, visible)
+        this._config = this._config.copy(
+            layout = config.layout,
+            title = config.title,
+            text = config.text,
+            smallIcon = config.smallIcon,
+            largeIcon = config.largeIcon,
+            priority = config.priority,
+            actions = config.actions
+        )
+        updateNotification(_config, visible)
     }
 
     fun build(): Notification {
@@ -141,7 +183,7 @@ class ForegroundNotification(
         }
 
         fun extractActionId(fullActionName: String): String {
-            return fullActionName.removePrefix("$ACTION_PREFIX")
+            return fullActionName.removePrefix(ACTION_PREFIX)
         }
 
     }

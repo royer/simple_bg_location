@@ -45,17 +45,31 @@ class PositionUpdateState extends PositionState with EquatableMixin {
     required List<Position> positions,
     required double odometer,
   }) : super(isTracking: isTracking, positions: positions, odometer: odometer);
-
 }
 
 class PositionCurrentPositionResult extends PositionState with EquatableMixin {
   final Position currentResult;
 
-  const PositionCurrentPositionResult(this.currentResult,{
+  const PositionCurrentPositionResult(
+    this.currentResult, {
     required bool isTracking,
     required List<Position> positions,
     required double odometer,
   }) : super(isTracking: isTracking, positions: positions, odometer: odometer);
   @override
   List<Object?> get props => [currentResult, ...super.props];
+}
+
+class PositionStateError extends PositionState with EquatableMixin {
+  final PositionError error;
+
+  const PositionStateError(
+    this.error, {
+    required bool isTracking,
+    required List<Position> positions,
+    required double odometer,
+  }) : super(isTracking: isTracking, positions: positions, odometer: odometer);
+
+  @override
+  List<Object?> get props => [error, ... super.props ];
 }

@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 
@@ -12,7 +13,6 @@ class PositionCubit extends Cubit<PositionState> {
   // If use SimpleBgLocation.getPositionStream, define your owner stream
   // subscription
   // late final StreamSubscription<Position> _positionSub;
-
 
   PositionCubit() : super(const PositionInitial()) {
     // _positionSub = SimpleBgLocation.getPositionStream(_positionErrorHandle)
@@ -52,10 +52,26 @@ class PositionCubit extends Cubit<PositionState> {
   }
 
   Future<void> requestPositionUpdate(RequestSettings requestSettings) async {
-    emit(const PositionUpdateState(
-        isTracking: true, positions: [], odometer: 0.0));
-
-    await SimpleBgLocation.requestPositionUpdate(requestSettings);
+    try {
+      await SimpleBgLocation.requestPositionUpdate(requestSettings);
+      emit(const PositionUpdateState(
+          isTracking: true, positions: [], odometer: 0.0));
+    } on LocationServiceDisabledException catch (e) {
+      emit(PositionStateError(
+        PositionError(PositionError.locationServiceDisabled,
+            e.message ?? 'Location Services disabled'),
+        isTracking: false,
+        positions: [],
+        odometer: 0.0,
+      ));
+    } on PlatformException catch (e) {
+      emit(PositionStateError(
+        PositionError.fromPlatformException(e),
+        isTracking: false,
+        positions: [],
+        odometer: 0.0,
+      ));
+    }
   }
 
   Future<void> stopPositionUpdate() async {
@@ -85,7 +101,7 @@ class PositionCubit extends Cubit<PositionState> {
   void _positionErrorHandle(PositionError err) {
     dev.log('_onPositionError, errorCode: $err');
 
-    emit(PositionUpdateState(
+    emit(PositionStateError(err,
         isTracking: false,
         positions: state.positions,
         odometer: state.odometer));

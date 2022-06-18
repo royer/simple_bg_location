@@ -10,6 +10,7 @@ import com.royzed.simple_bg_location.data.Position
 import com.royzed.simple_bg_location.domain.RequestOptions
 import com.royzed.simple_bg_location.domain.location.LocationServiceListener
 import com.royzed.simple_bg_location.domain.location.SimpleBgLocationManager
+import com.royzed.simple_bg_location.domain.location.isLocationServiceEnable
 import com.royzed.simple_bg_location.errors.ErrorCodes
 import com.royzed.simple_bg_location.errors.PermissionUndefinedException
 import com.royzed.simple_bg_location.permission.BackgroundPermissionRationale
@@ -222,6 +223,10 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
     private fun onRequestPositionUpdate(call: MethodCall, result: MethodChannel.Result) {
         if (!hasPermission(result)) {
+            return
+        }
+        if (!isLocationServiceEnable(context)) {
+            result.error(ErrorCodes.locationServicesDisabled.code,ErrorCodes.locationServicesDisabled.description, null)
             return
         }
 

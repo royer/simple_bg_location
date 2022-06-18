@@ -145,7 +145,7 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
         .receiveBroadcastStream()
         .handleError((dynamic error) {
       if (failure != null) {
-        failure(PositionError(error as PlatformException));
+        failure(PositionError.fromPlatformException(error as PlatformException));
       } else {
         dev.log(
             'getPositionStream error!!! Uncaught position error: $error. You should provide a failure callback.');

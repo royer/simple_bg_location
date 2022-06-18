@@ -89,6 +89,7 @@ class SimpleBgLocationService : Service() {
         } else if (action == ACTION_START && intent?.component == comp) {
             Log.d(TAG,"service will start: service: $this")
             startForeground(notification.id, notification.build())
+            locationManager.startPositionUpdate(requestOptions, positionCallback, errorCallback)
         } else if (action.contains(ForegroundNotification.ACTION_PREFIX)) {
             val actionId = ForegroundNotification.extractActionId(action)
             SimpleBgLocationModule.getInstance().dispatchNotificationActionEvent(actionId)
@@ -156,7 +157,7 @@ class SimpleBgLocationService : Service() {
                 }
             }
 
-            locationManager.startPositionUpdate(options, positionCallback, errorCallback)
+
             _isTracking = true
             true
         } else {

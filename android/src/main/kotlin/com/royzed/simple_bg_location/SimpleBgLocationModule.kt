@@ -2,7 +2,10 @@ package com.royzed.simple_bg_location
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
+import android.os.PowerManager
 import android.util.Log
+import androidx.core.content.getSystemService
 import com.royzed.simple_bg_location.callbacks.CallbacksManager
 import com.royzed.simple_bg_location.callbacks.NotificationActionCallback
 import com.royzed.simple_bg_location.callbacks.PositionCallback
@@ -134,6 +137,9 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
             Methods.ready -> {
                 onReady(result)
             }
+            Methods.isPowerSaveMode -> {
+                onIsPowerSaveMode(result)
+            }
             else -> {
                 result.notImplemented()
             }
@@ -247,6 +253,15 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         Log.d(TAG,"onReady, state: $state")
         result.success(state.toMap())
 
+    }
+
+    private fun onIsPowerSaveMode(result: MethodChannel.Result) {
+        val powerManager: PowerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            result.success(powerManager.isPowerSaveMode)
+        } else {
+            result.success(true)
+        }
     }
 
 

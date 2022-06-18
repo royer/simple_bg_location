@@ -158,11 +158,9 @@ class LocationManagerClient(
 
     @Synchronized
     override fun onLocationChanged(location: Location) {
-        Log.d(TAG,"onLocationChanged(location: ${Date(location.time).toIso8601String()}, [${location.latitude}, ${location.longitude}])")
         //TODO should filter too bad location ??
 
         if (_positionCallback != null) {
-            Log.d(TAG,"location is posted.")
             _positionCallback!!(location)
         } else {
             Log.w(TAG,"Location arrived but positionCallback is null!")

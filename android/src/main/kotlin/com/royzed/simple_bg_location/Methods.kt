@@ -12,4 +12,5 @@ object Methods {
     const val requestPositionUpdate = "requestPositionUpdate"
     const val stopPositionUpdate = "stopPositionUpdate"
     const val ready = "ready"
+    const val isPowerSaveMode = "isPowerSaveMode"
 }

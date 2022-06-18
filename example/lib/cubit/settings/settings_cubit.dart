@@ -9,6 +9,18 @@ class SettingsCubit extends Cubit<SettingsState> {
   SettingsCubit() : super(SettingsInitial());
 
   void setCustomerAccuracy(CustomAccuracy accuracy) {
-    emit(AccuracyChanged(accuracy: accuracy));
+    emit(AccuracyChanged(
+      accuracy: accuracy,
+      forceLocationManager: state.forceLocationManager,
+    ));
+  }
+
+  void toggleForceLocationManager() {
+    emit(
+      ForceLocationManagerChanged(
+        accuracy: state.accuracy,
+        forceLocationManager: !state.forceLocationManager,
+      ),
+    );
   }
 }

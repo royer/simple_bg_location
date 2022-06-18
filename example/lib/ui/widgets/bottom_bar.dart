@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
+import 'package:simple_bg_location/simple_bg_device_info.dart';
 import 'package:simple_bg_location_example/cubit/position/position_cubit.dart';
 import 'package:simple_bg_location_example/cubit/settings/settings_cubit.dart';
 
@@ -68,6 +69,22 @@ class MyBottomBar extends StatelessWidget {
 
     final allow = await _checkAndRequestPermission(context);
     if (allow) {
+      if ((await SimpleBgDeviceInfo.isPowerSaveMode())) {
+        await showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Power Save Mode is ON'),
+            content: const Text(
+                "Track recording may not work properly in Power Save Mode. If track does not record properly, disable Power Save Mode."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
       late final RequestSettings requestSettings;
       switch (accuracy) {
         case CustomAccuracy.best:
@@ -91,6 +108,9 @@ class MyBottomBar extends StatelessWidget {
           title: "Simple BG Location",
           actions: ['Action1', 'Action2', 'Cancel']);
       requestSettings.distanceFilter = 20;
+      // ignore: use_build_context_synchronously
+      requestSettings.forceLocationManager =
+          context.read<SettingsCubit>().state.forceLocationManager;
       // ignore: use_build_context_synchronously
       context.read<PositionCubit>().requestPositionUpdate(requestSettings);
     }

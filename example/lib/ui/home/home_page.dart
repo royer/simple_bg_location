@@ -8,7 +8,14 @@ import '../../cubit/settings/settings_cubit.dart';
 import '../widgets/bottom_bar.dart';
 import 'views/views.dart';
 
-enum _Menu { best, good, balance, lowest, otherApi }
+enum _Menu {
+  best,
+  good,
+  balance,
+  lowest,
+  otherApi,
+  forceLocationManager,
+}
 
 class HomePage extends StatelessWidget {
   HomePage({Key? key}) : super(key: key) {
@@ -60,6 +67,11 @@ class HomePage extends StatelessWidget {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => const OtherApisPage()));
                         break;
+                      case _Menu.forceLocationManager:
+                        context
+                            .read<SettingsCubit>()
+                            .toggleForceLocationManager();
+                        break;
                     }
                   },
                   itemBuilder: (_) => <PopupMenuEntry<_Menu>>[
@@ -91,6 +103,11 @@ class HomePage extends StatelessWidget {
                         title: Text('Other Api...'),
                       ),
                     ),
+                    const PopupMenuDivider(),
+                    CheckedPopupMenuItem(
+                      checked: state.forceLocationManager,
+                      value: _Menu.forceLocationManager,
+                      child: const Text('Force LocationManager')),
                   ],
                 );
               },

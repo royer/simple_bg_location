@@ -5,20 +5,38 @@ enum CustomAccuracy { best, good, balance, lowest }
 @immutable
 abstract class SettingsState with EquatableMixin {
   final CustomAccuracy accuracy;
-  const SettingsState({this.accuracy = CustomAccuracy.best});
+  final bool forceLocationManager;
+  const SettingsState({
+    this.accuracy = CustomAccuracy.best,
+    this.forceLocationManager = false,
+  });
 }
 
 @immutable
 class SettingsInitial extends SettingsState with EquatableMixin {
   @override
-  List<Object?> get props => [accuracy];
+  List<Object?> get props => [accuracy, forceLocationManager];
 }
 
 @immutable
 class AccuracyChanged extends SettingsState with EquatableMixin {
-  
-  const AccuracyChanged({required CustomAccuracy accuracy})
-      : super(accuracy: accuracy);
+  const AccuracyChanged({
+    required CustomAccuracy accuracy,
+    required bool forceLocationManager,
+  }) : super(
+          accuracy: accuracy,
+          forceLocationManager: forceLocationManager,
+        );
   @override
-  List<Object?> get props => [accuracy];
+  List<Object?> get props => [accuracy, forceLocationManager];
+}
+
+class ForceLocationManagerChanged extends SettingsState with EquatableMixin {
+  const ForceLocationManagerChanged({
+    required CustomAccuracy accuracy,
+    required bool forceLocationManager,
+  }) : super(accuracy: accuracy, forceLocationManager: forceLocationManager);
+
+  @override
+  List<Object?> get props => [accuracy, forceLocationManager];
 }

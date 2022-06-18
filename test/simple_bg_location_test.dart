@@ -90,6 +90,12 @@ class MockSimpleBgLocationPlatform
     // TODO: implement getNotificationActionStream
     throw UnimplementedError();
   }
+
+  @override
+  Future<bool> isPowerSaveMode() {
+    // TODO: implement isPowerSaveMode
+    throw UnimplementedError();
+  }
 }
 
 void main() {

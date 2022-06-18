@@ -151,4 +151,14 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
     throw UnimplementedError(
         'openLocationSettings() has not been implemented.');
   }
+
+  /// Check device Power Save mode
+  /// 
+  /// Return `true` Power Save Mode is on.
+  /// 
+  /// Note: on Android: It only available Android 5.0 (API level 21), in early 
+  /// version always return false.
+  Future<bool> isPowerSaveMode() async {
+    throw UnimplementedError('isPowerSaveMode() has not been implemented.');
+  }
 }

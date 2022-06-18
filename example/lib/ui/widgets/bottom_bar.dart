@@ -89,7 +89,7 @@ class MyBottomBar extends StatelessWidget {
           smallIcon:
               const AndroidResource(name: 'drawable/ic_baseline_route_24'),
           title: "Simple BG Location",
-          actions: ['Action1', 'Action2', 'cancel']);
+          actions: ['Action1', 'Action2', 'Cancel']);
       requestSettings.distanceFilter = 20;
       // ignore: use_build_context_synchronously
       context.read<PositionCubit>().requestPositionUpdate(requestSettings);

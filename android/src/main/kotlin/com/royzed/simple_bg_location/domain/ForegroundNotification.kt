@@ -120,6 +120,7 @@ class ForegroundNotification(
                 setLargeIcon(largeIcon)
             setDefaults(NotificationCompat.DEFAULT_ALL)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            setOnlyAlertOnce(true)
             setOngoing(true)
             priority = newConfig.priority
             setStyle(NotificationCompat.BigTextStyle().bigText(replacedText))

@@ -33,6 +33,10 @@ enum class ErrorCodes(val code: String, val description: String) {
     canceled(
         "CANCELED",
         "operator canceled."
+    ),
+    missedCallReadyMethod(
+        "MISSED_CALL_READY",
+        "Missed call ready method before call requestPositionUpdate"
     )
 
 }

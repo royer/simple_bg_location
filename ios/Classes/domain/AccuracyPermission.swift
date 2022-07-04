@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+enum AccuracyPermission: Int {
+    case precise = 0,approximate,denied
+}

@@ -6,3 +6,6 @@
 //
 
 import Foundation
+enum LocationPermission: Int {
+    case denied = 0, deniedForever, whileInUse, always
+}

@@ -6,3 +6,18 @@
 //
 
 import Foundation
+
+enum Methods: String {
+    case checkPermission = "checkPermission"
+    case requestPermission = "requestPermission"
+    case isLocationServiceEnabled = "isLocationServiceEnabled"
+    case getAccuracyPermission = "getAccuracyPermission"
+    case openAppSettings = "openAppSettings"
+    case openLocationSettings = "openLocationSettings"
+    case getLastKnownPosition = "getLastKnownPosition"
+    case getCurrentPosition = "getCurrentPosition"
+    case requestPositionUpdate = "requestPositionUpdate"
+    case stopPositionUpdate = "stopPositionUpdate"
+    case ready = "ready"
+    case isPowerSaveMode = "isPowerSaveMode"
+}

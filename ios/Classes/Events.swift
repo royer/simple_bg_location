@@ -6,3 +6,9 @@
 //
 
 import Foundation
+enum Events: String {
+    case position = "position"
+    
+    // Android Only
+    case notificationAction = "notificationAction"
+}

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer' as dev;
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:simple_bg_location/src/extensions/extensions.dart';

@@ -61,14 +61,14 @@ class PositionCubit extends Cubit<PositionState> {
         PositionError(PositionError.locationServiceDisabled,
             e.message ?? 'Location Services disabled'),
         isTracking: false,
-        positions: [],
+        positions: const [],
         odometer: 0.0,
       ));
     } on PlatformException catch (e) {
       emit(PositionStateError(
         PositionError.fromPlatformException(e),
         isTracking: false,
-        positions: [],
+        positions: const [],
         odometer: 0.0,
       ));
     }

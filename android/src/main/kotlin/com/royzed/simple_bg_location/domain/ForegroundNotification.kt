@@ -1,5 +1,6 @@
 package com.royzed.simple_bg_location.domain
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -106,7 +107,8 @@ class ForegroundNotification(
 
     }
 
-    fun updateNotification(newConfig: ForegroundNotificationConfig , notify: Boolean) {
+    @SuppressLint("MissingPermission")
+    fun updateNotification(newConfig: ForegroundNotificationConfig, notify: Boolean) {
         val iconId = getIcon(newConfig.smallIcon.name, newConfig.smallIcon.defType)
         val largeIcon: Bitmap? = getBitmap(newConfig.largeIcon.name, newConfig.largeIcon.defType)
 

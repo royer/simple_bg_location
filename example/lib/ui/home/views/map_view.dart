@@ -4,7 +4,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
-import 'dart:developer' as dev;
 import 'package:simple_bg_location_example/cubit/position/position_cubit.dart';
 
 class MapView extends StatefulWidget {
@@ -67,7 +66,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
               state.currentResult.latitude, state.currentResult.longitude);
           _updateCurrentPositionResultMarker(ll);
         } else if (state is PositionStateError) {
-          final errorState = state as PositionStateError;
+          final errorState = state;
           Fluttertoast.showToast(
               msg: '${errorState.error}', toastLength: Toast.LENGTH_LONG);
           _clear();

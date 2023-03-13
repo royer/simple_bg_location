@@ -27,7 +27,7 @@ class PositionError {
     canceled,
   ];
 
-  PositionError(this.code, this.message) {}
+  PositionError(this.code, this.message);
 
   PositionError.fromPlatformException(PlatformException e) {
     code = _errorCodes.firstWhere(

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:simple_bg_location_example/constants.dart';
-import 'package:simple_bg_location_example/ui/other_apis/other_apis_view.dart';
-import 'package:simple_bg_location_example/ui/widgets/bottom_bar.dart';
+import 'other_apis_view.dart';
+import '../widgets/bottom_bar.dart';
 
 class OtherApisPage extends StatelessWidget {
   const OtherApisPage({Key? key}) : super(key: key);
@@ -16,7 +13,7 @@ class OtherApisPage extends StatelessWidget {
         title: const Text('Other Apis'),
       ),
       body: const OtherApiView(),
-      bottomNavigationBar: MyBottomBar(),
+      bottomNavigationBar: const MyBottomBar(),
     );
   }
 }

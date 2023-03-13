@@ -178,7 +178,6 @@ class RequestSettings {
     );
   }
 
-  @override
   String toJson() => json.encode(toMap());
 
   factory RequestSettings.fromJson(String source) =>

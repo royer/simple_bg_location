@@ -2,8 +2,8 @@ group 'com.royzed.simple_bg_location'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.6.21'
-    ext.room_version = '2.4.2'
+    ext.kotlin_version = '1.8.0'
+    ext.room_version = '2.5.0'
     repositories {
         google()
         mavenCentral()
@@ -26,7 +26,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,24 +42,26 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
+        targetSdkVersion 33
     }
 }
 
 dependencies {
-    def activity_version = "1.4.0"
-    implementation "androidx.core:core-ktx:1.7.0"
+    def activity_version = "1.6.1"
+    def fragment_version = "1.5.5"
+    implementation "androidx.core:core-ktx:1.9.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.activity:activity-ktx:$activity_version"
     // androidx.fragment and android.activity must implementation together
     // otherwise in androidx.activity.result.ActivityResultCallback will throw exception
     // said can only use 16 bits for requestCode
     // https://stackoverflow.com/questions/25529865/java-lang-illegalargumentexception-can-only-use-lower-16-bits-for-requestcode
-    implementation 'androidx.fragment:fragment-ktx:1.4.1'
+    implementation "androidx.fragment:fragment-ktx:$fragment_version"
 
-    implementation 'com.google.android.gms:play-services-location:19.0.1'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation "androidx.cardview:cardview:1.0.0"
-    implementation 'com.google.android.material:material:1.7.0-alpha02'
+    implementation 'com.google.android.material:material:1.9.0-alpha02'
 
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"

@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,10 +65,13 @@ class MyBottomBar extends StatelessWidget {
 
   void _requestPositionUpdate(BuildContext context) async {
     final accuracy = context.read<SettingsCubit>().state.accuracy;
-
+    final forceLocationManager = context.read<SettingsCubit>().state.forceLocationManager;
     final allow = await _checkAndRequestPermission(context);
+    if (!context.mounted) return;
     if (allow) {
+      
       if ((await SimpleBgDeviceInfo.isPowerSaveMode())) {
+        if (!context.mounted) return;
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
@@ -108,10 +110,9 @@ class MyBottomBar extends StatelessWidget {
           title: "Simple BG Location",
           actions: ['Action1', 'Action2', 'Cancel']);
       requestSettings.distanceFilter = 20;
-      // ignore: use_build_context_synchronously
       requestSettings.forceLocationManager =
-          context.read<SettingsCubit>().state.forceLocationManager;
-      // ignore: use_build_context_synchronously
+          forceLocationManager;
+      if (!context.mounted) return;
       context.read<PositionCubit>().requestPositionUpdate(requestSettings);
     }
   }
@@ -198,6 +199,7 @@ class MyBottomBar extends StatelessWidget {
         final dontAskOpenAppSettings =
             prefs.getBool('dont_ask_open_app_settings') ?? false;
         if (dontAskOpenAppSettings == false) {
+          // ignore: use_build_context_synchronously
           final useSayYes = await showDialog<bool>(
               context: context,
               builder: (_) => AlertDialog(

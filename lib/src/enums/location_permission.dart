@@ -1,4 +1,3 @@
-import '../errors/location_permission_exception.dart';
 
 /// Represent the possible location permissions.
 /// 

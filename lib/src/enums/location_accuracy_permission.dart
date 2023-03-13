@@ -1,4 +1,3 @@
-import '../errors/location_accuracy_permission_exception.dart';
 
 /// Represent permission of location accuracy is approved
 /// 

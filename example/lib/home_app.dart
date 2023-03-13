@@ -11,7 +11,7 @@ class HomeApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: Colors.green,
         ).copyWith(secondary: Colors.amber),
-        textTheme: const TextTheme(bodyText2: TextStyle(color: Colors.purple)),
+        textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.purple)),
         listTileTheme: const ListTileThemeData(
           dense: true,
           visualDensity: VisualDensity(horizontal: 0, vertical: -2.0),

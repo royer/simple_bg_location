@@ -4,7 +4,6 @@ import 'package:simple_bg_location/simple_bg_location_platform_interface.dart';
 import 'package:simple_bg_location/simple_bg_location_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-import 'package:simple_bg_location/src/enums/enums.dart';
 
 final Position fakePosition = Position(
   uuid: '',
@@ -114,7 +113,6 @@ void main() {
   });
 
   test('requestPermission', () async {
-    SimpleBgLocation simpleBgLocationPlugin = SimpleBgLocation();
     MockSimpleBgLocationPlatform fakePlatform = MockSimpleBgLocationPlatform();
     SimpleBgLocationPlatform.instance = fakePlatform;
 

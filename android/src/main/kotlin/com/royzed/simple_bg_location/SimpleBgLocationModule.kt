@@ -19,7 +19,7 @@ import com.royzed.simple_bg_location.permission.PermissionManager
 import com.royzed.simple_bg_location.streams.NotificationActionStreamHandler
 import com.royzed.simple_bg_location.streams.PositionStreamHandler
 import com.royzed.simple_bg_location.utils.SettingsUtils
-import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.embedding.engine.plugins.FlutterPlugin
 
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
@@ -33,23 +33,26 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
     private lateinit var methodChannel: MethodChannel
     private lateinit var messenger: BinaryMessenger
-    private lateinit var context: Context
+    private lateinit var flutterBinding: FlutterPlugin.FlutterPluginBinding
+    //private var _context: Context? = null
+    private val context: Context get() = flutterBinding.applicationContext
     private var activityBinding: ActivityPluginBinding? = null
-    private var activity: Activity? = null
+    //private var activity: Activity? = null
+    private val activity: Activity get() = activityBinding!!.activity
     private val activityObserver: ActivityObserver = ActivityObserver()
 
     private val permissionManager: PermissionManager = PermissionManager()
 
     private val streamHandlers: MutableList<EventChannel.StreamHandler> = mutableListOf()
 
-    val callbacksManager: CallbacksManager = CallbacksManager()
+    private val callbacksManager: CallbacksManager = CallbacksManager()
 
     private var _isReady: Boolean = false
-    val isReady: Boolean get() = _isReady
+    private val isReady: Boolean get() = _isReady
 
-    fun onAttachedToEngine(context: Context, messenger: BinaryMessenger) {
+    fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding, messenger: BinaryMessenger) {
         this.messenger = messenger
-        this.context = context
+        this.flutterBinding = binding
         methodChannel = MethodChannel(messenger, SimpleBgLocationPlugin.METHOD_CHANNEL_NAME)
         methodChannel.setMethodCallHandler(this)
     }
@@ -59,10 +62,9 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
     }
 
     fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        assert(activity == null && activityBinding == null)
+        assert(activityBinding == null)
         activityBinding = binding
-        activity = binding.activity
-        activityObserver.attachActivity(activity!!)
+        activityObserver.attachActivity(activity)
         FlutterLifecycleAdapter.getActivityLifecycle(binding).addObserver(activityObserver)
         permissionManager.onAttachedToActivity(binding)
 
@@ -74,7 +76,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
 
     fun onDetachedFromActivity() {
-        assert(activity != null && activityBinding != null)
+        assert(activityBinding != null)
 
         permissionManager.onDetachedFromActivity()
         activityObserver.onDetachFromActivity()
@@ -89,7 +91,6 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
         _isReady = false
         activityBinding = null
-        activity = null
     }
 
     fun onDetachedFromActivityForConfigChanges() {
@@ -310,7 +311,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         callbacksManager.unregisterListener(eventName, callback)
     }
 
-    fun unregisterAllListener() {
+    private fun unregisterAllListener() {
         callbacksManager.unregisterAll()
     }
 

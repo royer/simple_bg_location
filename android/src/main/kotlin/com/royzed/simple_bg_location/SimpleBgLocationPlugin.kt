@@ -2,7 +2,6 @@ package com.royzed.simple_bg_location
 
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.annotation.NonNull
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -17,17 +16,17 @@ private const val TAG = "SimpleBgLocationPlugin"
 class SimpleBgLocationPlugin: FlutterPlugin, ActivityAware {
 
 
-  override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+  override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     Log.d(TAG,"onAttachedToFlutterEngine()")
 
     SimpleBgLocationModule.getInstance().onAttachedToEngine(
-      flutterPluginBinding.applicationContext,
+      flutterPluginBinding,
       flutterPluginBinding.binaryMessenger
     )
 
   }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     Log.d(TAG,"onDetachedFromEngine()")
     SimpleBgLocationModule.getInstance().onDetachedFromEngine()
   }

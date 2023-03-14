@@ -2,10 +2,8 @@ package com.royzed.simple_bg_location
 
 import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.os.PowerManager
 import android.util.Log
-import androidx.core.content.getSystemService
 import com.royzed.simple_bg_location.callbacks.CallbacksManager
 import com.royzed.simple_bg_location.callbacks.NotificationActionCallback
 import com.royzed.simple_bg_location.callbacks.PositionCallback
@@ -21,6 +19,8 @@ import com.royzed.simple_bg_location.permission.PermissionManager
 import com.royzed.simple_bg_location.streams.NotificationActionStreamHandler
 import com.royzed.simple_bg_location.streams.PositionStreamHandler
 import com.royzed.simple_bg_location.utils.SettingsUtils
+import io.flutter.embedding.engine.FlutterEngine
+
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.embedding.engine.plugins.lifecycle.FlutterLifecycleAdapter
 import io.flutter.plugin.common.BinaryMessenger
@@ -103,7 +103,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when(call.method) {
             Methods.checkPermission -> {
-                onCheckPermission(result)
+                onCheckPermission(call, result)
             }
             Methods.requestPermission -> {
                 onRequestPermission(call, result)
@@ -121,6 +121,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
                 onGetCurrentPosition(call, result)
             }
             Methods.openAppSettings -> {
+
                 val hasOpenAppSettings = SettingsUtils.openAppSettings(context)
                 result.success(hasOpenAppSettings)
             }
@@ -146,9 +147,10 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         }
     }
 
-    private fun onCheckPermission(result: MethodChannel.Result) {
+    private fun onCheckPermission(call: MethodCall, result: MethodChannel.Result) {
         try {
-            val permission = PermissionManager.checkPermissionStatus(context)
+            val onlyCheckBackground = call.argument<Boolean>("onlyCheckBackground") ?: false
+            val permission = PermissionManager.checkPermissionStatus((activity as Context?)?: context, onlyCheckBackground)
             result.success(permission.ordinal)
 
         } catch (e: PermissionUndefinedException) {
@@ -257,11 +259,8 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
     private fun onIsPowerSaveMode(result: MethodChannel.Result) {
         val powerManager: PowerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            result.success(powerManager.isPowerSaveMode)
-        } else {
-            result.success(true)
-        }
+        result.success(powerManager.isPowerSaveMode)
+
     }
 
 
@@ -319,6 +318,7 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
     companion object {
         private const val TAG = "SimpleBgLocationModule"
 
+        // todo: Warning:(323, 9) Do not place Android context classes in static fields (static reference to `SimpleBgLocationModule` which has field `context` pointing to `Context`); this is a memory leak
         @Volatile
         private var INSTANCE: SimpleBgLocationModule? = null
 

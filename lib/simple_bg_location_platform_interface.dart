@@ -28,7 +28,7 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
 
   /// Returns a [Future]<`LocationPermission`> indicating if the user allows the
   /// App to access the device's location
-  Future<LocationPermission> checkPermission() {
+  Future<LocationPermission> checkPermission({bool onlyCheckBackground = false}) {
     throw UnimplementedError("checkPermission() has not been implemented.");
   }
 

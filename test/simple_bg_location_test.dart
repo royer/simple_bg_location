@@ -16,7 +16,7 @@ class MockSimpleBgLocationPlatform
     with MockPlatformInterfaceMixin
     implements SimpleBgLocationPlatform {
   @override
-  Future<LocationPermission> checkPermission() =>
+  Future<LocationPermission> checkPermission({bool onlyCheckBackground = false}) =>
       Future.value(LocationPermission.always);
 
   @override

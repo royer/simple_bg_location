@@ -66,8 +66,8 @@ class SimpleBgLocation {
   }
 
   /// see [SimpleBgLocationPlatform.checkPermission]
-  static Future<LocationPermission> checkPermission() {
-    return SimpleBgLocationPlatform.instance.checkPermission();
+  static Future<LocationPermission> checkPermission({bool onlyCheckBackground = false}) {
+    return SimpleBgLocationPlatform.instance.checkPermission(onlyCheckBackground: onlyCheckBackground);
   }
 
   /// Wraps the [SimpleBgLocationPlatform.requestPermission]

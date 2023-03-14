@@ -58,6 +58,11 @@ class _OtherApiViewState extends State<OtherApiView> {
                     child: const Text("checkPermission"),
                   ),
                   TextButton(
+                    onPressed: _onlyCheckBackgroundPermission,
+                    child: const Text("checkPermission (only background)"),
+                  ),
+
+                  TextButton(
                       onPressed: _requestPermission,
                       child: const Text("requestPermission")),
                   TextButton(
@@ -165,6 +170,30 @@ class _OtherApiViewState extends State<OtherApiView> {
       });
     }
   }
+
+  void _onlyCheckBackgroundPermission() async {
+    _reset();
+    try {
+      setState(() {
+        _method = "checkPermission(onlyBackground: true)";
+      });
+      final result = await SimpleBgLocation.checkPermission(onlyCheckBackground: true);
+      setState(() {
+        _resultInfo += "$result";
+      });
+    } on PermissionDefinitionsNotFoundException catch (e) {
+      setState(() {
+        _resultInfo +=
+            'failed.\nException: ${e.runtimeType}\n"${e.toString()}"';
+      });
+    } on Exception catch (e) {
+      setState(() {
+        _resultInfo +=
+            'failed.\nOther Exception: ${e.runtimeType}\n"${e.toString()}"';
+      });
+    }
+  }
+
 
   void _requestPermission() async {
     _reset();

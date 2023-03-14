@@ -49,10 +49,13 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
   static Stream<String>? _notifyActionStream;
 
   @override
-  Future<LocationPermission> checkPermission() async {
+  Future<LocationPermission> checkPermission({bool onlyCheckBackground = false}) async {
     try {
+      final params = <String, dynamic>{
+        'onlyCheckBackground': onlyCheckBackground
+      };      
       final int permission =
-          await methodChannel.invokeMethod(Methods.checkPermission);
+          await methodChannel.invokeMethod(Methods.checkPermission, params);
 
       return permission.toLocationPermission();
     } on PlatformException catch (e) {

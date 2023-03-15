@@ -25,22 +25,25 @@ import com.royzed.simple_bg_location.utils.findActivity
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 
 typealias PermissionResultCallback = (LocationPermission) -> Unit
-
+typealias NotificationPermissionResultCallback = (Boolean) -> Unit
 
 class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener {
 
     private var activity: Activity? = null
     private var flutterActivityPluginBinding: ActivityPluginBinding? = null
     private var jetPackResultLauncher: ActivityResultLauncher<Array<String>>? = null
+    private var notificationPermissionResultLauncher: ActivityResultLauncher<String>? = null
     private var permissionResultCallback: PermissionResultCallback? = null
     private var errorCallback: ErrorCallback? = null
     private var rationale: BackgroundPermissionRationale? = null
+    private var notificationPermissionResultCallback: NotificationPermissionResultCallback? = null
 
     fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
         flutterActivityPluginBinding = binding
         if (activity is ComponentActivity && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             jetPackRegisterResultContract()
+            notificationResultContract()
             Log.d(
                 TAG,
                 "onAttachedToActivity: activity is ComponentActivity. use ComponentActivity.registerForActivityResult"
@@ -70,6 +73,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         flutterActivityPluginBinding = null
 
         jetPackResultLauncher = null
+        notificationPermissionResultLauncher = null
     }
 
 
@@ -82,6 +86,14 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         }
     }
 
+    private fun notificationResultContract() {
+        notificationPermissionResultLauncher =
+            (activity!! as ComponentActivity).registerForActivityResult(
+                ActivityResultContracts.RequestPermission()
+            ) { granted ->
+                handleNotificationRequestResult(granted)
+            }
+    }
     private fun handleRequestResult(
         permissions: Map<String, @JvmSuppressWildcards Boolean>,
         requestCode: Int? = null
@@ -143,7 +155,14 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         answerPermissionRequestResult(locationPermission)
     }
 
-
+    private fun handleNotificationRequestResult(granted: Boolean) {
+        if (notificationPermissionResultCallback != null) {
+            notificationPermissionResultCallback!!.invoke(granted)
+            notificationPermissionResultCallback = null
+        }else {
+            Log.e(TAG, "handleNotificationRequestResult: notificationPermissionResultCallback is null")
+        }
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -159,6 +178,11 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             TAG,
             "onRequestPermissionsResult() requestCode: $requestCode permissions: $permissionsString and grantResults: $grantsString"
         )
+
+        if (requestCode == REQUEST_POST_NOTIFICATIONS_PERMISSION_CODE) {
+            handleNotificationRequestResult(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            return true
+        }
 
         if (requestCode != REQUEST_FOREGROUND_LOCATION_PERMISSION_CODE && requestCode != REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE) {
             Log.w(TAG, "request code is not mine")
@@ -215,6 +239,25 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         this.rationale = rationale
         handleRequestPermission()
 
+    }
+
+    fun requestNotificationPermission(requestSinglePermissionResult: (Boolean) -> Unit) {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            requestSinglePermissionResult(true)
+            return
+        } else {
+            assert(notificationPermissionResultCallback == null)
+            notificationPermissionResultCallback = requestSinglePermissionResult
+            if (notificationPermissionResultLauncher != null) {
+                notificationPermissionResultLauncher!!.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                ActivityCompat.requestPermissions(
+                    activity!!,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    REQUEST_POST_NOTIFICATIONS_PERMISSION_CODE
+                )
+            }
+        }
     }
 
 
@@ -529,26 +572,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
 
         // after Android 13(API 33) , need to check notification permission
         // reference https://developer.android.com/training/permissions/requesting
-        @JvmStatic
-        fun hasNotifyPermission(context: Context): Boolean {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                return true
-            }
 
-            if (hasPermissionInManifest(context, Manifest.permission.POST_NOTIFICATIONS)) {
-                if (ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    return true
-                }
-                return false
-            } else {
-                return false
-            }
-
-        }
 
 
         @JvmStatic

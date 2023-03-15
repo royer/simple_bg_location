@@ -2,6 +2,7 @@ package com.royzed.simple_bg_location
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.PowerManager
 import android.util.Log
 import com.royzed.simple_bg_location.callbacks.CallbacksManager
@@ -241,8 +242,17 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
         val requestOptions: RequestOptions = RequestOptions.fromMap(context, call.arguments())
         // Log.d(TAG,"onRequestPositionUpdate: $requestOptions")
-        activityObserver.requestPositionUpdate(requestOptions)
-        result.success(true)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // need request notifications permission
+            permissionManager.requestNotificationPermission { isGrand ->
+                if (!isGrand) {
+                    Log.w(TAG,"Notification permission is not granted.")
+                }
+                result.success(activityObserver.requestPositionUpdate(requestOptions))
+            }
+        } else {
+            result.success(activityObserver.requestPositionUpdate(requestOptions))
+        }
     }
 
     private fun onStopPositionUpdate(result: MethodChannel.Result) {

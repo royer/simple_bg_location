@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.location.Location
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
 import androidx.annotation.MainThread
 import com.royzed.simple_bg_location.SimpleBgLocationModule
@@ -177,7 +178,11 @@ class SimpleBgLocationService : Service() {
         }
         locationManager.stopPositionUpdate()
         Log.d(TAG, "Position Update Stopped.")
-        stopForeground(true)
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            stopForeground(true)
+        } else {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        }
         stopSelf()
     }
 

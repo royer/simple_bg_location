@@ -49,8 +49,16 @@ public class SwiftSimpleBgLocationPlugin: NSObject, FlutterPlugin {
           case Methods.ready.rawValue:
               onReady(result)
           case Methods.checkPermission.rawValue: do {
+              let onlyBackground = (call.arguments as! Dictionary<String, Any?>)["onlyCheckBackground"] as! Bool? ?? false
               let authStatus = SwiftLocation.authorizationStatus
-              let permission = SwiftSimpleBgLocationPlugin.mapAuthStatusToLocationPermission(authStatus)
+              var permission: LocationPermission = LocationPermission.denied
+              if (onlyBackground) {
+                  if (authStatus == CLAuthorizationStatus.authorizedAlways) {
+                      permission = LocationPermission.always
+                  }
+              } else {
+                  permission = SwiftSimpleBgLocationPlugin.mapAuthStatusToLocationPermission(authStatus)
+              }
               result(permission.rawValue)
           }
           case Methods.requestPermission.rawValue:
@@ -71,6 +79,8 @@ public class SwiftSimpleBgLocationPlugin: NSObject, FlutterPlugin {
               onIsPowerSaveModeEnable(result)
           case Methods.openAppSettings.rawValue, Methods.openLocationSettings.rawValue:
               openSettings(result)
+          case Methods.shouldShowRequestPermissionRationale.rawValue:
+              result(NSNumber(false))
           default:
               result(1)
       }

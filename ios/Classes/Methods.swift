@@ -20,4 +20,5 @@ enum Methods: String {
     case stopPositionUpdate = "stopPositionUpdate"
     case ready = "ready"
     case isPowerSaveMode = "isPowerSaveMode"
+    case shouldShowRequestPermissionRationale = "shouldShowRequestPermissionRationale"
 }

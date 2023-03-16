@@ -182,6 +182,10 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
 
     private fun onShouldShowRequestPermissionRationale(result: MethodChannel.Result) {
         try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                result.success(false)
+                return
+            }
             val shouldShow = PermissionManager.shouldShowRequestPermissionRationale(
                 activity,
                 android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)

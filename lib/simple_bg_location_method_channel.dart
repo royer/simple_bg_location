@@ -26,6 +26,7 @@ class Methods {
   static const stopPositionUpdate = "stopPositionUpdate";
   static const ready = 'ready';
   static const isPowerSaveMode = "isPowerSaveMode";
+  static const shouldShowRequestPermissionRationale = "shouldShowRequestPermissionRationale";
 }
 
 @visibleForTesting
@@ -95,6 +96,17 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
       final int permission =
           await methodChannel.invokeMethod(Methods.requestPermission, param);
       return permission.toLocationPermission();
+    } on PlatformException catch (e) {
+      final error = _handlePlatformException(e);
+      throw error;
+    }
+  }
+
+  @override
+  Future<bool> shouldShowRequestPermissionRationale() async {
+    try {
+      return (await methodChannel
+          .invokeMethod(Methods.shouldShowRequestPermissionRationale ));
     } on PlatformException catch (e) {
       final error = _handlePlatformException(e);
       throw error;

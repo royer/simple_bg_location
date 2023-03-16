@@ -143,6 +143,9 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
             Methods.isPowerSaveMode -> {
                 onIsPowerSaveMode(result)
             }
+            Methods.shouldShowRequestPermissionRationale -> {
+                onShouldShowRequestPermissionRationale(result)
+            }
             else -> {
                 result.notImplemented()
             }
@@ -171,6 +174,18 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
                 result.success(it.ordinal)
             }
             Log.d(TAG,"onRequestPermission finished")
+        } catch (e: PermissionUndefinedException) {
+            val errorCode = ErrorCodes.permissionDefinitionsNotFound
+            result.error(errorCode.code, errorCode.description, null)
+        }
+    }
+
+    private fun onShouldShowRequestPermissionRationale(result: MethodChannel.Result) {
+        try {
+            val shouldShow = PermissionManager.shouldShowRequestPermissionRationale(
+                activity,
+                android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            result.success(shouldShow)
         } catch (e: PermissionUndefinedException) {
             val errorCode = ErrorCodes.permissionDefinitionsNotFound
             result.error(errorCode.code, errorCode.description, null)

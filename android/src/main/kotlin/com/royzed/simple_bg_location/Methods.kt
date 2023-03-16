@@ -13,4 +13,5 @@ object Methods {
     const val stopPositionUpdate = "stopPositionUpdate"
     const val ready = "ready"
     const val isPowerSaveMode = "isPowerSaveMode"
+    const val shouldShowRequestPermissionRationale = "shouldShowRequestPermissionRationale"
 }

@@ -76,6 +76,10 @@ class SimpleBgLocation {
     return SimpleBgLocationPlatform.instance.requestPermission(rationale);
   }
 
+  static Future<bool> shouldShowRequestPermissionRationale() {
+    return SimpleBgLocationPlatform.instance.shouldShowRequestPermissionRationale();
+  }
+
   static Future<bool> isLocationServiceEnabled() {
     return SimpleBgLocationPlatform.instance.isLocationServiceEnabled();
   }

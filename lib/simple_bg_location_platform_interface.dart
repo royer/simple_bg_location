@@ -57,6 +57,21 @@ abstract class SimpleBgLocationPlatform extends PlatformInterface {
     throw UnimplementedError('requestPermission() has not been implemented.');
   }
 
+  /// Should show request permission rationale for background location. Only for Android.
+  /// iOS will always return false.
+  /// 
+  /// On Android 11 or higher, If your App hasn't been granted background location, and 
+  /// shouldShowRequestPermissionRationale returns false, you should show an educational
+  /// UI to the user explaining why your App needs background location access.
+  /// 
+  /// Note: The Plugin provide a default rationale UI which is [BackgroundPermissionRationale]
+  /// when call [requestPermission]. If you show your own rationale UI, don't set this parameter
+  /// when call [requestPermission].
+  Future<bool> shouldShowRequestPermissionRationale() {
+    throw UnimplementedError(
+        'shouldShowRequestPermissionRationale() has not been implemented.');
+  }
+
   /// Check location service is enabled
   Future<bool> isLocationServiceEnabled() {
     throw UnimplementedError(

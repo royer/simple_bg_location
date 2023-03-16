@@ -95,6 +95,11 @@ class MockSimpleBgLocationPlatform
     // TODO: implement isPowerSaveMode
     throw UnimplementedError();
   }
+
+  @override
+  Future<bool> shouldShowRequestPermissionRationale() {
+    throw UnimplementedError();
+  }
 }
 
 void main() {

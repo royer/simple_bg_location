@@ -14,7 +14,6 @@ class CallbacksManager {
     val nofificationActionCallbacks: List<NotificationActionCallback> = _notificationCallbacks.toList()
 
     fun registerPositionListener(callback: PositionCallback) {
-        Log.d(TAG, "A PositionCallback registered. $callback")
         synchronized(_positionCallbacks) {
             _positionCallbacks.add(callback)
         }
@@ -37,7 +36,6 @@ class CallbacksManager {
     }
 
     fun registerNotificationActionListener(callback: NotificationActionCallback) {
-        Log.d(TAG,"A notificationActionCallback registered. $callback")
         synchronized(_notificationCallbacks) {
             _notificationCallbacks.add(callback)
         }
@@ -58,8 +56,6 @@ class CallbacksManager {
                     val finded = _positionCallbacks.remove(callback)
                     if (finded == false) {
                         Log.w(TAG, "remove PositionCallback failed.")
-                    } else {
-                        Log.d(TAG,"A PositionCallback removed.")
                     }
                 }
             }
@@ -68,8 +64,6 @@ class CallbacksManager {
                     val finded = _notificationCallbacks.remove(callback)
                     if (finded == false) {
                         Log.w(TAG,"remove notificationActionCallback failed.")
-                    } else {
-                        Log.d(TAG,"A NotificationActionCallback removed.")
                     }
                 }
             }
@@ -79,11 +73,9 @@ class CallbacksManager {
     fun unregisterAll() {
         synchronized(_positionCallbacks) {
             _positionCallbacks.clear()
-            Log.d(TAG,"All PositionCallback removed.")
         }
         synchronized(_notificationCallbacks) {
             _notificationCallbacks.clear()
-            Log.d(TAG,"All NotificationActionCallback removed.")
         }
     }
 

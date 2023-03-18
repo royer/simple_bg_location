@@ -42,7 +42,7 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
             val binder = service as SimpleBgLocationService.LocalBinder
             mService = binder.service
             mBound = true
-            Log.d(TAG,"service connected .")
+            Log.d(TAG,"service connected.")
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -53,7 +53,6 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     }
 
     override fun onCreate(owner: LifecycleOwner) {
-        Log.d(TAG, "activity onCreated($owner) and _activity = $_activity")
         super.onCreate(owner)
         //_activity = owner.lifecycle.
         Intent(activity, SimpleBgLocationService::class.java).also {
@@ -94,7 +93,6 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        Log.d(TAG,"onStart($owner)")
         super.onStart(owner)
 //        Intent(activity, SimpleBgLocationService::class.java).also {
 //            activity.bindService(it, serviceConnection, Context.BIND_AUTO_CREATE)
@@ -102,17 +100,14 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        Log.d(TAG,"onResume($owner)")
         super.onResume(owner)
     }
 
     override fun onPause(owner: LifecycleOwner) {
-        Log.d(TAG,"onPause($owner)")
         super.onPause(owner)
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        Log.d(TAG,"onStop($owner)")
 //        if (mBound) {
 //            activity.unbindService(serviceConnection)
 //        }
@@ -120,7 +115,6 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
     }
 
     override fun onDestroy(owner: LifecycleOwner) {
-        Log.d(TAG,"onDestroy($owner)")
         if (mBound) {
             activity.unbindService(serviceConnection)
         }
@@ -135,20 +129,17 @@ class ActivityObserver : DefaultLifecycleObserver, ActivityPluginBinding.OnSaveI
 
     }
     fun onDetachFromActivity() {
-        Log.d(TAG,"onDetachFromActivity")
         _activity = null
     }
 
     companion object {
-        private const val TAG = "SimpleBgl.ActivityObserver"
+        private const val TAG = "SBL.ActivityObserver"
 
     }
 
     override fun onSaveInstanceState(bundle: Bundle) {
-        Log.d(TAG,"onSaveInstanceState")
     }
 
     override fun onRestoreInstanceState(bundle: Bundle?) {
-        Log.d(TAG,"onRestoreInstanceState")
     }
 }

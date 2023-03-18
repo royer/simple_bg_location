@@ -173,7 +173,6 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
             }) {
                 result.success(it.ordinal)
             }
-            Log.d(TAG,"onRequestPermission finished")
         } catch (e: PermissionUndefinedException) {
             val errorCode = ErrorCodes.permissionDefinitionsNotFound
             result.error(errorCode.code, errorCode.description, null)
@@ -260,7 +259,6 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
         }
 
         val requestOptions: RequestOptions = RequestOptions.fromMap(context, call.arguments())
-        // Log.d(TAG,"onRequestPositionUpdate: $requestOptions")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // need request notifications permission
             permissionManager.requestNotificationPermission { isGrand ->
@@ -282,7 +280,6 @@ class SimpleBgLocationModule : MethodChannel.MethodCallHandler {
     private fun onReady(result: MethodChannel.Result) {
         _isReady = true
         val state = activityObserver.getState()
-        Log.d(TAG,"onReady, state: $state")
         result.success(state.toMap())
 
     }

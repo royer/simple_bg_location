@@ -88,7 +88,7 @@ class SimpleBgLocationService : Service() {
             stopPositionUpdate()
             SimpleBgLocationModule.getInstance().dispatchPositionErrorEvent(ErrorCodes.canceled)
         } else if (action == ACTION_START && intent?.component == comp) {
-            Log.d(TAG,"service will start: service: $this")
+            Log.d(TAG,"service will start...")
             startForeground(notification.id, notification.build())
             locationManager.startPositionUpdate(requestOptions, positionCallback, errorCallback)
         } else if (action.contains(ForegroundNotification.ACTION_PREFIX)) {
@@ -138,7 +138,6 @@ class SimpleBgLocationService : Service() {
     }
 
     fun requestPositionUpdate(options: RequestOptions): Boolean {
-        Log.d(TAG,"requestPositionUpdate this time service is: $this ")
         return if (!_isTracking) {
             requestOptions = options
             notification = ForegroundNotification(applicationContext, requestOptions.notificationConfig)
@@ -236,7 +235,7 @@ class SimpleBgLocationService : Service() {
             get() = this@SimpleBgLocationService
     }
     companion object {
-        private const val TAG = "SimpleBgLocationService"
+        private const val TAG = "SBLService"
 
         const val ACTION_START = "Start"
         const val PACKAGE_NAME = "com.royzed.simple_bg_location"

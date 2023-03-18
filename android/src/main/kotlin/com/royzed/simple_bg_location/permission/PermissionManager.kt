@@ -44,16 +44,10 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         if (activity is ComponentActivity && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             jetPackRegisterResultContract()
             notificationResultContract()
-            Log.d(
-                TAG,
-                "onAttachedToActivity: activity is ComponentActivity. use ComponentActivity.registerForActivityResult"
-            )
+
         } else {
             binding.addRequestPermissionsResultListener(this)
-            Log.d(
-                TAG,
-                "onAttachedToActivity: activity is not ComponentActivity. use ActivityPluginBinding.addRequestPermissionsResultListener"
-            )
+
         }
     }
 
@@ -81,7 +75,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         jetPackResultLauncher = (activity!! as ComponentActivity).registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            Log.d(TAG, "onContractsResult: $permissions")
             handleRequestResult(permissions)
         }
     }
@@ -102,7 +95,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         val locationPermission: LocationPermission
         when {
             permissions.myGetOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                Log.d(TAG, "precise Approved in $whichModule mode")
                 locationPermission =
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
                         || permissions.getOrDefault(
@@ -115,7 +107,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
                         LocationPermission.WhileInUse
             }
             permissions.myGetOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                Log.d(TAG, "approximate Approved in $whichModule mode")
                 locationPermission =
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
                         || permissions.getOrDefault(
@@ -128,7 +119,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
                         LocationPermission.WhileInUse
             }
             permissions.myGetOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
-                Log.d(TAG, "background Approved in $whichModule")
                 locationPermission = LocationPermission.Always
             }
             else -> {
@@ -174,10 +164,7 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
         val grantsString = grantResults.joinToString(",", "[", "]") {
             it.toString()
         }
-        Log.d(
-            TAG,
-            "onRequestPermissionsResult() requestCode: $requestCode permissions: $permissionsString and grantResults: $grantsString"
-        )
+
 
         if (requestCode == REQUEST_POST_NOTIFICATIONS_PERMISSION_CODE) {
             handleNotificationRequestResult(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
@@ -345,12 +332,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
     ) {
 
         assert((permission != null && errorCode == null) || (permission == null && errorCode != null))
-        if (permission != null) {
-            Log.d(TAG, "Permission request result: $permission will send back to user.")
-        } else if (errorCode != null) {
-            Log.d(TAG, "Permission request failed. error code: $errorCode will send back to user.")
-        }
-
 
         if (permission != null) {
             permissionResultCallback!!(permission)
@@ -380,7 +361,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             // "VERSION.SDK_INT < R"
             "Always"
         }
-        Log.d(TAG, "resultCallback: $permissionResultCallback ; errorCallback: $errorCallback")
 
         val permission = checkPermissionStatus(activity.applicationContext)
         val contentView: View
@@ -399,36 +379,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
                 messageView.text =
                     rationale.message.ifEmpty { activity.getString(R.string.sbl_background_rationale_text) }
                 setView(contentView)
-                //setIcon(R.drawable.ic_simple_bg_location_location)
-//                setPositiveButton("Change to \"$permissionLabel\"") { _, _ ->
-//                    Log.d(TAG, "Background Permission Rationale Dialog user clicked PositiveButton")
-//                    if (jetPackResultLauncher != null) {
-//                        jetPackResultLauncher!!.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
-//                    } else {
-//                        ActivityCompat.requestPermissions(
-//                            activity,
-//                            arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-//                            REQUEST_BACKGROUND_LOCATION_PERMISSION_CODE
-//                        )
-//                    }
-//
-//                }
-//                setNegativeButton("No, Thanks!") { _, _ ->
-//                    Log.d(TAG, "Background Permission rationale Dialog user clicked NegativeButton")
-//                    answerPermissionRequestResult(permission)
-//                }
-//                setTitle("Allow Title")
-//                setMessage("need background location form the feature.")
-//                setOnDismissListener(DialogInterface.OnDismissListener { dialog ->
-//                    run {
-//                        Log.i(TAG, "dismiss")
-//                        if (permissionResultCallback != null) {
-//                            answerPermissionRequestResult(permission)
-//                        } else {
-//                            Log.d(TAG, "on dismiss resultCallback is null")
-//                        }
-//                    }
-//                })
                 setOnCancelListener {
                     Log.d(TAG, "Background Permission rationale dialog canceled")
                     answerPermissionRequestResult(permission)
@@ -437,11 +387,6 @@ class PermissionManager : io.flutter.plugin.common.PluginRegistry.RequestPermiss
             }
             builder.create()
         }
-        //rationalDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//        val positiveButton = rationalDialog.findViewById<Button>(R.id.btn_sbgl_positive)
-//        Log.d(TAG,"postiveButton: $positiveButton")
-//        val negativeButton = rationalDialog.findViewById<Button>(R.id.btn_sbgl_negative)
-//        Log.d(TAG,"negativeButton: $negativeButton")
 
         val pButton = contentView.findViewById<Button>(R.id.btn_sbgl_positive)
         val pButtonText =

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 import 'package:simple_bg_location/simple_bg_device_info.dart';
 import '../../cubit/location/location_cubit.dart';
+import '../../cubit/request_ui_flow/request_ui_flow_cubit.dart';
 import '../../cubit/settings/settings_cubit.dart';
 
 class MyBottomBar extends StatelessWidget {
@@ -13,225 +14,242 @@ class MyBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomAppBar(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () =>
-                  context.read<LocationCubit>().getCurrentPosition(),
-              icon: const Icon(Icons.gps_fixed),
-            ),
-            BlocBuilder<LocationCubit, LocationState>(
-              buildWhen: (previous, current) => previous.odometer != current.odometer,
-              builder: (context, state) {
-                final distance = state.odometer;
-                var text = '';
-                if (distance > 1000) {
-                  text += "${(distance / 1000.0).toStringAsFixed(1)}km";
-                } else {
-                  text += '${distance.toStringAsFixed(0)}m';
-                }
-                return Text(text);
-              },
-            ),
-            SizedBox(
-              width: 54.0,
-              child: BlocBuilder<LocationCubit, LocationState>(
-                buildWhen: (previous, current) =>
-                    previous.isTracking != current.isTracking,
-                builder: (context, state) {
-                  return ElevatedButton(
-                    onPressed: () {
+    return BlocProvider(
+      create: (context) => RequestUiFlowCubit(),
+      child: BottomAppBar(
+        child: BlocListener<RequestUiFlowCubit, RequestUiFlowState>(
+          listener: (context, state) {
+            final forBackground = state.forBackground;
+            switch (state.step) {
+              case RequestUiFlowStep.requestPermission:
+                _requestPermission(context, state.forBackground).then((result) {
+                  if (result) {
+                    _requestPositionUpdate(context,
+                        forBackground: forBackground);
+                  }
+                });
+                break;
+              case RequestUiFlowStep.showBackgroundRationale:
+                _showBackgroundRationaleDialog(context).then((result) {
+                  if (result) {
+                    context
+                        .read<RequestUiFlowCubit>()
+                        .startRequestPermission(forBackground: true);
+                  }
+                });
+                break;
+              case RequestUiFlowStep.showPowerSavedModeWarning:
+                _showPowerSavedModeWarningDialog(context).then((result) {
+                  final accuracy = context.read<SettingsCubit>().state.accuracy;
+                  final forceLocationManager =
+                      context.read<SettingsCubit>().state.forceLocationManager;
+                  final locationCubit = context.read<LocationCubit>();
+                  final uiFlowCubit = context.read<RequestUiFlowCubit>();
+                  _callRequestPositionUpdate(accuracy, forceLocationManager,
+                      locationCubit, uiFlowCubit);
+                });
 
-                      if (!state .isTracking) {
-                        _requestPositionUpdate(context);
-                      } else {
-                        _stopPositionUpdate(context);
-                      }
+                break;
+              case RequestUiFlowStep.none:
+                break;
+            }
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () =>
+                      context.read<LocationCubit>().getCurrentPosition(),
+                  icon: const Icon(Icons.gps_fixed),
+                ),
+                BlocBuilder<LocationCubit, LocationState>(
+                  buildWhen: (previous, current) =>
+                      previous.odometer != current.odometer,
+                  builder: (context, state) {
+                    final distance = state.odometer;
+                    var text = '';
+                    if (distance > 1000) {
+                      text += "${(distance / 1000.0).toStringAsFixed(1)}km";
+                    } else {
+                      text += '${distance.toStringAsFixed(0)}m';
+                    }
+                    return Text(text);
+                  },
+                ),
+                SizedBox(
+                  width: 54.0,
+                  child: BlocBuilder<LocationCubit, LocationState>(
+                    buildWhen: (previous, current) =>
+                        previous.isTracking != current.isTracking,
+                    builder: (context, state) {
+                      return ElevatedButton(
+                        onPressed: () {
+                          if (!state.isTracking) {
+                            _requestPositionUpdate(context);
+                          } else {
+                            _stopPositionUpdate(context);
+                          }
+                        },
+                        child: Icon((!state.isTracking)
+                            ? Icons.play_arrow
+                            : Icons.stop),
+                      );
                     },
-                    child: Icon(
-                        (!state.isTracking) ? Icons.play_arrow : Icons.stop),
-                  );
-                },
-              ),
+                  ),
+                ),
+                BlocBuilder<RequestUiFlowCubit, RequestUiFlowState>(
+                  builder: (context, state) {
+                    return ElevatedButton(
+                      onPressed: context.select(
+                              (LocationCubit cubit) => cubit.state.isTracking)
+                          ? null
+                          : () => _requestPositionUpdate(context,
+                              forBackground: true),
+                      child: const Text('Background Task'),
+                    );
+                  },
+                )
+              ],
             ),
-            ElevatedButton(onPressed: (){}, child: const Text('Background Task'))
-          ],
+          ),
         ),
       ),
     );
   }
 
-  void _requestPositionUpdate(BuildContext context) async {
+  void _requestPositionUpdate(BuildContext context,
+      {bool forBackground = false}) async {
     final accuracy = context.read<SettingsCubit>().state.accuracy;
-    final forceLocationManager = context.read<SettingsCubit>().state.forceLocationManager;
-    final allow = await _checkAndRequestPermission(context);
-    if (!context.mounted) return;
-    if (allow) {
-      
+    final forceLocationManager =
+        context.read<SettingsCubit>().state.forceLocationManager;
+    final locationCubit = context.read<LocationCubit>();
+
+    // use RequestUiFlowCubit just for avoid dart compile lint warning for
+    // DON'T use BuildContext across asynchronous gaps.
+    // https://dart-lang.github.io/linter/lints/use_build_context_synchronously.html
+    final uiFlowCubit = context.read<RequestUiFlowCubit>();
+
+    final permission = await SimpleBgLocation.checkPermission(
+        onlyCheckBackground: forBackground);
+
+    if (permission == LocationPermission.denied) {
+      if (forBackground) {
+        final shouldShowRationale =
+            await SimpleBgLocation.shouldShowRequestPermissionRationale();
+        if (shouldShowRationale) {
+          uiFlowCubit.startShowBackgroundRationale(
+              forBackground: forBackground);
+          return;
+        }
+      }
+      uiFlowCubit.startRequestPermission(forBackground: forBackground);
+      return;
+    } else if (permission == LocationPermission.deniedForever) {
+      //uiFlowCubit.startShowBackgroundRationale(forBackground: forBackground);
+      // todo: show dialog to open app setting
+      return;
+    } else if (permission == LocationPermission.whileInUse && forBackground) {
+      uiFlowCubit.startRequestPermission(forBackground: forBackground);
+      return;
+    } else {
       if ((await SimpleBgDeviceInfo.isPowerSaveMode())) {
-        if (!context.mounted) return;
-        await showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text('Power Save Mode is ON'),
-            content: const Text(
-                "Track recording may not work properly in Power Save Mode. If track does not record properly, disable Power Save Mode."),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
+        uiFlowCubit.startShowPowerSavedModeWarning(
+            forBackground: forBackground);
+        return;
+      } else {
+        _callRequestPositionUpdate(
+            accuracy, forceLocationManager, locationCubit, uiFlowCubit);
       }
-      late final RequestSettings requestSettings;
-      switch (accuracy) {
-        case CustomAccuracy.best:
-          requestSettings = RequestSettings();
-          break;
-        case CustomAccuracy.good:
-          requestSettings = RequestSettings.good();
-          break;
-        case CustomAccuracy.balance:
-          //!! Does not worked on Android Emulator
-          requestSettings = RequestSettings.balance();
-          break;
-        case CustomAccuracy.lowest:
-          //!! Does not worked on Android Emulator
-          requestSettings = RequestSettings.lowPower();
-          break;
-      }
-      requestSettings.notificationConfig = ForegroundNotificationConfig(
-          smallIcon:
-              const AndroidResource(name: 'drawable/ic_baseline_route_24'),
-          title: "Simple BG Location",
-          actions: ['Action1', 'Action2', 'Cancel']);
-      requestSettings.distanceFilter = 20;
-      requestSettings.forceLocationManager =
-          forceLocationManager;
-      if (!context.mounted) return;
-      context.read<LocationCubit>().requestPositionUpdate(requestSettings);
     }
+  }
+
+  void _callRequestPositionUpdate(
+    CustomAccuracy accuracy,
+    bool forceLocationManager,
+    LocationCubit locationCubit,
+    RequestUiFlowCubit uiFlowCubit,
+  ) {
+    late final RequestSettings requestSettings;
+    switch (accuracy) {
+      case CustomAccuracy.best:
+        requestSettings = RequestSettings();
+        break;
+      case CustomAccuracy.good:
+        requestSettings = RequestSettings.good();
+        break;
+      case CustomAccuracy.balance:
+        //!! Does not worked on Android Emulator
+        requestSettings = RequestSettings.balance();
+        break;
+      case CustomAccuracy.lowest:
+        //!! Does not worked on Android Emulator
+        requestSettings = RequestSettings.lowPower();
+        break;
+    }
+    requestSettings.notificationConfig = ForegroundNotificationConfig(
+        smallIcon: const AndroidResource(name: 'drawable/ic_baseline_route_24'),
+        title: "Simple BG Location",
+        actions: ['Action1', 'Action2', 'Cancel']);
+    requestSettings.distanceFilter = 20;
+    requestSettings.forceLocationManager = forceLocationManager;
+    locationCubit.requestPositionUpdate(requestSettings);
+    uiFlowCubit.finish();
   }
 
   void _stopPositionUpdate(BuildContext context) {
     context.read<LocationCubit>().stopPositionUpdate();
   }
 
-  Future<bool> _checkAndRequestPermission(BuildContext context) async {
-    // Since Android 6.0 (API level 23) or high, you must request any dangerous
-    // permission at runtime.
-    // more detail description:
-    // https://developer.android.com/training/permissions/requesting#manage-request-code-yourself
-    // and request location permission
-    // https://developer.android.com/training/location/permissions
-    //
-    var requestResult = await SimpleBgLocation.requestPermission();
-
-    if (requestResult == LocationPermission.always ||
-        requestResult == LocationPermission.whileInUse) {
-      // Since Android 11 (API level 30) the system enforces app performs
-      // incremental request for location permission. so if your app needs
-      // background permission, first time request only permit whileInUse
-      // permission. second time request will bring user to permit always
-      // permission.
-      return true;
+  Future<bool> _requestPermission(
+      BuildContext context, bool forBackground) async {
+    final permission = await SimpleBgLocation.requestPermission();
+    if (forBackground) {
+      return permission == LocationPermission.always;
     }
+    return permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse;
+  }
 
-    if (requestResult == LocationPermission.denied) {
-      final alreadyHasPermission = await SimpleBgLocation.checkPermission();
-      if (alreadyHasPermission == LocationPermission.whileInUse) {
-        // upgrade permission from whileInUse to always was denied by user
-
-        // Because the example app need always permission, so follow android best
-        // practice, explain why you need the background permission
-        // show your rationale dialog here. or call SimpleBgLocation.requestPermission
-        // with BackgroundPermissionRationale argument again.
-        final rationResult = await showDialog<bool>(
-          context: context,
-          builder: (_) => AlertDialog(
-            content: const Text(
-                'Share you location to your family need background location permission'),
-            title: const Text('This App need background Location Permission'),
-            actions: [
-              TextButton(
-                child: const Text('Change to "Allow always"'),
-                onPressed: () => Navigator.pop(context, true),
-              ),
-              TextButton(
-                child: const Text('No, Thanks'),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-            ],
+  Future<bool> _showPowerSavedModeWarningDialog(BuildContext context) async {
+    final result = await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Power Save Mode is ON'),
+        content: const Text(
+            "Track recording may not work properly in Power Save Mode. If track does not record properly, disable Power Save Mode."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('OK'),
           ),
-        );
-        if (rationResult == true) {
-          await SimpleBgLocation.requestPermission();
-          // we don't care this time request result. if user upgrade to always
-          // or just keep whileInUse permission, we should return true.
-          // if user downgrade permission to 'don't allow', android system will
-          // force restart app. so whatever return true or false is no matter.
-        }
-        return true;
-      } else if (alreadyHasPermission == LocationPermission.always) {
-        /// this situation happen after Android 12, user denied upgrade accuracy
-        /// permission from approximate to precise, but you still have background
-        /// permission.
-        return true;
-      } else {
-        /// user denied any permission.
-        return false;
-      }
-    } else if (requestResult == LocationPermission.deniedForever) {
-      // User denied same permission more than one times. system will never
-      // bring permission setting dialog.
-      final alreadyHasPermission = await SimpleBgLocation.checkPermission();
-      if (alreadyHasPermission == LocationPermission.denied) {
-        return false;
-      }
-      if (alreadyHasPermission == LocationPermission.whileInUse) {
-        // we want always permission, but system never show permission setting
-        // again, we can suggest user to open App Settings dialog the permit.
-        final prefs = await SharedPreferences.getInstance();
-        final dontAskOpenAppSettings =
-            prefs.getBool('dont_ask_open_app_settings') ?? false;
-        if (dontAskOpenAppSettings == false) {
-          // ignore: use_build_context_synchronously
-          final useSayYes = await showDialog<bool>(
-              context: context,
-              builder: (_) => AlertDialog(
-                    title:
-                        const Text('We truly need the backgroud permissioin'),
-                    content: const Text(
-                        'Do you want open AppSettings to upgrade location permission?'),
-                    actions: [
-                      TextButton(
-                        child: const Text('Yes'),
-                        onPressed: () => Navigator.pop(context, true),
-                      ),
-                      TextButton(
-                        child: const Text('No, Never ask me again!'),
-                        onPressed: () {
-                          prefs.setBool('dont_ask_open_app_settings', true);
-                          Navigator.pop(context, false);
-                        },
-                      ),
-                    ],
-                  ));
-          if (useSayYes == true) {
-            SimpleBgLocation.openAppSettings();
-            return false;
-          }
-        }
-      }
-      return true;
-    }
-    return false;
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
+  Future<bool> _showBackgroundRationaleDialog(BuildContext context) async {
+    final result = await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Background Permission'),
+        content: const Text(
+            "Geofence and Share your location to your Family requires Background Location Permission."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Change to "Allow always"'),
+          ),
+          TextButton(
+            child: const Text('No, Thanks'),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
   }
 }

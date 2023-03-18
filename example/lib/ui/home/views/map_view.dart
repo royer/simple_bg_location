@@ -4,7 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
-import 'package:simple_bg_location_example/cubit/position/position_cubit.dart';
+import '../../../cubit/location/location_cubit.dart';
 
 class MapView extends StatefulWidget {
   const MapView({Key? key}) : super(key: key);
@@ -45,7 +45,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<PositionCubit, PositionState>(
+    return BlocListener<LocationCubit, LocationState>(
       listener: (context, state) {
         if (state is PositionArrived) {
           final position = state.newPosition;

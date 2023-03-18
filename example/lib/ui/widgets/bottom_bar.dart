@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 import 'package:simple_bg_location/simple_bg_device_info.dart';
-import 'package:simple_bg_location_example/cubit/position/position_cubit.dart';
-import 'package:simple_bg_location_example/cubit/settings/settings_cubit.dart';
+import '../../cubit/location/location_cubit.dart';
+import '../../cubit/settings/settings_cubit.dart';
 
 class MyBottomBar extends StatelessWidget {
   const MyBottomBar({
@@ -22,15 +22,14 @@ class MyBottomBar extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () =>
-                  context.read<PositionCubit>().getCurrentPosition(),
+                  context.read<LocationCubit>().getCurrentPosition(),
               icon: const Icon(Icons.gps_fixed),
             ),
-            BlocBuilder<PositionCubit, PositionState>(
-              buildWhen: (previous, current) =>
-                  previous.odometer != current.odometer,
+            BlocBuilder<LocationCubit, LocationState>(
+              buildWhen: (previous, current) => previous.odometer != current.odometer,
               builder: (context, state) {
                 final distance = state.odometer;
-                var text = 'distance: ';
+                var text = '';
                 if (distance > 1000) {
                   text += "${(distance / 1000.0).toStringAsFixed(1)}km";
                 } else {
@@ -41,11 +40,14 @@ class MyBottomBar extends StatelessWidget {
             ),
             SizedBox(
               width: 54.0,
-              child: BlocBuilder<PositionCubit, PositionState>(
+              child: BlocBuilder<LocationCubit, LocationState>(
+                buildWhen: (previous, current) =>
+                    previous.isTracking != current.isTracking,
                 builder: (context, state) {
                   return ElevatedButton(
                     onPressed: () {
-                      if (!state.isTracking) {
+
+                      if (!state .isTracking) {
                         _requestPositionUpdate(context);
                       } else {
                         _stopPositionUpdate(context);
@@ -57,6 +59,7 @@ class MyBottomBar extends StatelessWidget {
                 },
               ),
             ),
+            ElevatedButton(onPressed: (){}, child: const Text('Background Task'))
           ],
         ),
       ),
@@ -113,12 +116,12 @@ class MyBottomBar extends StatelessWidget {
       requestSettings.forceLocationManager =
           forceLocationManager;
       if (!context.mounted) return;
-      context.read<PositionCubit>().requestPositionUpdate(requestSettings);
+      context.read<LocationCubit>().requestPositionUpdate(requestSettings);
     }
   }
 
   void _stopPositionUpdate(BuildContext context) {
-    context.read<PositionCubit>().stopPositionUpdate();
+    context.read<LocationCubit>().stopPositionUpdate();
   }
 
   Future<bool> _checkAndRequestPermission(BuildContext context) async {

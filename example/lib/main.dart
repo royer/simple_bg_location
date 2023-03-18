@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:simple_bg_location_example/home_app.dart';
 
-import 'cubit/position/position_cubit.dart';
+import 'cubit/location/location_cubit.dart';
 import 'cubit/settings/settings_cubit.dart';
 
 void main() {
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => PositionCubit(),
+          create: (context) => LocationCubit(),
         ),
         BlocProvider(
           create: (context) => SettingsCubit(),

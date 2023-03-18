@@ -42,6 +42,11 @@ class HomePage extends StatelessWidget {
         appBar: AppBar(
           title: const Text(appTitle),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.door_back_door),
+              onPressed: () {}
+            ),
+
             BlocBuilder<SettingsCubit, SettingsState>(
               builder: (context, state) {
                 return PopupMenuButton<_Menu>(
@@ -112,11 +117,6 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-            // IconButton(
-            //   icon: const Icon(Icons.more_horiz),
-            //   onPressed: () => Navigator.of(context).push(
-            //       MaterialPageRoute(builder: (_) => const OtherApisPage())),
-            // ),
           ],
           bottom: TabBar(tabs: tabs),
         ),

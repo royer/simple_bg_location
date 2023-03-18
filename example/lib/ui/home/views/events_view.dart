@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
-import 'package:simple_bg_location_example/cubit/position/position_cubit.dart';
+import '../../../cubit/location/location_cubit.dart';
 
 class EventsView extends StatefulWidget {
   const EventsView({Key? key}) : super(key: key);
@@ -22,14 +22,15 @@ class _EventsViewState extends State<EventsView> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(5.0),
-      child: BlocBuilder<PositionCubit, PositionState>(
+      child: BlocBuilder<LocationCubit, LocationState>(
+        buildWhen: (previous, current) => current is PositionArrived,
         builder: (context, state) {
           WidgetsBinding.instance
               .addPostFrameCallback((_) => _scrollToBottom());
 
           return ListView.separated(
             controller: scrollController,
-            itemCount: state.positions.length,
+            itemCount: (state as PositionArrived).positions.length,
             itemBuilder: (context, index) {
               return PositionListTile(position: state.positions[index]);
             },

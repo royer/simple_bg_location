@@ -7,21 +7,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 
-part 'position_state.dart';
+part 'location_state.dart';
 
-class PositionCubit extends Cubit<PositionState> {
+class LocationCubit extends Cubit<LocationState> {
   // If use SimpleBgLocation.getPositionStream, define your owner stream
   // subscription
   // late final StreamSubscription<Position> _positionSub;
 
-  PositionCubit() : super(const PositionInitial()) {
+
+
+  LocationCubit() : super(const PositionInitial()) {
     // _positionSub = SimpleBgLocation.getPositionStream(_positionErrorHandle)
     //     .listen(_onPosition);
 
     SimpleBgLocation.onPosition(_onPosition, _positionErrorHandle);
 
-    SimpleBgLocation.ready().then((sbglState) {
-      sbglState.isTracking;
+    SimpleBgLocation.ready().then((sbglState) async {
       List<Position> positions = [];
       positions.addAll(sbglState.positions ?? []);
       double odometer = 0;
@@ -40,6 +41,7 @@ class PositionCubit extends Cubit<PositionState> {
         isTracking: sbglState.isTracking,
         positions: positions,
         odometer: odometer,
+        permission: await SimpleBgLocation.checkPermission(),
       ));
     });
   }
@@ -54,22 +56,22 @@ class PositionCubit extends Cubit<PositionState> {
   Future<void> requestPositionUpdate(RequestSettings requestSettings) async {
     try {
       await SimpleBgLocation.requestPositionUpdate(requestSettings);
-      emit(const PositionUpdateState(
-          isTracking: true, positions: [], odometer: 0.0));
+
+      emit(PositionUpdateState(
+          isTracking: true, positions: const [], odometer: 0.0,
+          permission: await SimpleBgLocation.checkPermission()));
     } on LocationServiceDisabledException catch (e) {
       emit(PositionStateError(
-        PositionError(PositionError.locationServiceDisabled,
+        oldState: state,
+        error: PositionError(PositionError.locationServiceDisabled,
             e.message ?? 'Location Services disabled'),
-        isTracking: false,
-        positions: const [],
-        odometer: 0.0,
+
       ));
     } on PlatformException catch (e) {
       emit(PositionStateError(
-        PositionError.fromPlatformException(e),
-        isTracking: false,
-        positions: const [],
-        odometer: 0.0,
+        oldState: state,
+        error:PositionError.fromPlatformException(e),
+
       ));
     }
   }
@@ -79,7 +81,8 @@ class PositionCubit extends Cubit<PositionState> {
     emit(PositionUpdateState(
         isTracking: false,
         positions: state.positions,
-        odometer: state.odometer));
+        odometer: state.odometer,
+        permission: state.permission));
   }
 
   Future<void> getCurrentPosition() async {
@@ -87,10 +90,9 @@ class PositionCubit extends Cubit<PositionState> {
       final position = await SimpleBgLocation.getCurrentPosition();
       if (position != null) {
         emit(PositionCurrentPositionResult(
-          position,
-          isTracking: state.isTracking,
-          positions: state.positions,
-          odometer: state.odometer,
+          oldState: state,
+          currentResult: position,
+
         ));
       }
     } catch (e) {
@@ -101,14 +103,14 @@ class PositionCubit extends Cubit<PositionState> {
   void _positionErrorHandle(PositionError err) {
     dev.log('_onPositionError, errorCode: $err');
 
-    emit(PositionStateError(err,
-        isTracking: false,
-        positions: state.positions,
-        odometer: state.odometer));
+    emit(PositionStateError(
+      error: err,
+      oldState: state,
+));
   }
 
-  void _onPosition(Position position) {
-    var positions = state.positions.toList();
+  void _onPosition(Position position) async{
+    List<Position> positions = state.positions.toList();
     positions.add(position);
     double odometer = state.odometer;
     if (positions.length >= 2) {
@@ -121,9 +123,11 @@ class PositionCubit extends Cubit<PositionState> {
     }
     // dev.log(
     //     'onPosition received. (timestamp: ${position.timestamp}, [${position.latitude}, ${position.longitude}], accuracy: ${position.accuracy})');
-    emit(PositionArrived(position,
-        isTracking: state.isTracking,
-        positions: positions,
-        odometer: odometer));
+    emit(PositionArrived(
+      oldState: state,
+      newPosition: position,
+      positions: positions,
+      odometer: odometer,
+));
   }
 }

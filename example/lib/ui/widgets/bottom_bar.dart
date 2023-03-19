@@ -148,10 +148,11 @@ class MyBottomBar extends StatelessWidget {
       uiFlowCubit.startRequestPermission(forBackground: forBackground);
       return;
     } else if (permission == LocationPermission.deniedForever) {
-      //uiFlowCubit.startShowBackgroundRationale(forBackground: forBackground);
       // todo: show dialog to open app setting
       return;
     } else if (permission == LocationPermission.whileInUse && forBackground) {
+      // we need background permission, but we have only whileInUse permission
+      // call requestPermission again.
       uiFlowCubit.startRequestPermission(forBackground: forBackground);
       return;
     } else {

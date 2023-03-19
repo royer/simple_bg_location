@@ -26,7 +26,8 @@ class Methods {
   static const stopPositionUpdate = "stopPositionUpdate";
   static const ready = 'ready';
   static const isPowerSaveMode = "isPowerSaveMode";
-  static const shouldShowRequestPermissionRationale = "shouldShowRequestPermissionRationale";
+  static const shouldShowRequestPermissionRationale =
+      "shouldShowRequestPermissionRationale";
 }
 
 @visibleForTesting
@@ -50,11 +51,12 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
   static Stream<String>? _notifyActionStream;
 
   @override
-  Future<LocationPermission> checkPermission({bool onlyCheckBackground = false}) async {
+  Future<LocationPermission> checkPermission(
+      {bool onlyCheckBackground = false}) async {
     try {
       final params = <String, dynamic>{
         'onlyCheckBackground': onlyCheckBackground
-      };      
+      };
       final int permission =
           await methodChannel.invokeMethod(Methods.checkPermission, params);
 
@@ -106,7 +108,7 @@ class MethodChannelSimpleBgLocation extends SimpleBgLocationPlatform {
   Future<bool> shouldShowRequestPermissionRationale() async {
     try {
       return (await methodChannel
-          .invokeMethod(Methods.shouldShowRequestPermissionRationale ));
+          .invokeMethod(Methods.shouldShowRequestPermissionRationale));
     } on PlatformException catch (e) {
       final error = _handlePlatformException(e);
       throw error;

@@ -186,7 +186,13 @@ The main steps to use this plugin are:
   }
 
 ```
-Full Example()
+
+[Full Example](https://github.com/royer/simple_bg_location/tree/master/full_example)
+
+## Mainly Api quick view
+
+
+
 
 This project is a starting point for a Flutter
 [plug-in package](https://flutter.dev/developing-packages/),

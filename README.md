@@ -113,7 +113,79 @@ The main steps to use this plugin are:
 ## Example
 
 ### Request Position update
+```dart
+  void _startPositionUpdate() async {
+    if (!(await SimpleBgLocation.isLocationServiceEnabled())) {
+      events.add(const LocationEventItem(
+        LocationEventType.log,
+        'Location service disabled',
+      ));
+      setState(() {});
+      SimpleBgLocation.openLocationSettings();
+      return;
+    }
+    var permission = await SimpleBgLocation.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await SimpleBgLocation.requestPermission();
+      if (permission == LocationPermission.denied) {
+        events.add(const LocationEventItem(
+          LocationEventType.log,
+          'Permission denied',
+        ));
+        setState(() {});
 
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      events.add(const LocationEventItem(
+        LocationEventType.log,
+        'Permission denied forever',
+      ));
+      setState(() {});
+      // Do not call openAppSetting directly in the formal product.
+      // Instead, you should ask the user if they are willing,
+      // and do not ask again after the user has refused multiple times.
+      SimpleBgLocation.openAppSettings();
+
+      return;
+    }
+
+    if ((await SimpleBgDeviceInfo.isPowerSaveMode())) {
+      events.add(const LocationEventItem(
+        LocationEventType.log,
+        'Power save mode enabled!',
+        detail: '''Track recording may not work properly in Power Save Mode. 
+            If track does not record properly, disable Power Save Mode.''',
+      ));
+      return;
+    }
+
+    final requestSettings = RequestSettings.good();
+    requestSettings.notificationConfig = ForegroundNotificationConfig(
+      notificationId: 100,
+      title: "Simple BG Location",
+      text: "distance: {distance}",
+      priority: ForegroundNotificationConfig.NOTIFICATION_PRIORITY_DEFAULT,
+      actions: ['Action1', 'Action2', 'cancel'],
+    );
+
+    final success =
+        await SimpleBgLocation.requestPositionUpdate(requestSettings);
+    if (success) {
+      isTracking = true;
+    } else {
+      events.add(const LocationEventItem(
+        LocationEventType.log,
+        'Error',
+        detail: 'Request position update failed',
+      ));
+    }
+    setState(() {});
+  }
+
+```
 Full Example()
 
 This project is a starting point for a Flutter

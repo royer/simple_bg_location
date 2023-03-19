@@ -51,16 +51,6 @@ The Simple Background Location Plugin requires the `minSdkVersion` >= 21 and `co
    >    ...
    >}
 
-**Kotlin Versioin**
-
-Simple_bg_location use kotlin 1.8.0. if you have build error of kotlin version. change your android/build.gradle file:
-
-```
-buildscript {
-    ext.kotlin_version = '1.8.0'
-
-}
-```
 
 **Permissions**
 
@@ -123,55 +113,6 @@ The main steps to use this plugin are:
 ## Example
 
 ### Request Position update
-```dart
-  void _requestPositionUpdate(BuildContext context,
-      {bool forBackground = false}) async {
-    final accuracy = context.read<SettingsCubit>().state.accuracy;
-    final forceLocationManager =
-        context.read<SettingsCubit>().state.forceLocationManager;
-    final locationCubit = context.read<LocationCubit>();
-
-    // use RequestUiFlowCubit just for avoid dart compile lint warning for
-    // DON'T use BuildContext across asynchronous gaps.
-    // https://dart-lang.github.io/linter/lints/use_build_context_synchronously.html
-    final uiFlowCubit = context.read<RequestUiFlowCubit>();
-
-    final permission = await SimpleBgLocation.checkPermission(
-        onlyCheckBackground: forBackground);
-
-    if (permission == LocationPermission.denied) {
-      if (forBackground) {
-        final shouldShowRationale =
-            await SimpleBgLocation.shouldShowRequestPermissionRationale();
-        if (shouldShowRationale) {
-          uiFlowCubit.startShowBackgroundRationale(
-              forBackground: forBackground);
-          return;
-        }
-      }
-      uiFlowCubit.startRequestPermission(forBackground: forBackground);
-      return;
-    } else if (permission == LocationPermission.deniedForever) {
-      // todo: show dialog to open app setting
-      return;
-    } else if (permission == LocationPermission.whileInUse && forBackground) {
-      // we need background permission, but we have only whileInUse permission
-      // call requestPermission again.
-      uiFlowCubit.startRequestPermission(forBackground: forBackground);
-      return;
-    } else {
-      if ((await SimpleBgDeviceInfo.isPowerSaveMode())) {
-        uiFlowCubit.startShowPowerSavedModeWarning(
-            forBackground: forBackground);
-        return;
-      } else {
-        _callRequestPositionUpdate(
-            accuracy, forceLocationManager, locationCubit, uiFlowCubit);
-      }
-    }
-  }
-
-```
 
 Full Example()
 

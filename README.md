@@ -51,6 +51,17 @@ The Simple Background Location Plugin requires the `minSdkVersion` >= 21 and `co
    >    ...
    >}
 
+**Kotlin Versioin**
+
+Simple_bg_location use kotlin 1.8.0. if you have build error of kotlin version. change your android/build.gradle file:
+
+```
+buildscript {
+    ext.kotlin_version = '1.8.0'
+
+}
+```
+
 **Permissions**
 
 If your App only need approximate accuracy, add `ACCESS_COARSE_LOCATION` in AndroidManifest.xml file (located under android/app/src/main) as children of the `<manifest>` tag.

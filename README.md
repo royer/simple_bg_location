@@ -1,6 +1,6 @@
 # Flutter Simple Background Location Plugin
 
-[![License](https://img.shields.io/github/license/royer/simple_bg_location?style=flat-square)](https://github.com/royer/simple_bg_location/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/royer/simple_bg_location?style=flat-square&logo=github)](https://github.com/royer/simple_bg_location/blob/master/LICENSE)
 
 The Flutter simple_bg_location plugin provides a basic location API for Android and iOS, specially supporting the recording of location updates in the background on Android devices, even if the user exits the app using the system back button.
 

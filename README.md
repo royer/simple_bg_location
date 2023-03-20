@@ -1,5 +1,7 @@
 # Flutter Simple Background Location Plugin
 
+[![License](https://img.shields.io/github/license/royer/simple_bg_location?style=flat-square)](https://github.com/royer/simple_bg_location/blob/master/LICENSE)
+
 The Flutter simple_bg_location plugin provides a basic location API for Android and iOS, specially supporting the recording of location updates in the background on Android devices, even if the user exits the app using the system back button.
 
 Simple_bg_location use FusedLocationProvider or if not available then the LocationManager on Android and CLLocationManager on iOS.
@@ -191,15 +193,101 @@ The main steps to use this plugin are:
 
 ## Mainly Api quick view
 
+### Prepare use plugin
 
+* `onPosition`
+  ```dart
+  void onPosition(Function(Position) success, [Function(PositionError)? failure])
+  ```
+  Directly register a callback function to receive Location update events. Alternatively, if you prefer to use a stream, you can call `getPositionStream` to obtain a `Stream<Position>`, and manage the subscription yourself. 
+  ```dart
+  Stream<Position> getPositionStream([Function(PositionError)? handleError])
+  ```
 
+* `ready()`
+  ```dart
+  Future<SBGLState> ready()
+  ```
+  Before call other location service API such as `requestPositionUpdate`  must call ready() to get current plugin state.
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+  In android when user use back button quit app, flutter will shutdown all
+  dart code. use ready() notify plugin and check whether the last position
+  update is sill tracking, and get positions updates in plugin cache.
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+  ⚠️No position updated event will send if miss called ready()
+
+* `onNotificationAction` (Android Only)
+  ```dart
+  void onNotificationAction(Function(String) success)
+  ```
+  For custom notification action events. or `getNotificationStream` to obtain a `Stream<String>`.
+  ```dart
+  Stream<String> getNotificationStream()
+  ```
+### Permission
+* `checkPermission`
+  ```dart
+  Future<LocationPermission> checkPermission({bool onlyCheckBackground = false})
+  ```
+* `requestPermission`
+  ```dart
+  Future<LocationPermission> requestPermission([BackgroundPermissionRationale? rationale])
+  ```
+* `getAccuracyPermission`
+  ```dart
+  Future<LocationAccuracyPermission> getAccuracyPermission()
+  ```
+
+### Position
+
+* `requestPositionUpdate`
+  ```dart
+  Future<bool> requestPositionUpdate(RequestSettings requestSettings)
+  ```
+* `stopPositionUpdate`
+  ```dart
+  Future<bool> stopPositionUpdate()
+  ```
+* `getLastKnowPosition`
+  ```dart
+  Future<Position?> getLastKnowPosition({bool forceLocationManager = false})
+  ```
+* `getCurrentPosition`
+  ```dart
+  Future<Position?> getCurrentPosition({bool forceLocationManager = false})
+  ```
+### Device information
+
+* `isLocationServiceEnabled`
+  ```dart
+  Future<bool> isLocationServiceEnabled()
+  ```
+  Check location service is enable or not.
+
+* `isPowerSaveMode`
+  ```dart
+  Future<bool> SimpleBgDeviceInfo.isPowerSaveMode()
+  ```
+
+### Utility
+
+* `openAppSettings`
+  ```dart
+  Future<bool> openAppSettings()
+  ```
+
+* `openLocationSettings`
+  ```dart
+  Future<bool> openLocationSettings()
+  ```
+
+* `distance`
+  ```dart
+  double distance(double startLatitude, double startLongitude, double endLatitude, double endLongitude)
+  ```
+
+## Issues
+
+Please file any issues, bugs or feature requests as an issue on our [GitHub](https://github.com/royer/simple_bg_location/issues) page.
+
 

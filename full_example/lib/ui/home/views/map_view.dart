@@ -45,6 +45,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return BlocListener<LocationCubit, LocationState>(
       listener: (context, state) {
         if (state is PositionArrived) {

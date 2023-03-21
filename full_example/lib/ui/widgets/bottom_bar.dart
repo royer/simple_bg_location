@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:simple_bg_location/simple_bg_location.dart';
 import 'package:simple_bg_location/simple_bg_device_info.dart';
 import '../../cubit/location/location_cubit.dart';

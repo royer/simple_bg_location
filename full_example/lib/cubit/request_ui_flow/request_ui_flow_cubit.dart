@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
@@ -15,11 +15,15 @@ class RequestUiFlowCubit extends Cubit<RequestUiFlowState> {
   }
 
   void startShowBackgroundRationale({bool forBackground = false}) {
-    emit(state.copyWith(step: RequestUiFlowStep.showBackgroundRationale, forBackground: forBackground));
+    emit(state.copyWith(
+        step: RequestUiFlowStep.showBackgroundRationale,
+        forBackground: forBackground));
   }
 
   void startShowPowerSavedModeWarning({bool forBackground = false}) {
-    emit(state.copyWith(step: RequestUiFlowStep.showPowerSavedModeWarning, forBackground: forBackground));
+    emit(state.copyWith(
+        step: RequestUiFlowStep.showPowerSavedModeWarning,
+        forBackground: forBackground));
   }
 
   void finish() {

@@ -147,7 +147,7 @@ class RequestSettings {
           interval: 30 * 60 * 1000,
           minUpdateInterval: 15 * 60 * 1000,
         );
-        
+
   Map<String, dynamic> toMap() {
     return {
       'accuracy': accuracy.index,

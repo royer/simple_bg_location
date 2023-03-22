@@ -1,6 +1,12 @@
 part of 'request_ui_flow_cubit.dart';
 
-enum RequestUiFlowStep {none, requestPermission, showBackgroundRationale, showPowerSavedModeWarning }
+enum RequestUiFlowStep {
+  none,
+  requestPermission,
+  showBackgroundRationale,
+  showPowerSavedModeWarning
+}
+
 @immutable
 class RequestUiFlowState with EquatableMixin {
   final RequestUiFlowStep step;

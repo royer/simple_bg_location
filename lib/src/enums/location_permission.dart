@@ -1,12 +1,11 @@
-
 /// Represent the possible location permissions.
-/// 
+///
 /// |  value         |  description
 /// |----------------|----------------------|
 /// |-denied         | permission is denied |
 /// |-deniedForever  | this value is only return by requestPermission.
 /// |-whileInUse     | allowed only while the App is in use
-/// |-always         | allowed even when the App is running in the background  
+/// |-always         | allowed even when the App is running in the background
 /// |-unableToDetermine| program internal wrong
 enum LocationPermission {
   /// Permission to access the device's location is denied, the App should try

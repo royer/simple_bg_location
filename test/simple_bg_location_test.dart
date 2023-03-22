@@ -4,7 +4,6 @@ import 'package:simple_bg_location/simple_bg_location_platform_interface.dart';
 import 'package:simple_bg_location/simple_bg_location_method_channel.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
-
 final Position fakePosition = Position(
   uuid: '',
   latitude: 30.00,
@@ -16,7 +15,8 @@ class MockSimpleBgLocationPlatform
     with MockPlatformInterfaceMixin
     implements SimpleBgLocationPlatform {
   @override
-  Future<LocationPermission> checkPermission({bool onlyCheckBackground = false}) =>
+  Future<LocationPermission> checkPermission(
+          {bool onlyCheckBackground = false}) =>
       Future.value(LocationPermission.always);
 
   @override

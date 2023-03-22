@@ -43,10 +43,7 @@ class HomePage extends StatelessWidget {
           title: const Text(appTitle),
           actions: [
             IconButton(
-              icon: const Icon(Icons.door_back_door),
-              onPressed: () {}
-            ),
-
+                icon: const Icon(Icons.door_back_door), onPressed: () {}),
             BlocBuilder<SettingsCubit, SettingsState>(
               builder: (context, state) {
                 return PopupMenuButton<_Menu>(
@@ -110,9 +107,9 @@ class HomePage extends StatelessWidget {
                     ),
                     const PopupMenuDivider(),
                     CheckedPopupMenuItem(
-                      checked: state.forceLocationManager,
-                      value: _Menu.forceLocationManager,
-                      child: const Text('Force LocationManager')),
+                        checked: state.forceLocationManager,
+                        value: _Menu.forceLocationManager,
+                        child: const Text('Force LocationManager')),
                   ],
                 );
               },

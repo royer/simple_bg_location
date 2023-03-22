@@ -177,7 +177,8 @@ class _OtherApiViewState extends State<OtherApiView> {
       setState(() {
         _method = "checkPermission(onlyBackground: true)";
       });
-      final result = await SimpleBgLocation.checkPermission(onlyCheckBackground: true);
+      final result =
+          await SimpleBgLocation.checkPermission(onlyCheckBackground: true);
       setState(() {
         _resultInfo += "$result";
       });
@@ -194,7 +195,6 @@ class _OtherApiViewState extends State<OtherApiView> {
     }
   }
 
-
   void _requestPermission() async {
     _reset();
 
@@ -204,8 +204,10 @@ class _OtherApiViewState extends State<OtherApiView> {
       });
       final result = await SimpleBgLocation.requestPermission(
           const BackgroundPermissionRationale(
-        title: 'This is demo of request background location permission rationale',
-        message: 'Keep share your location to your family need background location permission',
+        title:
+            'This is demo of request background location permission rationale',
+        message:
+            'Keep share your location to your family need background location permission',
       ));
       setState(() {
         _resultInfo += "$result";

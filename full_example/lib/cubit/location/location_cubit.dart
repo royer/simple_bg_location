@@ -14,8 +14,6 @@ class LocationCubit extends Cubit<LocationState> {
   // subscription
   // late final StreamSubscription<Position> _positionSub;
 
-
-
   LocationCubit() : super(const PositionInitial()) {
     // _positionSub = SimpleBgLocation.getPositionStream(_positionErrorHandle)
     //     .listen(_onPosition);
@@ -58,20 +56,20 @@ class LocationCubit extends Cubit<LocationState> {
       await SimpleBgLocation.requestPositionUpdate(requestSettings);
 
       emit(PositionUpdateState(
-          isTracking: true, positions: const [], odometer: 0.0,
+          isTracking: true,
+          positions: const [],
+          odometer: 0.0,
           permission: await SimpleBgLocation.checkPermission()));
     } on LocationServiceDisabledException catch (e) {
       emit(PositionStateError(
         oldState: state,
         error: PositionError(PositionError.locationServiceDisabled,
             e.message ?? 'Location Services disabled'),
-
       ));
     } on PlatformException catch (e) {
       emit(PositionStateError(
         oldState: state,
-        error:PositionError.fromPlatformException(e),
-
+        error: PositionError.fromPlatformException(e),
       ));
     }
   }
@@ -92,7 +90,6 @@ class LocationCubit extends Cubit<LocationState> {
         emit(PositionCurrentPositionResult(
           oldState: state,
           currentResult: position,
-
         ));
       }
     } catch (e) {
@@ -106,10 +103,10 @@ class LocationCubit extends Cubit<LocationState> {
     emit(PositionStateError(
       error: err,
       oldState: state,
-));
+    ));
   }
 
-  void _onPosition(Position position) async{
+  void _onPosition(Position position) async {
     List<Position> positions = state.positions.toList();
     positions.add(position);
     double odometer = state.odometer;
@@ -128,6 +125,6 @@ class LocationCubit extends Cubit<LocationState> {
       newPosition: position,
       positions: positions,
       odometer: odometer,
-));
+    ));
   }
 }

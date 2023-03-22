@@ -180,7 +180,9 @@ class Position {
       uuid: map['uuid'] ?? '',
       latitude: map['latitude']?.toDouble() ?? 0.0,
       longitude: map['longitude']?.toDouble() ?? 0.0,
-      timestamp: map['timestamp'] != null ? DateTime.fromMillisecondsSinceEpoch(map['timestamp']) : null,
+      timestamp: map['timestamp'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['timestamp'])
+          : null,
       altitude: map['altitude']?.toDouble() ?? -1.0,
       altitudeAccuracy: map['altitudeAccuracy']?.toDouble() ?? -1.0,
       accuracy: map['accuracy']?.toDouble() ?? -1.0,
@@ -195,7 +197,8 @@ class Position {
 
   String toJson() => json.encode(toMap());
 
-  factory Position.fromJson(String source) => Position.fromMap(json.decode(source));
+  factory Position.fromJson(String source) =>
+      Position.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -209,37 +212,37 @@ class Position {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-  
+
     return other is Position &&
-      other.uuid == uuid &&
-      other.latitude == latitude &&
-      other.longitude == longitude &&
-      other.timestamp == timestamp &&
-      other.altitude == altitude &&
-      other.altitudeAccuracy == altitudeAccuracy &&
-      other.accuracy == accuracy &&
-      other.heading == heading &&
-      other.headingAccuracy == headingAccuracy &&
-      other.floor == floor &&
-      other.speed == speed &&
-      other.speedAccuracy == speedAccuracy &&
-      other.isMocked == isMocked;
+        other.uuid == uuid &&
+        other.latitude == latitude &&
+        other.longitude == longitude &&
+        other.timestamp == timestamp &&
+        other.altitude == altitude &&
+        other.altitudeAccuracy == altitudeAccuracy &&
+        other.accuracy == accuracy &&
+        other.heading == heading &&
+        other.headingAccuracy == headingAccuracy &&
+        other.floor == floor &&
+        other.speed == speed &&
+        other.speedAccuracy == speedAccuracy &&
+        other.isMocked == isMocked;
   }
 
   @override
   int get hashCode {
     return uuid.hashCode ^
-      latitude.hashCode ^
-      longitude.hashCode ^
-      timestamp.hashCode ^
-      altitude.hashCode ^
-      altitudeAccuracy.hashCode ^
-      accuracy.hashCode ^
-      heading.hashCode ^
-      headingAccuracy.hashCode ^
-      floor.hashCode ^
-      speed.hashCode ^
-      speedAccuracy.hashCode ^
-      isMocked.hashCode;
+        latitude.hashCode ^
+        longitude.hashCode ^
+        timestamp.hashCode ^
+        altitude.hashCode ^
+        altitudeAccuracy.hashCode ^
+        accuracy.hashCode ^
+        heading.hashCode ^
+        headingAccuracy.hashCode ^
+        floor.hashCode ^
+        speed.hashCode ^
+        speedAccuracy.hashCode ^
+        isMocked.hashCode;
   }
 }

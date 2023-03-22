@@ -1,6 +1,6 @@
 name: simple_bg_location
 description: A simple background location plugin for Flutter. This plugin provides a cross-platform(iOS, Android) Api for generic location functions.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/royer/simple_bg_location
 issue_tracker: https://github.com/royer/simple_bg_location/issues
 

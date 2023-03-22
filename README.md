@@ -5,6 +5,8 @@
 The Flutter simple_bg_location plugin provides a basic location API for Android and iOS, specially supporting the recording of location updates in the background on Android devices, even if the user exits the app using the system back button.
 
 Simple_bg_location use FusedLocationProvider or if not available then the LocationManager on Android and CLLocationManager on iOS.
+
+![demo](tiny_demo.gif)
 ## Features
 
 * Records location updates in the background.

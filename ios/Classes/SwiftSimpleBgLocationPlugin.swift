@@ -138,10 +138,12 @@ public class SwiftSimpleBgLocationPlugin: NSObject, FlutterPlugin {
     }
     
     func onIsLocationServiceEnabled(_ result: @escaping FlutterResult) {
-        if CLLocationManager.locationServicesEnabled() {
-            result(NSNumber(true))
-        } else {
-            result(NSNumber(false))
+        DispatchQueue.global().async {
+            if CLLocationManager.locationServicesEnabled() {
+                result(NSNumber(true))
+            } else {
+                result(NSNumber(false))
+            }
         }
     }
     

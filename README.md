@@ -6,7 +6,7 @@ The Flutter simple_bg_location plugin provides a basic location API for Android 
 
 Simple_bg_location use FusedLocationProvider or if not available then the LocationManager on Android and CLLocationManager on iOS.
 
-![demo](full_demo.gif)
+![demo](https://github.com/royer/simple_bg_location/blob/master/full_demo.gif)
 ## Features
 
 * Records location updates in the background.

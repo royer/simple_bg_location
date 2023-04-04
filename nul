@@ -1,0 +1,81 @@
+INFO    | Android emulator version 32.1.12.0 (build_id 9751036) (CL:N/A)
+INFO    | Found systemPath /Users/roywang/Library/Android/sdk/system-images/android-28/google_apis/arm64-v8a/
+INFO    | Storing crashdata in: /tmp/android-roywang/emu-crash.db, detection is enabled
+INFO    | Duplicate loglines will be removed, if you wish to see each indiviudal line launch with the -log-nofilter flag.
+INFO    | Warning: QMetaObject::connectSlotsByName: No matching signal for on_new_posture_requested(int) ((null):0, (null))
+INFO    | Warning: QMetaObject::connectSlotsByName: No matching signal for on_dismiss_posture_selection_dialog() ((null):0, (null))
+INFO    | Warning: QMetaObject::connectSlotsByName: No matching signal for on_new_resizable_requested(PresetEmulatorSizeType) ((null):0, (null))
+INFO    | Warning: QMetaObject::connectSlotsByName: No matching signal for on_dismiss_resizable_dialog() ((null):0, (null))
+INFO    | Crash reports will be automatically uploaded to: https://clients2.google.com/cr/report
+INFO    | added library /Users/roywang/Library/Android/sdk/emulator/lib64/vulkan/libvulkan.dylib
+INFO    | Started GRPC server at 127.0.0.1:8554, security: Local, auth: none
+INFO    | Advertising in: /Users/roywang/Library/Caches/TemporaryItems/avd/running/pid_93726.ini
+INFO    | Setting display: 0 configuration to: 1080x2340, dpi: 440x440 
+03-24 10:37:49.864  3377  3897 I GnssLocationProvider: WakeLock acquired by sendMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@6af8401)
+03-24 10:37:49.865  3377  3399 I GnssLocationProvider: WakeLock released by handleMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@6af8401)
+03-24 10:37:49.866  3812  3812 I wpa_supplicant: wlan0: CTRL-EVENT-BEACON-LOSS 
+03-24 10:37:49.868  3377  3875 D AlarmManagerService: Kernel timezone updated to 420 minutes west of GMT
+03-24 10:37:49.873  3377  3875 D AlarmManagerService: Setting time of day to sec=1679679593
+03-24 10:39:53.007  3377  3875 W AlarmManagerService: Unable to set rtc to 1679679593: No such device
+03-24 10:37:49.865  3377  3404 I chatty  : uid=1000(system) batterystats-wo identical 2 lines
+03-24 10:37:49.867  3377  3404 E BatteryExternalStatsWorker: no controller energy info supplied for wifi
+03-24 10:39:53.009  3377  3377 D DevicePolicyManager: updateSystemUpdateFreezePeriodsRecord
+03-24 10:39:53.009  3377  3377 D ConditionProviders.SCP: onReceive android.intent.action.TIME_SET
+03-24 10:39:53.009  3377  3377 D ConditionProviders.SCP: evaluateSubscriptionLocked cal=ScheduleCalendar[mDays={1, 2, 3, 4, 5, 6, 7}, mSchedule=ScheduleInfo{days=[1, 2, 3, 4, 5, 6, 7], startHour=22, startMinute=0, endHour=7, endMinute=0, exitAtAlarm=true, nextAlarm=Wed Dec 31 16:00:00 PST 1969 (0)}], now=Fri Mar 24 10:39:53 PDT 2023 (1679679593009), nextUserAlarmTime=Wed Dec 31 16:00:00 PST 1969 (0)
+03-24 10:39:53.009  3377  3377 D ConditionProviders.SCP: notifyCondition condition://android/schedule?days=1.2.3.4.5.6.7&start=22.0&end=7.0&exitAtAlarm=true STATE_FALSE reason=!meetsSchedule
+03-24 10:39:53.010  3377  3377 D ConditionProviders.SCP: Scheduling evaluate for Fri Mar 24 22:00:00 PDT 2023 (1679720400000), in +11h20m6s991ms, now=Fri Mar 24 10:39:53 PDT 2023 (1679679593009)
+03-24 10:39:53.013  3377  3399 E memtrack: Couldn't load memtrack module
+03-24 10:39:53.013  3377  3399 W android.os.Debug: failed to get memory consumption info: -1
+03-24 10:39:53.016  6333  6333 I AlarmClock: AlarmInitReceiver android.intent.action.TIME_SET
+03-24 10:39:53.026  3377  3399 I UsageStatsService: Time changed in UsageStats by 123 seconds
+03-24 10:39:53.026  3377  3399 I UsageStatsService: User[0] Flushing usage stats to disk
+03-24 10:39:53.029  3236  3261 D hwcomposer: hw_composer sent 18 syncs in 82s
+03-24 10:39:53.030  6333 12790 I AlarmClock: Removing AlarmClockInfo
+03-24 10:39:53.033  6333  6333 I DigitalWidgetProvider: onReceive: Intent { act=android.intent.action.TIME_SET flg=0x25200010 cmp=com.google.android.deskclock/com.android.alarmclock.DigitalAppWidgetProvider }
+03-24 10:39:53.037  3377  3399 I UsageStatsDatabase: Time changed by +2m3s133ms. files deleted: 0 files moved: 8
+03-24 10:39:53.038  3377  3399 I UsageStatsService: User[0] Rollover scheduled @ 2023-03-25 17:33:10(1679765590736)
+03-24 10:39:53.048  6333  6333 I DigitalWidgetProvider: onReceive: Intent { act=com.android.deskclock.ALARM_CHANGED flg=0x10 cmp=com.google.android.deskclock/com.android.alarmclock.DigitalAppWidgetProvider }
+03-24 10:39:53.050  5440 12793 I SystemUpdate: [Installation,ReceiverIntentOperation] Received intent: Intent { act=android.intent.action.TIME_SET flg=0x25200010 pkg=com.google.android.gms cmp=com.google.android.gms/.chimera.GmsIntentOperationService$PersistentTrustedReceiver }.
+03-24 10:39:53.059  3537  3537 D BoundBrokerSvc: onRebind: Intent { act=com.google.android.gms.clearcut.bootcount.service.START cmp=com.google.android.gms/.chimera.PersistentBoundBrokerService }
+03-24 10:39:53.060  5440 12791 I SystemUpdate: [Execution,InstallationEventIntentOperation] Handling event of type 6.
+03-24 10:39:53.062  5440 12791 I SystemUpdate: [Execution,InstallationIntentOperation] Received intent: Intent { act=com.google.android.gms.update.INSTALL_UPDATE cat=[targeted_intent_op_prefix:.update.execution.InstallationIntentOperation] cmp=com.google.android.gms/.chimera.GmsIntentOperationService }.
+03-24 10:39:53.062  5440 12791 I SystemUpdate: [Execution,ExecutionManager] Action finished-execution executed for 0.00 seconds.
+03-24 10:39:53.516  3377  3897 I GnssLocationProvider: WakeLock acquired by sendMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@71c4a00)
+03-24 10:39:53.517  3377  3399 I GnssLocationProvider: WakeLock released by handleMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@71c4a00)
+03-24 10:39:54.520  3377  3897 I GnssLocationProvider: WakeLock acquired by sendMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@197b239)
+03-24 10:39:54.520  3377  3399 I GnssLocationProvider: WakeLock released by handleMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@197b239)
+03-24 10:39:55.524  3377  3897 I GnssLocationProvider: WakeLock acquired by sendMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@6fa707e)
+03-24 10:39:55.524  3377  3399 I GnssLocationProvider: WakeLock released by handleMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@6fa707e)
+03-24 10:39:56.524  3377  3897 I GnssLocationProvider: WakeLock acquired by sendMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@65c79df)
+03-24 10:39:56.524  3377  3399 I GnssLocationProvider: WakeLock released by handleMessage(REPORT_SV_STATUS, 0, com.android.server.location.GnssLocationProvider$SvStatusInfo@65c79df)
+INFO    | Warning: QMetaObject::connectSlotsByName: No matching signal for on_rgbcSensorValueWidget_valueChanged() ((null):0, (null))
+INFO    | Warning: QMetaObject::connectSlotsByName: No matching signal for on_posture_valueChanged(int) ((null):0, (null))
+INFO    | Wait for emulator (pid 93726) 20 seconds to shutdown gracefully before kill;you can set environment variable ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL(in seconds) to change the default value (20 seconds)
+INFO    | Info: 
+
+GLImplementation: 
+Surface Type: OpenGL
+Surface Profile: CoreProfile
+Surface Version: 4.1
+Using Default SG Backend: no
+Using Software Dynamic GL: no
+Using Angle: no
+
+Init Parameters:
+  *  application-name Emulator 
+  *  browser-subprocess-path /Users/roywang/Library/Android/sdk/emulator/lib64/qt/libexec/QtWebEngineProcess 
+  *  disable-features DnsOverHttpsUpgrade,ConsolidatedMovementXY,InstalledApp,BackgroundFetch,WebOTP,WebPayments,WebUSB,PictureInPicture 
+  *  disable-gpu  
+  *  disable-speech-api  
+  *  enable-features TracingServiceInProcess 
+  *  enable-threaded-compositing  
+ ((null):0, (null))
+INFO    | Warning: No functional TLS backend was found ((null):0, (null))
+INFO    | Warning: No functional TLS backend was found ((null):0, (null))
+ (2x)
+INFO    | Warning: No TLS backend is available ((null):0, (null))
+INFO    | Warning: No functional TLS backend was found ((null):0, (null))
+INFO    | Warning: No functional TLS backend was found ((null):0, (null))
+ (3x)
+INFO    | Warning: No TLS backend is available ((null):0, (null))
+INFO    | Warning: No functional TLS backend was found ((null):0, (null))

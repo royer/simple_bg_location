@@ -78,32 +78,23 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
         mapController: _mapController,
         options: _mapOptions,
         children: [
-          TileLayerWidget(
-            options: TileLayerOptions(
-              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-              subdomains: ['a', 'b', 'c'],
-              attributionBuilder: (_) {
-                return const Text("© OpenStreetMap contributors");
-              },
-            ),
+          TileLayer(
+            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            userAgentPackageName: "com.royzed.simple_bg_location_example",
           ),
-          PolylineLayerWidget(
-              options: PolylineLayerOptions(polylines: [
+          PolylineLayer(polylineCulling: false, polylines: [
             Polyline(
               points: _trace,
               strokeWidth: 10.0,
               color: const Color.fromRGBO(0, 179, 253, 0.8),
             ),
-          ])),
-          CircleLayerWidget(
-            options: CircleLayerOptions(
-              circles: _positions,
-            ),
+          ]),
+          CircleLayer(
+            circles: _positions,
           ),
-          CircleLayerWidget(
-              options: CircleLayerOptions(
+          CircleLayer(
             circles: _currentPositionResult,
-          )),
+          ),
         ],
       ),
     );

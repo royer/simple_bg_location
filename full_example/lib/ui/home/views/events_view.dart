@@ -30,7 +30,7 @@ class _EventsViewState extends State<EventsView> {
 
           return ListView.separated(
             controller: scrollController,
-            itemCount: (state as PositionArrived).positions.length,
+            itemCount: state.positions.length,
             itemBuilder: (context, index) {
               return PositionListTile(position: state.positions[index]);
             },
